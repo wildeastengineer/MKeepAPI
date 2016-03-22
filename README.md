@@ -20,6 +20,21 @@ Install Nodemon:
 $ sudo npm install nodemon -g
 ```
 
+### Installation
+Check out the code
+```
+$ git clone git@github.com:wildeastengineer/MKeepAPI.git
+$ cd MKeepAPI
+```
+```
+$ git checkout --track origin/develop
+```
+
+Install npm packages:
+```
+$ sudo npm install
+```
+
 ### Install MongoDB:
 Import the public key used by the package management system:
 ```
@@ -41,21 +56,6 @@ $ sudo apt-get update
 $ sudo apt-get install -y mongodb-org
 ```
 More information [here](https://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/)
-
-### Installation
-Check out the code
-```
-$ git clone git@github.com:wildeastengineer/MKeepAPI.git
-$ cd MKeepAPI
-```
-```
-$ git checkout --track origin/develop
-```
-
-Install npm packages:
-```
-$ sudo npm install
-```
 
 ### Run
 MongoDB:
