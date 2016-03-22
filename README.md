@@ -68,6 +68,8 @@ $ nodemon server.js
 ```
 Try to send *GET* request to `localhost:8080/api`
 
+REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/postman-rest-client-short/mkhojklkhkdaghjjfdnphfphiaiohkef)
+
 ### Additional Information
 **MongoDB**
 
