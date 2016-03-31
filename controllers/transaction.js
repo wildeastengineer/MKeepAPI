@@ -1,7 +1,6 @@
 var Transaction = require('../models/transaction');
 var Account = require('../models/account');
 var Category = require('../models/category');
-var transactionRoutes = require('./transaction_routes');
 
 // ToDo: remove this when auth is implemented
 var user = {
@@ -346,9 +345,6 @@ var transactionController = {
                 );
             }
         );
-    },
-    registerRoutes: function (router, isAuthorized, sendError) {
-        transactionRoutes(router, this, isAuthorized, sendError);
     }
 };
 

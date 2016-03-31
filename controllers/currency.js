@@ -7,7 +7,6 @@ var user = {
 };
 
 var Currency = require('../models/currency');
-var currencyRoutes = require('./currency_routes');
 var currencyController = {
     getAll: function () {
         var deferred = Q.defer();
@@ -150,9 +149,6 @@ var currencyController = {
         });
 
         return deferred.promise;
-    },
-    registerRoutes: function (router, isAuthorized, sendError) {
-        currencyRoutes(router, this, isAuthorized, sendError);
     }
 };
 

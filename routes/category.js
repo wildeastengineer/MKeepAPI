@@ -1,7 +1,9 @@
-module.exports = function (router, CategoryController, isAuthorized, sendError) {
+var categoryController = require('../controllers/category.js');
+
+var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
     router.route('/categories')
         .get(isAuthorized, function (req, res) {
-            CategoryController.getAll(
+            categoryController.getAll(
                 function (err, categories) {
                     if (err) {
                         sendError(err, res);
@@ -14,7 +16,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
             );
         })
         .post(isAuthorized, function (req, res) {
-            CategoryController.post(
+            categoryController.post(
                 {
                     name: req.body.name,
                     parent: req.body.parent,
@@ -34,7 +36,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
 
     router.route('/categories/income')
         .get(isAuthorized, function (req, res) {
-            CategoryController.getIncome(
+            categoryController.getIncome(
                 function (err, categories) {
                     if (err) {
                         sendError(err, res);
@@ -49,7 +51,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
 
     router.route('/categories/expense')
         .get(isAuthorized, function (req, res) {
-            CategoryController.getExpense(
+            categoryController.getExpense(
                 function (err, categories) {
                     if (err) {
                         sendError(err, res);
@@ -64,7 +66,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
 
     router.route('/categories/:category_id')
         .get(isAuthorized, function (req, res) {
-            CategoryController.getById(
+            categoryController.getById(
                 req.params.category_id,
                 function (err, category) {
                     if (err) {
@@ -78,7 +80,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
             );
         })
         .put(isAuthorized, function (req, res) {
-            CategoryController.update(
+            categoryController.update(
                 req.params.category_id,
                 {
                     name: req.body.name,
@@ -96,7 +98,7 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
             );
         })
         .delete(isAuthorized, function (req, res) {
-            CategoryController.remove(
+            categoryController.remove(
                 req.params.category_id,
                 function (err, category) {
                     if (err) {
@@ -109,4 +111,8 @@ module.exports = function (router, CategoryController, isAuthorized, sendError) 
                 }
             );
         });
+};
+
+module.exports = {
+    register: categoryRegisterRoutes
 };

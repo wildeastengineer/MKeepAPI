@@ -12,7 +12,7 @@ mongoose.connect(configDB.url); // connect to our database
 app.use(bodyParser()); // get information from html forms
 
 // routes ======================================================================
-require('./routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
+require('./routes/routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
 app.use(function(req, res, next) {
     res.status(404).redirect('/');
 });

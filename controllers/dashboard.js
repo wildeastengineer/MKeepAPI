@@ -1,5 +1,4 @@
 var Account = require('../models/account');
-var dashboardRoutes = require('./dashboard_routes');
 
 // ToDo: remove this when auth is implemented
 var user = {
@@ -60,9 +59,6 @@ var dashboardController = {
                     }
                 );
             });
-    },
-    registerRoutes: function (router, isAuthorized, sendError) {
-        dashboardRoutes(router, this, isAuthorized, sendError);
     }
 };
 

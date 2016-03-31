@@ -1,7 +1,9 @@
-module.exports = function (router, TransactionController, isAuthorized, sendError) {
+var transactionController = require('../controllers/transaction.js');
+
+var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
     router.route('/transactions')
         .get(isAuthorized, function (req, res) {
-            TransactionController.getAll(
+            transactionController.getAll(
                 {
                     page: req.query.page,
                     perPage: req.query.perPage
@@ -19,7 +21,7 @@ module.exports = function (router, TransactionController, isAuthorized, sendErro
             );
         })
         .post(isAuthorized, function (req, res) {
-            TransactionController.post(
+            transactionController.post(
                 {
                     date: req.body.date,
                     category: req.body.category,
@@ -43,7 +45,7 @@ module.exports = function (router, TransactionController, isAuthorized, sendErro
 
     router.route('/transactions/:transaction_id')
         .get(isAuthorized, function (req, res) {
-            TransactionController.getById(
+            transactionController.getById(
                 req.params.transaction_id,
                 function (err, transaction) {
                     if (err) {
@@ -57,7 +59,7 @@ module.exports = function (router, TransactionController, isAuthorized, sendErro
             );
         })
         .put(isAuthorized, function (req, res) {
-            TransactionController.update(
+            transactionController.update(
                 req.params.transaction_id,
                 {
                     date: req.body.date,
@@ -80,7 +82,7 @@ module.exports = function (router, TransactionController, isAuthorized, sendErro
             );
         })
         .delete(isAuthorized, function (req, res) {
-            TransactionController.remove(
+            transactionController.remove(
                 req.params.transaction_id,
                 function (err, transaction) {
                     if (err) {
@@ -93,4 +95,8 @@ module.exports = function (router, TransactionController, isAuthorized, sendErro
                 }
             );
         });
+};
+
+module.exports = {
+    register: transactionRegisterRoutes
 };

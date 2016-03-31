@@ -1,5 +1,4 @@
 var Category = require('../models/category');
-var categoryRoutes = require('./category_routes');
 
 // ToDo: remove this when auth is implemented
 var user = {
@@ -89,9 +88,6 @@ var categoryController = {
                     .exec(callback);
             }
         );
-    },
-    registerRoutes: function (router, isAuthorized, sendError) {
-        categoryRoutes(router, this, isAuthorized, sendError);
     }
 };
 

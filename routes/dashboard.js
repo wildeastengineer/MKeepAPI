@@ -1,7 +1,9 @@
-module.exports = function (router, DashboardController, isAuthorized, sendError) {
+var dashboardController = require('../controllers/dashboard.js');
+
+var dashboardRegisterRoutes = function (router, isAuthorized, sendError) {
     router.route('/dashboard')
         .get(isAuthorized, function (req, res) {
-            DashboardController.getData(
+            dashboardController.getData(
                 function (err, dashboardData) {
                     if (err) {
                         sendError(err, res);
@@ -13,4 +15,8 @@ module.exports = function (router, DashboardController, isAuthorized, sendError)
                 }
             );
         })
+};
+
+module.exports = {
+    register: dashboardRegisterRoutes
 };

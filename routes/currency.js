@@ -1,7 +1,9 @@
-module.exports = function (router, CurrencyController, isAuthorized, sendError) {
+var currencyController = require('../controllers/currency.js');
+
+var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
     router.route('/currencies')
         .get(isAuthorized, function (req, res) {
-            CurrencyController.getAll(req.user)
+            currencyController.getAll(req.user)
                 .then(function (currencies) {
                     res.json(currencies);
                 })
@@ -10,7 +12,7 @@ module.exports = function (router, CurrencyController, isAuthorized, sendError) 
                 });
         })
         .post(isAuthorized, function (req, res) {
-            CurrencyController.post(
+            currencyController.post(
                 req.body.globalCurrencyId
             )
                 .then(function (currency) {
@@ -23,7 +25,7 @@ module.exports = function (router, CurrencyController, isAuthorized, sendError) 
 
     router.route('/currencies/global')
         .get(isAuthorized, function (req, res) {
-            CurrencyController.getGlobals()
+            currencyController.getGlobals()
                 .then(function (globalCurrencies) {
                     res.json(globalCurrencies);
                 })
@@ -34,7 +36,7 @@ module.exports = function (router, CurrencyController, isAuthorized, sendError) 
 
     router.route('/currencies/:currency_id')
         .get(isAuthorized, function (req, res) {
-            CurrencyController.getById(
+            currencyController.getById(
                 req.params.currency_id,
                 function (err, currency) {
                     if (err) {
@@ -48,7 +50,7 @@ module.exports = function (router, CurrencyController, isAuthorized, sendError) 
             );
         })
         .delete(isAuthorized, function (req, res) {
-            CurrencyController.remove(
+            currencyController.remove(
                 req.params.currency_id,
                 function (err, currency) {
                     if (err) {
@@ -61,4 +63,8 @@ module.exports = function (router, CurrencyController, isAuthorized, sendError) 
                 }
             );
         });
+};
+
+module.exports = {
+    register: currencyRegisterRoutes
 };
