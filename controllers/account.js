@@ -1,6 +1,5 @@
 var Account = require('../models/account');
 var Transaction = require('../models/transaction');
-var accountRoutes = require('./account_routes');
 
 // ToDo: remove this when auth is implemented
 var user = {
@@ -147,9 +146,6 @@ var accountController = {
                     .exec(callback);
             }
         );
-    },
-    registerRoutes: function (router, isAuthorized, sendError) {
-        accountRoutes(router, this, isAuthorized, sendError);
     }
 };
 

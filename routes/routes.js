@@ -1,9 +1,8 @@
-var dashboardController = require('./controllers/dashboard');
-var categoryController = require('./controllers/category');
-var currencyController = require('./controllers/currency');
-var accountController = require('./controllers/account');
-var transactionController = require('./controllers/transaction');
-
+var accountRoutes = require('./account');
+var categoryRoutes = require('./category');
+var currencyRoutes = require('./currency');
+var dashboardRoutes = require('./dashboard');
+var transactionRoutes = require('./transaction');
 
 module.exports = function (app, router) {
     // =================================================================================================================
@@ -15,11 +14,11 @@ module.exports = function (app, router) {
         });
     });
 
-    dashboardController.registerRoutes(router, isAuthorized, sendError);
-    accountController.registerRoutes(router, isAuthorized, sendError);
-    categoryController.registerRoutes(router, isAuthorized, sendError);
-    currencyController.registerRoutes(router, isAuthorized, sendError);
-    transactionController.registerRoutes(router, isAuthorized, sendError);
+    accountRoutes.register(router, isAuthorized, sendError);
+    categoryRoutes.register(router, isAuthorized, sendError);
+    currencyRoutes.register(router, isAuthorized, sendError);
+    dashboardRoutes.register(router, isAuthorized, sendError);
+    transactionRoutes.register(router, isAuthorized, sendError);
 
     // all of our routes will be prefixed with /api
     app.use('/api', router);
