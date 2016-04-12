@@ -1,8 +1,8 @@
 var transactionController = require('../controllers/transaction.js');
 
-var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
+var transactionRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/transactions')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             transactionController.getAll(
                 {
                     page: req.query.page,
@@ -20,7 +20,7 @@ var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .post(isAuthorized, function (req, res) {
+        .post(authenticate, function (req, res) {
             transactionController.post(
                 {
                     date: req.body.date,
@@ -44,7 +44,7 @@ var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/transactions/:transaction_id')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             transactionController.getById(
                 req.params.transaction_id,
                 function (err, transaction) {
@@ -58,7 +58,7 @@ var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .put(isAuthorized, function (req, res) {
+        .put(authenticate, function (req, res) {
             transactionController.update(
                 req.params.transaction_id,
                 {
@@ -81,7 +81,7 @@ var transactionRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .delete(isAuthorized, function (req, res) {
+        .delete(authenticate, function (req, res) {
             transactionController.remove(
                 req.params.transaction_id,
                 function (err, transaction) {

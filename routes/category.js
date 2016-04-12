@@ -1,8 +1,8 @@
 var categoryController = require('../controllers/category.js');
 
-var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
+var categoryRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/categories')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             categoryController.getAll(
                 function (err, categories) {
                     if (err) {
@@ -15,7 +15,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .post(isAuthorized, function (req, res) {
+        .post(authenticate, function (req, res) {
             categoryController.post(
                 {
                     name: req.body.name,
@@ -35,7 +35,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/categories/income')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             categoryController.getIncome(
                 function (err, categories) {
                     if (err) {
@@ -50,7 +50,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/categories/expense')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             categoryController.getExpense(
                 function (err, categories) {
                     if (err) {
@@ -65,7 +65,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/categories/:category_id')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             categoryController.getById(
                 req.params.category_id,
                 function (err, category) {
@@ -79,7 +79,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .put(isAuthorized, function (req, res) {
+        .put(authenticate, function (req, res) {
             categoryController.update(
                 req.params.category_id,
                 {
@@ -97,7 +97,7 @@ var categoryRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .delete(isAuthorized, function (req, res) {
+        .delete(authenticate, function (req, res) {
             categoryController.remove(
                 req.params.category_id,
                 function (err, category) {

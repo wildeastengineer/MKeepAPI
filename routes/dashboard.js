@@ -1,8 +1,8 @@
 var dashboardController = require('../controllers/dashboard.js');
 
-var dashboardRegisterRoutes = function (router, isAuthorized, sendError) {
+var dashboardRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/dashboard')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             dashboardController.getData(
                 function (err, dashboardData) {
                     if (err) {

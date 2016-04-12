@@ -1,21 +1,23 @@
+var config = require('./libs/config');
 var express = require('express');
 var app = express();
-var port = process.env.PORT || 8080;
+var port = config.get('port');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
-
-var configDB = require('./config/database.js');
 var migrations = require('./migrations/migrations');
+var passport = require('passport');
 
 // configuration ===============================================================
-mongoose.connect(configDB.url); // connect to our database
+mongoose.connect(config.get('mongoose:uri')); // connect to our database
 app.use(bodyParser()); // get information from html forms
+app.use(passport.initialize());
 
 // routes ======================================================================
 require('./routes/routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
 app.use(function(req, res, next) {
     res.status(404).redirect('/');
 });
+
 
 // launch ======================================================================
 migrations.run()
