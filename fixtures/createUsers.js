@@ -1,18 +1,18 @@
-var mongoose = require('mongoose');
-var UserModel = require('../models/auth/user');
-var ClientModel = require('../models/auth/client');
-var AccessTokenModel = require('../models/auth/accessToken');
-var RefreshTokenModel = require('../models/auth/refreshToken');
-var faker = require('Faker');
 var config = require('../libs/config');
+var mongoose = require('mongoose');
+
+var AccessTokenModel = require('../models/auth/accessToken');
+var ClientModel = require('../models/auth/client');
+var RefreshTokenModel = require('../models/auth/refreshToken');
+var UserModel = require('../models/auth/user');
 
 var users = [
     {
-        username: 'andrey',
+        username: 'andrey@andrey.com',
         password: '123456'
     },
     {
-        username: 'dmitry',
+        username: 'dimkahare@gmail.com',
         password: 'qwerty'
     }
 ];
@@ -29,23 +29,6 @@ UserModel.remove({}, function () {
 
     for (i = 0; i < users.length; i++) {
         user = new UserModel(users[i]);
-        user.save(function (err, user) {
-            if (err) {
-                console.log('Error', err);
-            } else {
-                console.log('New user - ${username}:${password}'
-                    .replace('${username}', user.username)
-                    .replace('${password}', user.password));
-            }
-        });
-    }
-
-    for (i = 0; i < 4; i++) {
-        user = new UserModel({
-            username: faker.random.first_name().toLowerCase(),
-            password: faker.Lorem.words(1)[0]
-        });
-
         user.save(function (err, user) {
             if (err) {
                 console.log('Error', err);

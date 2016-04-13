@@ -1,18 +1,17 @@
+var config = require('./config');
+var crypto = require('crypto');
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
-var crypto = require('crypto');
-var config = require('./config');
 
-var UserModel = require('../models/auth/user');
-var ClientModel = require('../models/auth/client');
 var AccessTokenModel = require('../models/auth/accessToken');
+var ClientModel = require('../models/auth/client');
 var RefreshTokenModel = require('../models/auth/refreshToken');
+var UserModel = require('../models/auth/user');
 
 var BasicStrategy = require('passport-http').BasicStrategy;
-var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
+var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 
-// create OAuth 2.0 server
 var server = oauth2orize.createServer();
 
 // Exchange username & password for access token.

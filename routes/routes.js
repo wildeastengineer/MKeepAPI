@@ -1,6 +1,6 @@
 var passport = require('passport');
-var oauth2 = require('../libs/oauth2');
 
+var userRoutes = require('./user');
 var accountRoutes = require('./account');
 var categoryRoutes = require('./category');
 var currencyRoutes = require('./currency');
@@ -14,22 +14,14 @@ module.exports = function (app, router) {
         session: false
     });
 
-    // Register authentication routes
-    router.post('/authenticate', oauth2.token);
-    router.get('/profile', authenticate, function (req, res) {
-        res.json({
-            user_id: req.user.userId,
-            name: req.user.username,
-            scope: req.authInfo.scope
-        })
-    });
-
     // Register API routes
     router.get('/', function (req, res) {
         res.json({
             message: 'Welcome to MoneyKeeper API'
         });
     });
+
+    userRoutes.register(router, authenticate, sendError);
 
     accountRoutes.register(router, authenticate, sendError);
     categoryRoutes.register(router, authenticate, sendError);
