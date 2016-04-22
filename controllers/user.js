@@ -1,9 +1,5 @@
-var config = require('../libs/config');
-var crypto = require('crypto');
 var _ = require('underscore');
 var Q = require('q');
-var emailSender = require('../utils/emailSender');
-var url = require('url');
 
 var UserModel = require('../models/auth/user');
 
@@ -58,9 +54,84 @@ var userController = {
 
         return deferred.promise;
     },
-    generatePassRecoveryToken: function (data) {
+    /**
+     * Generate password recovery token
+     *
+     * @param {string} username - email in fact
+     *
+     * @returns {promise}
+     */
+    generatePassRecoveryToken: function (username) {
         var deferred = Q.defer();
-        var passRecoveryUrl;
+
+        UserModel.findOne(
+            {
+                username: username
+            },
+            function (error, user) {
+                if (error) {
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (!user) {
+                    deferred.reject(new Error('User with this email doesn\'t exist'));
+
+                    return;
+                }
+
+                user.passRecoveryToken = generateRecoveryToken(user);
+                user.passRecoveryCreatedAt = new Date();
+
+                user.save(function (error) {
+                    if (error) {
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    deferred.resolve(user);
+                });
+            }
+        );
+
+        return deferred.promise;
+
+        /**
+         * Generate password recovery token
+         *
+         * @param {Object} user
+         * @param {string} user.username
+         * @param {Function} user.encryptPassword
+         *
+         * @returns {string}
+         */
+        function generateRecoveryToken (user) {
+            var encryptedRecoveryToken;
+            var plainRecoveryToken = user.username + Date.parse(new Date);
+
+            encryptedRecoveryToken = user.encryptPassword(plainRecoveryToken);
+
+            return encryptedRecoveryToken;
+        }
+    },
+    /**
+     * Check whether password recovery token exists and is not expired
+     *
+     * @param {Object} data
+     * @param {string} data.username - email in fact
+     * @param {string} data.token - password recovery token that is passed as param in url
+     *
+     * @returns {promise}
+     */
+    isPassRecoveryTokenExpired: function (data) {
+        var expirationPeriod = 12; //how many hours should be passed till date is expired
+        var deferred = Q.defer();
+        var result = {
+            success: true,
+            message: 'Password can be changed. Password recovery token is valid and actual'
+        };
 
         UserModel.findOne(
             {
@@ -74,24 +145,87 @@ var userController = {
                 }
 
                 if (!user) {
-                    deferred.reject(new Error('User with this email doe\'t exist'));
+                    deferred.reject(new Error('User with this email doesn\'t exist'));
 
                     return;
                 }
 
-                user.passRecoveryToken = generateRecoveryToken(user);
-                user.passRecoveryCreatedAt = new Date();
+                if (isExpired(data.token)) {
+                    user.passRecoveryToken = undefined;
+                    user.passRecoveryCreatedAt = undefined;
 
-                passRecoveryUrl = url.format({
-                    protocol: config.get('protocol') || 'http',
-                    hostname: config.get('host'),
-                    port: config.get('port'),
-                    query: {
-                        username: user.username,
-                        token: user.passRecoveryToken
+                    user.save(function (error) {
+                        if (error) {
+                            deferred.reject(error);
+
+                            return;
+                        }
+
+                        deferred.reject(new Error('Passed token is expired for user: {user}.'
+                            .replace('{user}', data.username)));
+                    });
+                } else {
+                    if (user.passRecoveryToken === data.token) {
+                        deferred.resolve(result);
+                    } else {
+                        deferred.reject(new Error('Passed token doesn\'t exist for user: {user}'
+                                .replace('{user}', data.username)));
                     }
+                }
+            }
+        );
 
-                });
+        return deferred.promise;
+
+        /**
+         * Check whether given date is expired
+         *
+         * @param {string} requiredDate
+         *
+         * @returns {boolean}
+         */
+        function isExpired (requiredDate) {
+            requiredDate = new Date(requiredDate);
+
+            return new Date() >= requiredDate.setHours(requiredDate.getHours() + expirationPeriod);
+        }
+    },
+    /**
+     * Changes password of existing user
+     *
+     * @param {Object} data
+     * @param {string} data.username - email in fact
+     * @param {string} data.newPassword
+     *
+     * @returns {promise}
+     */
+    changePassword: function (data) {
+        var deferred = Q.defer();
+        var result = {
+            success: true,
+            message: 'Password has been successfully changed'
+        };
+
+        UserModel.findOne(
+            {
+                username: data.username
+            },
+            function (error, user) {
+                if (error) {
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (!user) {
+                    deferred.reject(new Error('User with this email doesn\'t exist'));
+
+                    return;
+                }
+
+                user.password = data.newPassword;
+                user.passRecoveryToken = undefined;
+                user.passRecoveryCreatedAt = undefined;
 
                 user.save(function (error) {
                     if (error) {
@@ -100,24 +234,12 @@ var userController = {
                         return;
                     }
 
-                    emailSender.generatePassRecoveryToken(user.username, passRecoveryUrl)
-                        .then(function () {
-                            deferred.resolve(user);
-                        });
+                    deferred.resolve(result);
                 });
             }
         );
 
         return deferred.promise;
-
-        function generateRecoveryToken (user) {
-            var encryptedRecoveryToken;
-            var plainRecoveryToken = user.username + Date.parse(new Date);
-
-            encryptedRecoveryToken = crypto.createHmac('sha1', user.salt).update(plainRecoveryToken).digest('hex');
-
-            return encryptedRecoveryToken;
-        }
     }
 };
 

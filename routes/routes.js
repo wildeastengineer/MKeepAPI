@@ -1,6 +1,7 @@
 /// Libs
 var passport = require('passport');
 /// Routes
+var config = require('../libs/config');
 var accountRoutes = require('./account');
 var categoryRoutes = require('./category');
 var currencyRoutes = require('./currency');
@@ -31,7 +32,7 @@ module.exports = function (app, router) {
     transactionRoutes.register(router, authenticate, sendError);
 
     // All of our routes will be prefixed with '/api'
-    app.use('/api', router);
+    app.use(config.get('baseUrl'), router);
 };
 
 function sendError(error, response) {

@@ -1,9 +1,14 @@
 /// Libs
+var config = require('../libs/config');
+var emailSender = require('../utils/emailSender');
 var oauth2 = require('../libs/oauth2');
 /// Controllers
 var userController = require('../controllers/user.js');
+var url = require('url');
 
 var userRegisterRoutes = function (router, authenticate, sendError) {
+    var changePasswordPath = '/change-password';
+
     router.post('/registration', function (req, res) {
         userController.createUser({
             username: req.body.username,
@@ -32,12 +37,68 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
         userController.generatePassRecoveryToken({
             username: req.body.username
         })
-        .then(function (result) {
-            res.json(result)
-        })
-        .fail(function (error) {
-            sendError(error, res);
-        });
+            .then(function (user) {
+                var passRecoveryUrl;
+
+                passRecoveryUrl = url.format({
+                    protocol: config.get('protocol') || 'http',
+                    hostname: config.get('host'),
+                    pathname: config.get('baseUrl') + changePasswordPath,
+                    port: config.get('port'),
+                    query: {
+                        username: user.username,
+                        token: user.passRecoveryToken
+                    }
+
+                });
+
+                return emailSender.passwordRecovery(user.username, passRecoveryUrl);
+            })
+            .then(function (result) {
+                if (result.indexOf('200') <= -1) {
+                    result = {
+                        success: false,
+                        message: 'Fail to send email to user: ' + req.body.username
+                    };
+                } else {
+                    result = {
+                        success: true,
+                        message: 'Password recovery token has been successfully generated. ' +
+                                'Notification email has been sent to user'
+                    };
+                }
+
+                res.json(result);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
+
+    router.get(changePasswordPath, function (req, res) {
+        userController.isPassRecoveryTokenExpired(req.query)
+            .then(function (result) {
+                res.json(result);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
+    
+    router.post(changePasswordPath, function (req, res) {
+        userController.isPassRecoveryTokenExpired(req.query)
+            .then(function () {
+                return userController.changePassword({
+                    username: req.query.username,
+                    newPassword: req.body.newPassword
+                });
+            })
+            .then(function (result) {
+                res.json(result)
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            })
     })
 };
 

@@ -24,7 +24,7 @@ var emailSender = {
             to: userEmail,
             subject: 'Password recovery for you MKeeper account', // Subject line
             text: url, // plaintext body
-            html: '<b>'+ url + '</b>' // html body
+            html: '<b><a href="' + url + '">' + url + '</a></b>' // html body
         };
 
         // send mail with defined transport object
@@ -36,7 +36,7 @@ var emailSender = {
 
             console.log('Message sent: ' + info.response);
 
-            deferred.resolve(info);
+            deferred.resolve(info.response);
         });
 
         return deferred.promise;

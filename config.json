@@ -14,5 +14,6 @@
         }
     ],
     "host": "localhost",
-    "protocol": "http"
+    "protocol": "http",
+    "baseUrl": "/api"
 }
