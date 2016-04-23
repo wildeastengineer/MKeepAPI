@@ -99,6 +99,7 @@ var userController = {
         return deferred.promise;
 
         /**
+         * @privet
          * Generate password recovery token
          *
          * @param {Object} user
@@ -178,6 +179,7 @@ var userController = {
         return deferred.promise;
 
         /**
+         * @private
          * Check whether given date is expired
          *
          * @param {string} requiredDate

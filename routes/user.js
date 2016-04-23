@@ -34,9 +34,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     router.post('/send-change-password-secret', function (req, res) {
-        userController.generatePassRecoveryToken({
-            username: req.body.username
-        })
+        userController.generatePassRecoveryToken(req.body.username)
             .then(function (user) {
                 var passRecoveryUrl;
 
@@ -55,7 +53,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
                 return emailSender.passwordRecovery(user.username, passRecoveryUrl);
             })
             .then(function (result) {
-                if (result.indexOf('200') <= -1) {
+                if (result.indexOf('OK') <= -1) {
                     result = {
                         success: false,
                         message: 'Fail to send email to user: ' + req.body.username

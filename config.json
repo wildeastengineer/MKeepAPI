@@ -15,5 +15,14 @@
     ],
     "host": "localhost",
     "protocol": "http",
-    "baseUrl": "/api"
+    "baseUrl": "/api",
+    "emailSender": {
+        "host": "smtp.gmail.com",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "user": "money.keeper.service@gmail.com",
+            "pass": "moneyKeeper123456"
+        }
+    }
 }

@@ -1,17 +1,30 @@
+var config = require('../libs/config');
+var fs = require('fs');
 var nodemailer = require('nodemailer');
 var Q = require('q');
-
+var passwordRecoveryTemplate;
+var path = require('path');
 var smtpConfig = {
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // use SSL
+    host: config.get('emailSender:host'),
+    port: config.get('emailSender:port'),
+    secure: config.get('emailSender:secure'), // use SSL
     auth: {
-        user: 'money.keeper.service@gmail.com',
-        pass: 'moneyKeeper123456'
+        user: config.get('emailSender:auth:user'),
+        pass: config.get('emailSender:auth:pass')
     }
 };
 
+passwordRecoveryTemplate = readTemplate('passwordRecovery');
+
 var emailSender = {
+    /**
+     * Send an email to given user sending link with password recovery url
+     *
+     * @param {string} userEmail
+     * @param {string} url
+     *
+     * @returns {promise}
+     */
     passwordRecovery: function (userEmail, url) {
         var deferred = Q.defer();
         var transporter = nodemailer.createTransport(smtpConfig);
@@ -22,9 +35,10 @@ var emailSender = {
                 address: smtpConfig.auth.user
             },
             to: userEmail,
-            subject: 'Password recovery for you MKeeper account', // Subject line
-            text: url, // plaintext body
-            html: '<b><a href="' + url + '">' + url + '</a></b>' // html body
+            subject: 'Password recovery for your MKeeper account', // Subject line
+            html: passwordRecoveryTemplate
+                    .replace('{username}', userEmail)
+                    .replace('{link}', url)
         };
 
         // send mail with defined transport object
@@ -42,5 +56,22 @@ var emailSender = {
         return deferred.promise;
     }
 };
+
+/**
+ * @privet
+ * Read content of given file name
+ *
+ * @param {string} templateName
+ *
+ * @returns {string}
+ */
+function readTemplate (templateName) {
+    var templateContent;
+
+    templateContent = fs.readFileSync(path.join(__dirname, '/templates/{templateName}.html'
+            .replace('{templateName}', templateName)));
+
+    return templateContent.toString();
+}
 
 module.exports = emailSender;
