@@ -27,6 +27,18 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             scope: req.authInfo.scope
         })
     });
+
+    router.post('/send-change-password-secret', function (req, res) {
+        userController.generatePassRecoveryToken({
+            username: req.body.username
+        })
+        .then(function (result) {
+            res.json(result)
+        })
+        .fail(function (error) {
+            sendError(error, res);
+        });
+    })
 };
 
 module.exports = {
