@@ -1,4 +1,6 @@
+/// Libs
 var mongoose = require('mongoose');
+/// Local variables
 var Schema = mongoose.Schema;
 
 var CurrencySchema = new Schema({

@@ -1,5 +1,7 @@
+/// Libs
 var mongoose = require('mongoose');
 var mongoosePaginate = require('mongoose-paginate');
+/// Local variables
 var Schema = mongoose.Schema;
 
 var TransactionSchema = new Schema({

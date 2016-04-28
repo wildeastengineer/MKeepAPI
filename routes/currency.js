@@ -1,8 +1,9 @@
+/// Controllers
 var currencyController = require('../controllers/currency.js');
 
-var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
+var currencyRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/currencies')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             currencyController.getAll(req.user)
                 .then(function (currencies) {
                     res.json(currencies);
@@ -11,7 +12,7 @@ var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
                     sendError(error, res);
                 });
         })
-        .post(isAuthorized, function (req, res) {
+        .post(authenticate, function (req, res) {
             currencyController.post(
                 req.body.globalCurrencyId
             )
@@ -24,7 +25,7 @@ var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/currencies/global')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             currencyController.getGlobals()
                 .then(function (globalCurrencies) {
                     res.json(globalCurrencies);
@@ -35,7 +36,7 @@ var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
         });
 
     router.route('/currencies/:currency_id')
-        .get(isAuthorized, function (req, res) {
+        .get(authenticate, function (req, res) {
             currencyController.getById(
                 req.params.currency_id,
                 function (err, currency) {
@@ -49,7 +50,7 @@ var currencyRegisterRoutes = function (router, isAuthorized, sendError) {
                 }
             );
         })
-        .delete(isAuthorized, function (req, res) {
+        .delete(authenticate, function (req, res) {
             currencyController.remove(
                 req.params.currency_id,
                 function (err, currency) {

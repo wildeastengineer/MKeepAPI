@@ -1,0 +1,16 @@
+{
+    "port" : 8080,
+    "mongoose": {
+        "uri": "mongodb://localhost"
+    },
+    "security": {
+        "tokenLife" : 3600
+    },
+    "clients": [
+        {
+            "name": "MK web application v1",
+            "clientId": "MKWebAppV1",
+            "clientSecret": "mbO2FdS451lEz0fM8FlSM3n1rbokBSyy"
+        }
+    ]
+}

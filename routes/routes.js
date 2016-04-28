@@ -1,32 +1,38 @@
+/// Libs
+var passport = require('passport');
+/// Routes
 var accountRoutes = require('./account');
 var categoryRoutes = require('./category');
 var currencyRoutes = require('./currency');
 var dashboardRoutes = require('./dashboard');
 var transactionRoutes = require('./transaction');
+var userRoutes = require('./user');
+/// Local variables
+var authenticate;
 
 module.exports = function (app, router) {
-    // =================================================================================================================
-    // === Register API routes =========================================================================================
-    // =================================================================================================================
+    authenticate = passport.authenticate('bearer', {
+        session: false
+    });
+
+    // Register API routes
     router.get('/', function (req, res) {
         res.json({
             message: 'Welcome to MoneyKeeper API'
         });
     });
 
-    accountRoutes.register(router, isAuthorized, sendError);
-    categoryRoutes.register(router, isAuthorized, sendError);
-    currencyRoutes.register(router, isAuthorized, sendError);
-    dashboardRoutes.register(router, isAuthorized, sendError);
-    transactionRoutes.register(router, isAuthorized, sendError);
+    userRoutes.register(router, authenticate, sendError);
 
-    // all of our routes will be prefixed with /api
+    accountRoutes.register(router, authenticate, sendError);
+    categoryRoutes.register(router, authenticate, sendError);
+    currencyRoutes.register(router, authenticate, sendError);
+    dashboardRoutes.register(router, authenticate, sendError);
+    transactionRoutes.register(router, authenticate, sendError);
+
+    // All of our routes will be prefixed with '/api'
     app.use('/api', router);
 };
-
-function isAuthorized(req, res, next) {
-    return next();
-}
 
 function sendError(error, response) {
     if (error) {
