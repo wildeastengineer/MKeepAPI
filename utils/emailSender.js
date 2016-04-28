@@ -1,7 +1,13 @@
+/// Libs
 var config = require('../libs/config');
 var fs = require('fs');
 var nodemailer = require('nodemailer');
+var Logger = require('../libs/log');
 var Q = require('q');
+
+/// Local variables
+var emailSender;
+var logger = Logger(module);
 var passwordRecoveryTemplate;
 var path = require('path');
 var smtpConfig = {
@@ -14,9 +20,10 @@ var smtpConfig = {
     }
 };
 
+/// Reading html templates
 passwordRecoveryTemplate = readTemplate('passwordRecovery');
 
-var emailSender = {
+emailSender = {
     /**
      * Send an email to given user sending link with password recovery url
      *
@@ -43,13 +50,14 @@ var emailSender = {
 
         // send mail with defined transport object
         transporter.sendMail(mailOptions, function(error, info){
-            if(error){
-                console.log(error);
+            if (error) {
+                logger.error(error);
                 deferred.reject(error);
             }
 
-            console.log('Message sent: ' + info.response);
-
+            logger.debug('Email message sent to {user}: {response}'
+                    .replace('{user}', userEmail)
+                    .replace('{response}', info.response));
             deferred.resolve(info.response);
         });
 

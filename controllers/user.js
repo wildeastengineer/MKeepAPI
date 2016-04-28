@@ -1,8 +1,11 @@
+/// Libs
 var _ = require('underscore');
+var Logger = require('../libs/log');
 var Q = require('q');
-
+/// Models
 var UserModel = require('../models/auth/user');
-
+/// Local variables
+var logger = Logger(module);
 var userController = {
     /**
      * Create new user
@@ -24,12 +27,14 @@ var userController = {
                 var newUser;
 
                 if (error) {
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
                 if (user) {
+                    logger.error('User with this email doesn\'t exist');
                     deferred.reject(new Error('User with this email already exists'));
 
                     return;
@@ -37,15 +42,16 @@ var userController = {
 
                 newUser = new UserModel({
                     username: data.username,
-                    password: data.password
+                    password: data.password,
+                    created: new Date()
                 });
-
-                newUser.created = new Date();
 
                 newUser.save(function (error, user) {
                     if (error) {
+                        logger.error(error);
                         deferred.reject(error);
                     } else {
+                        logger.info('New User has been successfully created: ' + user);
                         deferred.resolve(_.pick(user, 'username', 'created'));
                     }
                 });
@@ -70,12 +76,14 @@ var userController = {
             },
             function (error, user) {
                 if (error) {
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
                 if (!user) {
+                    logger.error('User with this email doesn\'t exist');
                     deferred.reject(new Error('User with this email doesn\'t exist'));
 
                     return;
@@ -86,11 +94,14 @@ var userController = {
 
                 user.save(function (error) {
                     if (error) {
+                        logger.error(error);
                         deferred.reject(error);
 
                         return;
                     }
 
+                    logger.debug('Password recovery token has been successfully generated'
+                            + ' for {user}'.replace('{user}', user.username));
                     deferred.resolve(user);
                 });
             }
@@ -140,12 +151,14 @@ var userController = {
             },
             function (error, user) {
                 if (error) {
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
                 if (!user) {
+                    logger.error('User with this email doesn\'t exist');
                     deferred.reject(new Error('User with this email doesn\'t exist'));
 
                     return;
@@ -157,6 +170,7 @@ var userController = {
 
                     user.save(function (error) {
                         if (error) {
+                            logger.error(error);
                             deferred.reject(error);
 
                             return;
@@ -167,6 +181,7 @@ var userController = {
                     });
                 } else {
                     if (user.passRecoveryToken === data.token) {
+                        logger.debug(result.message + ' for {user}'.replace('{user}', user.username));
                         deferred.resolve(result);
                     } else {
                         deferred.reject(new Error('Passed token doesn\'t exist for user: {user}'
@@ -214,12 +229,14 @@ var userController = {
             },
             function (error, user) {
                 if (error) {
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
                 if (!user) {
+                    logger.error('User with this email doesn\'t exist');
                     deferred.reject(new Error('User with this email doesn\'t exist'));
 
                     return;
@@ -231,11 +248,13 @@ var userController = {
 
                 user.save(function (error) {
                     if (error) {
+                        logger.error(error);
                         deferred.reject(error);
 
                         return;
                     }
 
+                    logger.info(result.message + ' for {user}'.replace('{user}', user.username));
                     deferred.resolve(result);
                 });
             }
