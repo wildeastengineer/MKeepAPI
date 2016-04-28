@@ -7,7 +7,7 @@ var userController = require('../controllers/user.js');
 var url = require('url');
 
 var userRegisterRoutes = function (router, authenticate, sendError) {
-    var changePasswordPath = '/change-password';
+    var recoverPasswordPath = '/recover-password';
 
     router.post('/registration', function (req, res) {
         userController.createUser({
@@ -33,7 +33,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
         })
     });
 
-    router.post('/send-change-password-secret', function (req, res) {
+    router.post('/send-recover-password-token', function (req, res) {
         userController.generatePassRecoveryToken(req.body.username)
             .then(function (user) {
                 var passRecoveryUrl;
@@ -41,7 +41,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
                 passRecoveryUrl = url.format({
                     protocol: config.get('protocol') || 'http',
                     hostname: config.get('host'),
-                    pathname: config.get('baseUrl') + changePasswordPath,
+                    pathname: config.get('baseUrl') + recoverPasswordPath,
                     port: config.get('port'),
                     query: {
                         username: user.username,
@@ -73,7 +73,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             });
     });
 
-    router.get(changePasswordPath, function (req, res) {
+    router.get(recoverPasswordPath, function (req, res) {
         userController.isPassRecoveryTokenExpired(req.query)
             .then(function (result) {
                 res.json(result);
@@ -83,7 +83,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             });
     });
     
-    router.post(changePasswordPath, function (req, res) {
+    router.post(recoverPasswordPath, function (req, res) {
         userController.isPassRecoveryTokenExpired(req.query)
             .then(function () {
                 return userController.changePassword({
