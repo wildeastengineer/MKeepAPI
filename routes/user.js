@@ -1,4 +1,6 @@
+/// Libs
 var oauth2 = require('../libs/oauth2');
+/// Controllers
 var userController = require('../controllers/user.js');
 
 var userRegisterRoutes = function (router, authenticate, sendError) {

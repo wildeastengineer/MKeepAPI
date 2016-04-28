@@ -1,3 +1,4 @@
+/// Controllers
 var currencyController = require('../controllers/currency.js');
 
 var currencyRegisterRoutes = function (router, authenticate, sendError) {

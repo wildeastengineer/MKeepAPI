@@ -1,17 +1,18 @@
+/// Libs
 var config = require('./config');
 var crypto = require('crypto');
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
-
+/// Models
 var AccessTokenModel = require('../models/auth/accessToken');
 var ClientModel = require('../models/auth/client');
 var RefreshTokenModel = require('../models/auth/refreshToken');
 var UserModel = require('../models/auth/user');
-
+/// Strategies
 var BasicStrategy = require('passport-http').BasicStrategy;
 var BearerStrategy = require('passport-http-bearer').Strategy;
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
-
+/// Local variables
 var server = oauth2orize.createServer();
 
 // Exchange username & password for access token.

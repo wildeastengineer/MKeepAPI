@@ -1,3 +1,4 @@
+/// Controllers
 var accountController = require('../controllers/account.js');
 
 var accountRegisterRoutes = function (router, authenticate, sendError) {

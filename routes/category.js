@@ -1,3 +1,4 @@
+/// Controllers
 var categoryController = require('../controllers/category.js');
 
 var categoryRegisterRoutes = function (router, authenticate, sendError) {

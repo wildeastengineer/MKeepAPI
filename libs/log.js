@@ -1,3 +1,4 @@
+/// Libs
 var winston = require('winston');
 
 function getLogger(module) {
@@ -10,7 +11,7 @@ function getLogger(module) {
         transports: [
             new winston.transports.Console({
                 colorize: true,
-                level: 'debug',
+                level: 'silly',
                 label: path
             })
         ]

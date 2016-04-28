@@ -1,4 +1,8 @@
+/// Libs
+var Logger = require('../libs/log');
 var Q = require('q');
+/// Local variables
+var logger = Logger(module);
 
 var currencies = [
     {
@@ -26,7 +30,7 @@ module.exports = function () {
     currenciesController.getGlobals()
         .then(function (globalCurrencies) {
             if (globalCurrencies && globalCurrencies.length === currencies.length) {
-                console.log('Migration 001 is skipped.');
+                logger.info('Migration 001 is skipped.');
                 deferred.resolve();
                 return;
             }

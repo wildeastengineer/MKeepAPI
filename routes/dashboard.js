@@ -1,3 +1,4 @@
+/// Controllers
 var dashboardController = require('../controllers/dashboard.js');
 
 var dashboardRegisterRoutes = function (router, authenticate, sendError) {

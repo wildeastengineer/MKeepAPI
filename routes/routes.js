@@ -1,12 +1,13 @@
+/// Libs
 var passport = require('passport');
-
-var userRoutes = require('./user');
+/// Routes
 var accountRoutes = require('./account');
 var categoryRoutes = require('./category');
 var currencyRoutes = require('./currency');
 var dashboardRoutes = require('./dashboard');
 var transactionRoutes = require('./transaction');
-
+var userRoutes = require('./user');
+/// Local variables
 var authenticate;
 
 module.exports = function (app, router) {

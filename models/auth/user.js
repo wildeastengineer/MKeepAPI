@@ -1,6 +1,7 @@
+/// Libs
 var crypto = require('crypto');
 var mongoose = require('mongoose');
-
+/// Local variables
 var Schema = mongoose.Schema;
 var UserSchema;
 

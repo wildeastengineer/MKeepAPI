@@ -1,3 +1,4 @@
+/// Controllers
 var transactionController = require('../controllers/transaction.js');
 
 var transactionRegisterRoutes = function (router, authenticate, sendError) {
