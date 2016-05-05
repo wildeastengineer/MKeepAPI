@@ -34,6 +34,11 @@ emailSender = {
      */
     passwordRecovery: function (userEmail, url) {
         var deferred = Q.defer();
+        var result = {
+            success: true,
+            message: 'Password recovery token has been successfully generated. ' +
+                    'Notification email has been sent to user'
+        };
         var transporter = nodemailer.createTransport(smtpConfig);
 
         var mailOptions = {
@@ -55,10 +60,21 @@ emailSender = {
                 deferred.reject(error);
             }
 
+            if (info.response.indexOf('OK') <= -1) {
+                result = {
+                    success: false,
+                    message: 'Fail to send email to user: ' + userEmail
+                };
+
+                deferred.reject(result);
+
+                return;
+            }
+
             logger.debug('Email message sent to {user}: {response}'
                     .replace('{user}', userEmail)
                     .replace('{response}', info.response));
-            deferred.resolve(info.response);
+            deferred.resolve(result);
         });
 
         return deferred.promise;

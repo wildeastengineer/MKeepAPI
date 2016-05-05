@@ -24,5 +24,8 @@
             "user": "money.keeper.service@gmail.com",
             "pass": "moneyKeeper123456"
         }
+    },
+    "passRecovery": {
+        "tokenLife": "12h"
     }
 }

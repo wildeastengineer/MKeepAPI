@@ -2,9 +2,11 @@
 var config = require('../libs/config');
 var emailSender = require('../utils/emailSender');
 var oauth2 = require('../libs/oauth2');
+var url = require('url');
 /// Controllers
 var userController = require('../controllers/user.js');
-var url = require('url');
+var passRecovery = require('../controllers/passRecovery.js');
+
 
 var userRegisterRoutes = function (router, authenticate, sendError) {
     var recoverPasswordPath = '/recover-password';
@@ -34,8 +36,8 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     router.post('/send-recover-password-token', function (req, res) {
-        userController.generatePassRecoveryToken(req.body.username)
-            .then(function (user) {
+        passRecovery.createPassRecoveryToken(req.body.username)
+            .then(function (token) {
                 var passRecoveryUrl;
 
                 passRecoveryUrl = url.format({
@@ -44,28 +46,15 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
                     pathname: config.get('baseUrl') + recoverPasswordPath,
                     port: config.get('port'),
                     query: {
-                        username: user.username,
-                        token: user.passRecoveryToken
+                        username: req.body.username,
+                        token: token.token
                     }
 
                 });
 
-                return emailSender.passwordRecovery(user.username, passRecoveryUrl);
+                return emailSender.passwordRecovery(req.body.username, passRecoveryUrl);
             })
             .then(function (result) {
-                if (result.indexOf('OK') <= -1) {
-                    result = {
-                        success: false,
-                        message: 'Fail to send email to user: ' + req.body.username
-                    };
-                } else {
-                    result = {
-                        success: true,
-                        message: 'Password recovery token has been successfully generated. ' +
-                                'Notification email has been sent to user'
-                    };
-                }
-
                 res.json(result);
             })
             .fail(function (error) {
@@ -74,7 +63,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     router.get(recoverPasswordPath, function (req, res) {
-        userController.isPassRecoveryTokenExpired(req.query)
+        passRecovery.exists(req.query.token)
             .then(function (result) {
                 res.json(result);
             })
@@ -84,12 +73,12 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
     
     router.post(recoverPasswordPath, function (req, res) {
-        userController.isPassRecoveryTokenExpired(req.query)
+        passRecovery.removePassRecoveryToken(req.query.token)
             .then(function () {
                 return userController.changePassword({
                     username: req.query.username,
                     newPassword: req.body.newPassword
-                });
+                })
             })
             .then(function (result) {
                 res.json(result)
