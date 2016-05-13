@@ -53,7 +53,7 @@ var TransactionSchema = new Schema({
     modifiedBy: {
     type: Schema.Types.ObjectId,
         ref: 'User'
-}
+    }
 });
 
 TransactionSchema.plugin(mongoosePaginate);

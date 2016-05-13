@@ -38,7 +38,12 @@ UserSchema = new Schema({
     projects: [{
         type: Schema.Types.ObjectId,
         ref: 'Project'
-    }]
+    }],
+    lang: {
+        type: String,
+        enum: ['en', 'ru'],
+        default: 'en'
+    }
 });
 
 UserSchema.virtual('userId')
