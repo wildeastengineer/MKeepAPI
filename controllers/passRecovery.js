@@ -65,6 +65,7 @@ var passRecoveryController = {
 
         return deferred.promise;
     },
+
     /**
      * Check whether given token does exist in data base
      *
@@ -72,7 +73,7 @@ var passRecoveryController = {
      *
      * @returns {promise}
      */
-    exists: function (token) {
+    isPasswordRecoveryTokenExisting: function (token) {
         var deferred = Q.defer();
         var result = {
             message: 'Password recovery token exists and is not expired',
@@ -98,13 +99,14 @@ var passRecoveryController = {
                     return;
                 }
 
-                logger.info(result.message + ': ' + token._id) ;
+                logger.info(result.message + ': ' + token._id);
                 deferred.resolve(result);
             }
         );
 
         return deferred.promise;
     },
+
     /**
      * Remove given password recovery token from data base
      *
@@ -117,7 +119,7 @@ var passRecoveryController = {
 
         PassRecoveryTokenModel.findOneAndRemove(
             {
-            token: token
+                token: token
             },
             function (error, token) {
                 if (error) {

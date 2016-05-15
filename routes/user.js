@@ -4,9 +4,8 @@ var emailSender = require('../utils/emailSender');
 var oauth2 = require('../libs/oauth2');
 var url = require('url');
 /// Controllers
-var userController = require('../controllers/user.js');
 var passRecovery = require('../controllers/passRecovery.js');
-
+var userController = require('../controllers/user.js');
 
 var userRegisterRoutes = function (router, authenticate, sendError) {
     var recoverPasswordPath = '/recover-password';
@@ -49,7 +48,6 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
                         username: req.body.username,
                         token: token.token
                     }
-
                 });
 
                 return emailSender.passwordRecovery(req.body.username, passRecoveryUrl);
@@ -63,7 +61,7 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     router.get(recoverPasswordPath, function (req, res) {
-        passRecovery.exists(req.query.token)
+        passRecovery.isPasswordRecoveryTokenExisting(req.query.token)
             .then(function (result) {
                 res.json(result);
             })

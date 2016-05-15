@@ -40,7 +40,6 @@ emailSender = {
                     'Notification email has been sent to user'
         };
         var transporter = nodemailer.createTransport(smtpConfig);
-
         var mailOptions = {
             from: {
                 name: 'MKeeper Service',
