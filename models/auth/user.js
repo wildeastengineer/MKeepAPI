@@ -29,6 +29,15 @@ UserSchema = new Schema({
         required: true
     },
     created: {
+        type: Date
+    },
+    passRecoveryToken: {
+        type: String
+    },
+    passRecoveryCreatedAt: {
+        type: Date
+    },
+    modified: {
         type: Date,
         default: Date.now
     }
