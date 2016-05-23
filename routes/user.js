@@ -8,8 +8,6 @@ var passRecovery = require('../controllers/passRecovery.js');
 var userController = require('../controllers/user.js');
 
 var userRegisterRoutes = function (router, authenticate, sendError) {
-    var recoverPasswordPath = '/recover-password';
-
     router.post('/registration', function (req, res) {
         userController.createUser({
             username: req.body.username,
@@ -31,37 +29,28 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             user_id: req.user.userId,
             name: req.user.username,
             scope: req.authInfo.scope
-        })
+        });
     });
 
     router.post('/send-recover-password-token', function (req, res) {
         passRecovery.createPassRecoveryToken(req.body.username)
             .then(function (token) {
-                var passRecoveryUrl;
+                var redirectUrl;
 
-                passRecoveryUrl = url.format({
-                    protocol: config.get('protocol') || 'http',
-                    hostname: config.get('host'),
-                    pathname: config.get('baseUrl') + recoverPasswordPath,
-                    port: config.get('port'),
-                    query: {
-                        username: req.body.username,
-                        token: token.token
-                    }
+                redirectUrl = url.parse(req.body.redirectUrl, true);
+                redirectUrl.query.username = req.body.username;
+                redirectUrl.query.token = token.token;
+
+                redirectUrl = url.format({
+                    protocol: redirectUrl.protocol,
+                    hostname: redirectUrl.hostname,
+                    port: redirectUrl.port,
+                    pathname: redirectUrl.pathname,
+                    query: redirectUrl.query
                 });
 
-                return emailSender.passwordRecovery(req.body.username, passRecoveryUrl);
+                return emailSender.passwordRecovery(req.body.username, redirectUrl);
             })
-            .then(function (result) {
-                res.json(result);
-            })
-            .fail(function (error) {
-                sendError(error, res);
-            });
-    });
-
-    router.get(recoverPasswordPath, function (req, res) {
-        passRecovery.isPasswordRecoveryTokenExisting(req.query.token)
             .then(function (result) {
                 res.json(result);
             })
@@ -70,11 +59,14 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             });
     });
     
-    router.post(recoverPasswordPath, function (req, res) {
-        passRecovery.removePassRecoveryToken(req.query.token)
+    router.post('/recover-password', function (req, res) {
+        passRecovery.isPasswordRecoveryTokenExisting(req.body.token)
+            .then(function () {
+                passRecovery.removePassRecoveryToken(req.body.token)
+            })
             .then(function () {
                 return userController.changePassword({
-                    username: req.query.username,
+                    username: req.body.username,
                     newPassword: req.body.newPassword
                 })
             })
@@ -83,8 +75,8 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
             })
             .fail(function (error) {
                 sendError(error, res);
-            })
-    })
+            });
+    });
 };
 
 module.exports = {
