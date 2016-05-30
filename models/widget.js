@@ -3,23 +3,15 @@ var mongoose = require('mongoose');
 /// Models
 var User = require('./auth/user');
 /// Local variables
-var Category;
 var Schema = mongoose.Schema;
+var Widget;
+var WidgetSchema;
 
-var CategorySchema = new Schema({
-    _owner: 'String',
+WidgetSchema = new Schema({
     name: {
         type: String,
         required: true,
-        default: 'Your New Category'
-    },
-    categoryType: {
-        type: String,
-        enum: ['income', 'expense']
-    },
-    parent: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category'
+        default: 'Your New Widget'
     },
     created: {
         type: Date,
@@ -40,10 +32,10 @@ var CategorySchema = new Schema({
     }
 });
 
-if (mongoose.models.Category) {
-    Category = mongoose.model('Category');
+if (mongoose.models.Widget) {
+    Widget = mongoose.model('Widget');
 } else {
-    Category = mongoose.model('Category', CategorySchema);
+    Widget = mongoose.model('Widget', WidgetSchema);
 }
 
-module.exports = Category;
+module.exports = Widget;

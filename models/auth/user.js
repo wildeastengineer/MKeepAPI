@@ -1,8 +1,11 @@
 /// Libs
 var crypto = require('crypto');
 var mongoose = require('mongoose');
+/// Models
+var Project = require('../project');
 /// Local variables
 var Schema = mongoose.Schema;
+var User;
 var UserSchema;
 
 var validateEmail;
@@ -40,6 +43,15 @@ UserSchema = new Schema({
     modified: {
         type: Date,
         default: Date.now
+    },
+    projects: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Project'
+    }],
+    lang: {
+        type: String,
+        enum: ['en', 'ru'],
+        default: 'en'
     }
 });
 
@@ -84,4 +96,10 @@ UserSchema.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+if (mongoose.models.User) {
+    User = mongoose.model('User');
+} else {
+    User = mongoose.model('User', UserSchema);
+}
+
+module.exports = User;
