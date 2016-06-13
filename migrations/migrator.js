@@ -1,4 +1,5 @@
 var Q = require('q');
+var fs =
 
 var migrations = [
     require('./001_initializeGlobalCurrencies')
