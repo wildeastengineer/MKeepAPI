@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var config = require('./libs/config');
 var express = require('express');
 var Logger = require('./libs/log');
-var migrations = require('./migrations/migrations');
+var migrator = require('./migrations/migrator');
 var mongoose = require('mongoose');
 var passport = require('passport');
 /// Local variables
@@ -12,7 +12,7 @@ var logger = Logger(module);
 var port = config.get('port');
 
 // configuration ===============================================================
-mongoose.connect(config.get('mongoose:uri')); // connect to our database
+mongoose.connect(config.get('database:uri')); // connect to our database
 app.use(bodyParser()); // get information from html forms
 app.use(passport.initialize());
 
@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 // launch ======================================================================
-migrations.run()
+migrator.run(config.get('database:uri') + '/' +config.get('database:name'))
     .then(function () {
         app.listen(port);
         logger.info('The magic happens on port ' + port);
