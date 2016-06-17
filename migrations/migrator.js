@@ -2,8 +2,10 @@
 var async = require('async');
 var fs = require('fs');
 var Logger = require('../libs/log');
+var MongoClient = require('mongodb').MongoClient;
 var path = require('path');
 var Q = require('q');
+
 /// Local variables
 var logger = Logger(module);
 
@@ -18,134 +20,178 @@ var migrator = {
      */
     run: function (dbUrl) {
         var deferred = Q.defer();
-        var MongoClient = require('mongodb').MongoClient;
 
         MongoClient.connect(dbUrl, function(err, db) {
             var migrationCollection;
 
             migrationCollection = db.collection('migrations');
+            
+            migrationCollection.ensureIndex({
+                    date: 1,
+                    fileName: 1
+                }, {
+                    unique: true
+                })
+                .then(function (indexName) {
+                    async.eachSeries(getArrayOfMigrations(), function (migration, callback) {
+                        findAndExecuteMigration(migration)
+                            .then(function () {
+                                callback();
+                            })
+                            .fail(function (err) {
+                                callback(err);
+                            });
+                    }, function (err) {
+                        db.close();
 
-            async.each(getAllMigrations(), function (migration, callback) {
-                findAndExecuteMigration(migration).then(function () {
-                    callback();
-                }).catch(function (err) {
-                    callback(err);
+                        if (err) {
+                            deferred.reject(err);
+
+                            return;
+                        }
+
+                        deferred.resolve();
+                    });
                 });
-            }, function (err) {
-                if (err) {
-                    db.close();
-                    deferred.reject(err);
-
-                    return;
-                }
-
-                db.close();
-                deferred.resolve();
-            });
 
             /**
              * @private
-             * @param {Object[]} migration
+             * @param {string} migrationFile
              *
              * @returns {promise}
              */
-            function findAndExecuteMigration (migration) {
+            function findAndExecuteMigration (migrationFile) {
                 var deferred = Q.defer();
-                var executeMigration = require('./' + migration.fileName);
+                var migration = require('./' + migrationFile);
+                var migrationObj = {
+                    name: getMigrationName(migrationFile),
+                    date: getMigrationDate(migrationFile),
+                    fileName: migrationFile
+                };
 
-                migrationCollection.find(
-                    {
-                        name: migration.name
-                    }
-                ).toArray().then(function (docs) {
+                migrationCollection.find({}).toArray()
+                    .then(function (docs) {
+                        var checkMig = checkMigration(migrationObj, docs);
+
+                        if (checkMig.isExecuted) {
+                            logger.info('Skip migration. "${migration}" is already executed'
+                                    .replace('${migration}', migrationFile));
+                            deferred.resolve();
+
+                            return;
+                        }
+
+                        if (!checkMig.isActual) {
+                            deferred.reject('Stop migrating. "${migration}" is not up-to-date '
+                                    .replace('${migration}', migrationFile));
+
+                            return;
+                        }
+
+                        logger.info('Execute migration "${migration}"'.replace('${migration}', migrationObj.fileName));
+
+                        migration.execute(db)
+                            .then(function () {
+                                migrationCollection.insertOne({
+                                    name: migrationObj.name,
+                                    date: migrationObj.date,
+                                    fileName: migrationObj.fileName,
+                                    created: new Date()
+                                }).then(function (result) {
+                                    deferred.resolve();
+                                }).catch(function (err) {
+                                    deferred.reject(err);
+                                });
+                            })
+                            .fail(function (err) {
+                                deferred.reject(err);
+                            });
+                    })
+                    .catch(function (err) {
+                        deferred.reject(err);
+                    });
+
+                return deferred.promise;
+
+                /**
+                 * @private
+                 * @param {Object} migration
+                 * @param {string} migration.date
+                 * @param {string} migration.fileName
+                 * @param {Object[]} executedMigrations
+                 * @param {Object} executedMigrations.migration
+                 * @param {string} executedMigrations.migration.date
+                 *
+                 * @returns {Object} result
+                 * @returns {boolean} result.isActual
+                 * @returns {boolean} result.isExecuted
+                 */
+                function checkMigration (migration, executedMigrations) {
                     var i;
+                    var result = {
+                        isActual: true,
+                        isExecuted: false
+                    };
 
-                    if (docs.length > 0) {
-                        for (i = 0; i < docs.length; i++) {
-                            if (migration.date <= docs[i].date) {
-                                logger.info('Skip migration "{migration}". It already exists or it is not up-to-date '
-                                        .replace('{migration}', migration.fileName));
+                    if (executedMigrations.length > 0) {
+                        for (i = 0; i < executedMigrations.length; i++) {
+                            if (migration.date === executedMigrations[i].date) {
+                                result = {
+                                    isActual: false,
+                                    isExecuted: true
+                                };
 
-                                deferred.resolve();
+                                return result;
+                            }
 
-                                return;
+                            if (migration.date < executedMigrations[i].date) {
+                                result.isActual = false;
+
+                                return result;
                             }
                         }
                     }
 
-                    logger.info('Execute migration "{migration}"'.replace('{migration}', migration.fileName));
+                    return result;
+                }
 
-                    executeMigration(db).then(function () {
-                        migrationCollection.insertOne(migration).then(function (result) {
-                            deferred.resolve();
-                        }).catch(function (err) {
-                            deferred.reject(err);
-                        });
-                    });
-                });
+                /**
+                 * @private
+                 * @param {string} fileName
+                 *
+                 * @returns {string}
+                 */
+                function getMigrationName (fileName) {
+                    return fileName.slice(fileName.indexOf('_') + 1).replace('.js', '');
+                }
 
-                return deferred.promise;
+                /**
+                 * @private
+                 * @param {string} fileName
+                 *
+                 * @returns {string}
+                 */
+                function getMigrationDate (fileName) {
+                    return fileName.slice(0, fileName.indexOf('_'));
+                }
             }
         });
 
         return deferred.promise;
 
         /**
-         * Returns all available migrations and dates of their creation
+         * @private
          *
-         * @returns {Object[]}
+         * @returns {string[]}
          */
-        function getAllMigrations () {
-            var arrayOfMigrations;
-            var migrations = [];
-            var i;
+        function getArrayOfMigrations () {
+            var migrationsDirFiles = fs.readdirSync(__dirname);
+            var migratorFileName = path.basename(__filename);
+            var migratorFileIndex = migrationsDirFiles.indexOf(migratorFileName);
 
-            arrayOfMigrations = getArrayOfMigrations();
+            migrationsDirFiles.splice(migratorFileIndex, 1);
 
-            for (i = 0; i < arrayOfMigrations.length; i++) {
-                migrations.push({
-                    name: getMigrationName(arrayOfMigrations[i]),
-                    date: getMigrationDate(arrayOfMigrations[i]),
-                    fileName: arrayOfMigrations[i]
-                });
-            }
-
-            return migrations;
-
-            /**
-             * @private
-             * @param {string} fileName
-             *
-             * @returns {string}
-             */
-            function getMigrationName (fileName) {
-                return fileName.slice(fileName.indexOf('_') + 1).replace('.js', '');
-            }
-
-            /**
-             * @private
-             * @param {string} fileName
-             *
-             * @returns {string}
-             */
-            function getMigrationDate (fileName) {
-                return fileName.slice(0, fileName.indexOf('_'));
-            }
-
-            /**
-             * @private
-             *
-             * @returns {string[]}
-             */
-            function getArrayOfMigrations () {
-                var migrationsDirFiles = fs.readdirSync(__dirname);
-                var migratorFileName = path.basename(__filename);
-                var migratorFileIndex = migrationsDirFiles.indexOf(migratorFileName);
-
-                migrationsDirFiles.splice(migratorFileIndex, 1);
-
-                return migrationsDirFiles;
-            }
+            return migrationsDirFiles.sort();
         }
     }
 };

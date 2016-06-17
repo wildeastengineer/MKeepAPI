@@ -16,16 +16,12 @@ var MigrationSchema = new Schema({
     },
     date: {
         type: String,
+        unique: true,
         required: true
     },
     created: {
         type: Date,
         required: true
-    },
-    modified: {
-        type: Date,
-        required: true,
-        default: Date.now
     }
 });
 
