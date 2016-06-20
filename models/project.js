@@ -14,8 +14,7 @@ var ProjectSchema;
 ProjectSchema = new Schema({
     owners: [{
         type: Schema.Types.ObjectId,
-        ref: 'User',
-        unique: true
+        ref: 'User'
     }],
     name: {
         type: String,
@@ -23,31 +22,24 @@ ProjectSchema = new Schema({
         default: 'Your New Project'
     },
     users: [{
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            unique: true
-        }
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }],
     accounts: [{
         type: Schema.Types.ObjectId,
-        ref: Account,
-        unique: true
+        ref: Account
     }],
     currencies: [{
         type: Schema.Types.ObjectId,
-        ref: 'Currency',
-        unique: true
+        ref: 'Currency'
     }],
     categories: [{
         type: Schema.Types.ObjectId,
-        ref: Category,
-        unique: true
+        ref: Category
     }],
     widgets: [{
         type: Schema.Types.ObjectId,
-        ref: Widget,
-        unique: true
+        ref: Widget
     }],
     created: {
         type: Date,
