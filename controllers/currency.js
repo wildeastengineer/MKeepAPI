@@ -1,12 +1,17 @@
+/// Libs
 var _ = require('underscore');
+var Logger = require('../libs/log');
 var Q = require('q');
+/// Models
+var Currency = require('../models/currency');
+/// Local variables
+var logger = Logger(module);
 
 // ToDo: remove this when auth is implemented
 var user = {
     _id: 777
 };
 
-var Currency = require('../models/currency');
 var currencyController = {
     getAll: function () {
         var deferred = Q.defer();
@@ -26,12 +31,42 @@ var currencyController = {
 
         return deferred.promise;
     },
-    getById: function (id, callback) {
+
+    /**
+     * Get currency by given id
+     * @param {string} id
+     *
+     * @returns {promise}
+     */
+    getById: function (id) {
+        var deferred = Q.defer();
+
         Currency.findOne({
-            _id: id,
-            _owner: user._id
-        })
-            .exec(callback);
+            _id: id
+        }).exec(function (error, currency) {
+            if (!currency) {
+                error = {
+                    status: 404,
+                    message: 'Currency with given id wasn\'t found: ' + id
+                };
+                logger.error(error);
+                deferred.reject(error);
+
+                return;
+            }
+
+            if (error) {
+                logger.error('Currency with given id wasn\'t found: ' + id);
+                logger.error(error);
+                console.log(error);
+                deferred.reject(error);
+            } else {
+                logger.info('Currency with given id was successfully found: ' + id);
+                deferred.resolve(project);
+            }
+        });
+
+        return deferred.promise;
     },
     post: function (globalCurrencyId) {
         var currency;
