@@ -6,6 +6,7 @@ var accountRoutes = require('./account');
 var categoryRoutes = require('./category');
 var currencyRoutes = require('./currency');
 var dashboardRoutes = require('./dashboard');
+var projectRoutes = require('./project');
 var transactionRoutes = require('./transaction');
 var userRoutes = require('./user');
 /// Local variables
@@ -30,6 +31,7 @@ module.exports = function (app, router) {
     currencyRoutes.register(router, authenticate, sendError);
     dashboardRoutes.register(router, authenticate, sendError);
     transactionRoutes.register(router, authenticate, sendError);
+    projectRoutes.register(router, authenticate, sendError);
 
     // All of our routes will be prefixed with '/api'
     app.use(config.get('baseUrl'), router);

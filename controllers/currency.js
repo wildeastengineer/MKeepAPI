@@ -34,7 +34,7 @@ var currencyController = {
 
     /**
      * Get currency by given id
-     * @param {string} id
+     * @param {ObjectId} id
      *
      * @returns {promise}
      */
@@ -62,7 +62,7 @@ var currencyController = {
                 deferred.reject(error);
             } else {
                 logger.info('Currency with given id was successfully found: ' + id);
-                deferred.resolve(project);
+                deferred.resolve(currency);
             }
         });
 

@@ -12,8 +12,9 @@ var Validation = {
      */
     isValidAndExist: function (entityId, controller) {
         var deferred = Q.defer();
+        var error;
 
-        if (!mongoose.Types.ObjectId.isValid(entityId)) {
+        if (!entityId.toString().match(/^[0-9a-fA-F]{24}$/)) {
             error = {
                 status: 403,
                 message: 'Document id is invalid: ' + entityId
