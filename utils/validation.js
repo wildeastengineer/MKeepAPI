@@ -66,6 +66,22 @@ var Validation = {
         var error;
         var i;
 
+        if (data.currencies instanceof Array && data.currencies.length === 0) {
+            logger.info('Given array of entities is empty and considered as valid');
+            deferred.resolve(entityIds);
+
+            return deferred.promise;
+        }
+
+        if (!(entityIds instanceof Array)) {
+            error = {
+                status: 400,
+                message: 'Invalid array of ids: ' + entityIds
+            };
+
+            deferred.reject(error);
+        }
+
         for (i = 0; i < entityIds.length; i++) {
             if (!isIdValid(entityIds[i])) {
                 error = {

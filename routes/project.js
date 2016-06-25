@@ -8,7 +8,8 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
 
     router.param('id', function (req, res, next, id) {
         projectController.getById({
-            id: id
+            id: id,
+            accessToken: req.query.access_token
         })
             .then(function (project) {
                 req.project = project;
@@ -53,11 +54,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
         }
     });
 
-    router.post('/projects/:id/add-currencies', authenticate, function (req, res) {
+    router.post('/projects/:id/update-currencies', authenticate, function (req, res) {
         if (!req.project) {
             sendError(req.error, res);
         } else {
-            projectController.addCurrencies({
+            projectController.updateCurrencies({
                 project: req.project,
                 userId: req.user._id,
                 currencies: req.body.currencies

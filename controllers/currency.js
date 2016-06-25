@@ -58,7 +58,6 @@ var currencyController = {
             if (error) {
                 logger.error('Currency with given id wasn\'t found: ' + id);
                 logger.error(error);
-                console.log(error);
                 deferred.reject(error);
             } else {
                 logger.info('Currency with given id was successfully found: ' + id);

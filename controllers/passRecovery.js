@@ -34,9 +34,9 @@ var passRecoveryController = {
                 }
 
                 if (!user) {
-                    logger.error('Cannot post password recovery token. ' +
+                    logger.error('Cannot create password recovery token. ' +
                             'User with this email doesn\'t exist' + username);
-                    deferred.reject(new Error('Cannot post password recovery token. ' +
+                    deferred.reject(new Error('Cannot create password recovery token. ' +
                             'User with this email doesn\'t exist' + username));
 
                     return;
