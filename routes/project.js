@@ -11,8 +11,9 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
             id: id,
             accessToken: req.query.access_token
         })
-            .then(function (project) {
-                req.project = project;
+            .then(function (result) {
+                req.result = result;
+                req.project = result.project;
                 next();
             })
             .fail(function (error) {
@@ -50,7 +51,7 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
         if (!req.project) {
             sendError(req.error, res);
         } else {
-            res.json(req.project);
+            res.json(req.result);
         }
     });
 
@@ -62,6 +63,25 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 project: req.project,
                 userId: req.user._id,
                 currencies: req.body.currencies
+            })
+                .then(function (project) {
+                    res.json(project);
+                })
+                .fail(function (error) {
+                    sendError(error, res);
+                });
+        }
+    });
+
+
+    router.post('/projects/:id/rename', authenticate, function (req, res) {
+        if (!req.project) {
+            sendError(req.error, res);
+        } else {
+            projectController.rename({
+                project: req.project,
+                userId: req.user._id,
+                name: req.body.name
             })
                 .then(function (project) {
                     res.json(project);

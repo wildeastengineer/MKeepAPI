@@ -66,7 +66,7 @@ var Validation = {
         var error;
         var i;
 
-        if (data.currencies instanceof Array && data.currencies.length === 0) {
+        if (entityIds instanceof Array && entityIds.length === 0) {
             logger.info('Given array of entities is empty and considered as valid');
             deferred.resolve(entityIds);
 
