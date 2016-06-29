@@ -5,18 +5,11 @@ var Currency;
 var Schema = mongoose.Schema;
 
 var CurrencySchema = new Schema({
-    _owner: 'String',
-    name: {
+    iso: {
         type: String,
         unique: true,
-        required: true,
-        default: 'Currency Name'
-    },
-    icon: {
-        type: String,
         required: true
     },
-    globalId: String,
     created: {
         type: Date,
         required: true
