@@ -4,24 +4,6 @@ var config = require('../libs/config');
 var projectController = require('../controllers/project.js');
 
 var ProjectRegisterRoutes = function (router, authenticate, sendError) {
-    //TODO: add authentication
-
-    router.param('id', function (req, res, next, id) {
-        projectController.getById({
-            id: id,
-            accessToken: req.query.access_token
-        })
-            .then(function (result) {
-                req.result = result;
-                req.project = result.project;
-                next();
-            })
-            .fail(function (error) {
-                req.error = error;
-                next();
-            });
-    });
-    
     router.post('/projects', authenticate, function (req, res) {
         projectController.post({
             name: req.body.name,
@@ -48,48 +30,45 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     router.get('/projects/:id', authenticate, function (req, res) {
-        if (!req.project) {
-            sendError(req.error, res);
-        } else {
-            res.json(req.result);
-        }
+        projectController.getById({
+            id: req.params.id,
+            userId: req.user._id
+        })
+            .then(function (project) {
+                res.json(project);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
     });
 
     router.post('/projects/:id/update-currencies', authenticate, function (req, res) {
-        if (!req.project) {
-            sendError(req.error, res);
-        } else {
-            projectController.updateCurrencies({
-                project: req.project,
-                userId: req.user._id,
-                currencies: req.body.currencies
+        projectController.updateCurrencies({
+            id: req.params.id,
+            userId: req.user._id,
+            currencies: req.body.currencies
+        })
+            .then(function (currencies) {
+                res.json(currencies);
             })
-                .then(function (project) {
-                    res.json(project);
-                })
-                .fail(function (error) {
-                    sendError(error, res);
-                });
-        }
+            .fail(function (error) {
+                sendError(error, res);
+            });
     });
 
 
     router.post('/projects/:id/rename', authenticate, function (req, res) {
-        if (!req.project) {
-            sendError(req.error, res);
-        } else {
-            projectController.rename({
-                project: req.project,
-                userId: req.user._id,
-                name: req.body.name
+        projectController.rename({
+            id: req.params.id,
+            userId: req.user._id,
+            name: req.body.name
+        })
+            .then(function (name) {
+                res.json(name);
             })
-                .then(function (project) {
-                    res.json(project);
-                })
-                .fail(function (error) {
-                    sendError(error, res);
-                });
-        }
+            .fail(function (error) {
+                sendError(error, res);
+            });
     });
 };
 

@@ -113,6 +113,44 @@ var userController = {
         );
 
         return deferred.promise;
+    },
+
+    /**
+     * Get user by given id
+     * @param {Object} data
+     * @param {ObjectId | string} data.id
+     *
+     * @returns {promise}
+     */
+    getById: function (data) {
+        var deferred = Q.defer();
+
+        UserModel.findOne({
+            _id: data.id
+        })
+            .exec(function (error, user) {
+                if (!user) {
+                    error = {
+                        status: 404,
+                        message: 'User with given id wasn\'t found: ' + data.id
+                    };
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (error) {
+                    logger.error('User with given id wasn\'t found: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('User with given id was successfully found: ' + data.id);
+                    deferred.resolve(user);
+                }
+            });
+
+        return deferred.promise;
     }
 };
 

@@ -1,6 +1,7 @@
 /// Libs
 var Logger = require('../libs/log');
 var Q = require('q');
+var _ = require('underscore');
 /// Private variables
 var logger = Logger(module);
 
@@ -121,6 +122,31 @@ var Validation = {
             });
 
         return deferred.promise;
+    },
+
+    /**
+     * Check userId is in given array of ids
+     * @params {ObjectId || string} userId
+     * @params {Objects[] || ObjectId[] || string} ownerIds
+     * @params {ObjectsId[] || string[]} ownerIds._id
+     *
+     * @returns {boolean}
+     */
+    isOwner: function (userId, ownerIds) {
+        var owners = [];
+        var i;
+
+        userId = userId.toString();
+
+        for (i = 0; i < ownerIds.length; i++) {
+            if (_.isObject(ownerIds[i]) && typeof ownerIds[i]._id !== 'undefined') {
+                owners.push(ownerIds[i]._id.toString());
+            } else {
+                owners.push(ownerIds[i].toString());
+            }
+        }
+
+        return owners.indexOf(userId) > -1;
     }
 };
 

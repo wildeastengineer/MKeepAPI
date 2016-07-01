@@ -34,7 +34,7 @@ var currencyController = {
 
     /**
      * Get currency by given id
-     * @param {ObjectId} id
+     * @param {ObjectId | string} id
      *
      * @returns {promise}
      */
@@ -43,26 +43,27 @@ var currencyController = {
 
         Currency.findOne({
             _id: id
-        }).exec(function (error, currency) {
-            if (!currency) {
-                error = {
-                    status: 404,
-                    message: 'Currency with given id wasn\'t found: ' + id
-                };
-                logger.error(error);
-                deferred.reject(error);
+        })
+            .exec(function (error, currency) {
+                if (!currency) {
+                    error = {
+                        status: 404,
+                        message: 'Currency with given id wasn\'t found: ' + id
+                    };
+                    logger.error(error);
+                    deferred.reject(error);
 
-                return;
-            }
+                    return;
+                }
 
-            if (error) {
-                logger.error('Currency with given id wasn\'t found: ' + id);
-                logger.error(error);
-                deferred.reject(error);
-            } else {
-                logger.info('Currency with given id was successfully found: ' + id);
-                deferred.resolve(currency);
-            }
+                if (error) {
+                    logger.error('Currency with given id wasn\'t found: ' + id);
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('Currency with given id was successfully found: ' + id);
+                    deferred.resolve(currency);
+                }
         });
 
         return deferred.promise;
