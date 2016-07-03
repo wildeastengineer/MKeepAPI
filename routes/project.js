@@ -1,5 +1,4 @@
 /// Libs
-var config = require('../libs/config');
 /// Controllers
 var projectController = require('../controllers/project.js');
 
@@ -7,7 +6,8 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
     router.post('/projects', authenticate, function (req, res) {
         projectController.post({
             name: req.body.name,
-            userId: req.user._id
+            userId: req.user._id,
+            mainCurrency: req.body.mainCurrency
         })
             .then(function (project) {
                 res.json(project);
@@ -42,7 +42,7 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
             });
     });
 
-    router.post('/projects/:id/update-currencies', authenticate, function (req, res) {
+    router.post('/projects/:id/currencies/update', authenticate, function (req, res) {
         projectController.updateCurrencies({
             id: req.params.id,
             userId: req.user._id,
@@ -56,6 +56,19 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
             });
     });
 
+    router.post('/projects/:id/currencies/main', authenticate, function (req, res) {
+        projectController.updateMainCurrency({
+            id: req.params.id,
+            userId: req.user._id,
+            mainCurrency: req.body.mainCurrency
+        })
+            .then(function (currencies) {
+                res.json(currencies);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
 
     router.post('/projects/:id/rename', authenticate, function (req, res) {
         projectController.rename({

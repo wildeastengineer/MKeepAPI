@@ -29,6 +29,12 @@ ProjectSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: Account
     }],
+    mainCurrency: {
+        type: Schema.Types.ObjectId,
+        ref: 'Currency',
+        required: true,
+        default: null
+    },
     currencies: [{
         type: Schema.Types.ObjectId,
         ref: 'Currency'

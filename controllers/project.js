@@ -3,7 +3,6 @@ var Logger = require('../libs/log');
 var Q = require('q');
 var validation = require('../utils/validation');
 /// Models
-var AccessTokenModel = require('../models/auth/accessToken');
 var CurrencyModel = require('../models/currency');
 var ProjectModel = require('../models/project');
 /// Controllers
@@ -11,58 +10,26 @@ var userController = require('./user');
 /// Local variables
 var logger = Logger(module);
 /// Private functions
-var getUserIdFromAccessToken;
-
-/**
- * @params {string} accessToken
- *
- * @returns {promise}
- */
-getUserIdFromAccessToken = function (accessToken) {
-    var deferred = Q.defer();
-
-    AccessTokenModel.findOne({
-        token: accessToken
-    })
-        .select({
-            userId: 1
-        })
-        .exec(function (error, userId) {
-            if (!userId) {
-                error = {
-                    status: 403,
-                    message: 'Access token doesn\'t exist or expired: ' + accessToken
-                };
-                logger.error(error);
-                deferred.reject(error);
-
-                return;
-            }
-
-            if (error) {
-                logger.error('Access token doesn\'t exist or expired: ' + userId);
-                logger.error(error);
-                deferred.reject(error);
-            } else {
-                logger.info('User with given access token was successfully found: ' + userId);
-                deferred.resolve(userId.userId);
-            }
-        });
-
-    return deferred.promise;
-};
 
 var projectController = {
 
     /**
      * Create new blank project
      * @params {Object} data
+     * @params {string} data.name
+     * @params {ObjectId | string} data.userId
+     * @params [Object[]] data.accounts
+     * @params [ObjectId[] | string[]] data.currencies
+     * @params {ObjectId | string} data.mainCurrency
+     * @params [Object[]] data.categories
+     * @params [Object[]] data.widgets
      *
      * @returns {promise}
      */
     post: function (data) {
         var deferred = Q.defer();
         var newProject;
+        console.log(data);
 
         //TODO: validate every entity before set it to project
         newProject = new ProjectModel({
@@ -71,6 +38,7 @@ var projectController = {
             users: [data.userId],
             accounts: data.accounts ? [data.accounts]: [],
             currencies: data.currencies ? [data.currencies]: [],
+            mainCurrency: data.mainCurrency,
             categories: data.categories ? [data.categories]: [],
             widgets: data.widgets ? [data.widgets]: [],
             created: new Date(),
@@ -87,43 +55,44 @@ var projectController = {
                 return;
             }
 
-            ProjectModel.populate(project, 'owners users currencies createdBy modifiedBy', function (error, project) {
-                if (error) {
-                    logger.error('New project cannot be populated');
-                    logger.error(error);
-                    deferred.reject(error);
-
-                    return;
-                }
-
-                // Find User and add project id to projects field
-                userController.getById({
-                    id: data.userId
-                })
-                    .then(function (user) {
-                        user.update({
-                            $addToSet: {
-                                projects: project._id
-                            }
-                        })
-                            .exec(function (error) {
-                                if (error) {
-                                    logger.error(error);
-                                    logger.error('Project with given id wasn\'t added to user: ' + data.userId);
-                                    deferred.reject(error);
-
-                                    return;
-                                }
-
-                                logger.info('New project has been successfully created: ' + project._id);
-                                deferred.resolve(project);
-                            })
-                    })
-                    .fail(function (error) {
+            ProjectModel.populate(project, 'owners users currencies mainCurrency createdBy modifiedBy',
+                function (error, project) {
+                    if (error) {
+                        logger.error('New project cannot be populated');
                         logger.error(error);
-                        logger.error('Project with given id wasn\'t added to user: ' + data.userId);
                         deferred.reject(error);
+
+                        return;
+                    }
+
+                    // Find User and add project id to projects field
+                    userController.getById({
+                        id: data.userId
                     })
+                        .then(function (user) {
+                            user.update({
+                                $addToSet: {
+                                    projects: project._id
+                                }
+                            })
+                                .exec(function (error) {
+                                    if (error) {
+                                        logger.error(error);
+                                        logger.error('Project with given id wasn\'t added to user: ' + data.userId);
+                                        deferred.reject(error);
+
+                                        return;
+                                    }
+
+                                    logger.info('New project has been successfully created: ' + project._id);
+                                    deferred.resolve(project);
+                                })
+                        })
+                        .fail(function (error) {
+                            logger.error(error);
+                            logger.error('Project with given id wasn\'t added to user: ' + data.userId);
+                            deferred.reject(error);
+                        })
             })
         });
 
@@ -151,7 +120,7 @@ var projectController = {
                     }
                 ]
             })
-                .populate('owners users currencies createdBy modifiedBy')
+                .populate('owners users currencies mainCurrency createdBy modifiedBy')
                 .exec(function (error, project) {
                     if (!project) {
                         error = {
@@ -190,7 +159,7 @@ var projectController = {
         ProjectModel.find({
             users: data.userId
         })
-            .populate('owners users currencies createdBy modifiedBy')
+            .populate('owners users currencies mainCurrency createdBy modifiedBy')
             .exec(function (error, projects) {
                 if (!projects) {
                     error = {
@@ -219,7 +188,7 @@ var projectController = {
     /**
      * Add currencies array to given project
      * @param {Object} data
-     * @param {ObjectId | string} data.id
+     * @param {ObjectId | string} data.id - project id
      * @param {ObjectId | string} data.userId
      * @param {ObjectId[] | string[]} data.currencies
      *
@@ -263,7 +232,7 @@ var projectController = {
                                 }
 
                                 logger.info('Currencies were successfully updated to the project: ' + data.id);
-                                deferred.resolve(currencies);
+                                deferred.resolve(data.currencies);
                             });
                     });
             })
@@ -277,9 +246,75 @@ var projectController = {
     },
 
     /**
+     * Update main project currency
+     * @param {Object} data
+     * @param {ObjectId | string} data.id - project id
+     * @param {ObjectId | string} data.userId
+     * @param {ObjectId | string} data.mainCurrency
+     *
+     * @returns {promise}
+     */
+    updateMainCurrency: function (data) {
+        var deferred = Q.defer();
+        var error;
+        var project;
+        var that = this;
+
+        validation.isEntityValid(data.mainCurrency, CurrencyModel)
+            .then(function (mainCurrency) {
+                that.getById({
+                    id: data.id,
+                    userId: data.userId
+                })
+                    .then(function (project) {
+                        if (!validation.isOwner(data.userId, project.owners)) {
+                            error = {
+                                status: 403,
+                                message: 'User doesn\'t have permissions for updating project name: ' + data.userId
+                            };
+
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return;
+                        }
+
+                        project.update({
+                            mainCurrency: data.mainCurrency || null
+                        })
+                            .exec(function (error) {
+                                if (error) {
+                                    logger.error(error);
+                                    logger.error('Project main currency was not updated: ' + data.id);
+                                    deferred.reject(error);
+
+                                    return;
+                                }
+
+                                logger.info('Project main currency was successfully updated: ' + data.id);
+                                deferred.resolve(data.mainCurrency);
+                            });
+                    })
+                    .fail(function (error) {
+                        logger.error(error);
+                        logger.error('Project main currency was not updated: ' + data.id);
+                        deferred.reject(error);
+                    });
+            })
+            .fail(function (error) {
+                logger.error(error);
+                logger.error('Project main currency was not updated: ' + data.id);
+                deferred.reject(error);
+            });
+
+
+        return deferred.promise;
+    },
+
+    /**
      * Rename project with given name
      * @param {Object} data
-     * @param {ObjectId | string} data.id
+     * @param {ObjectId | string} data.id - project id
      * @param {ObjectId | string} data.userId
      * @param {string} data.name
      *

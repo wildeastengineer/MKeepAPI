@@ -9,7 +9,7 @@ var Validation = {
 
     /**
      * Check whether given id is valid and exits in DB
-     * @param {ObjectId} entityId
+     * @param {ObjectId | string} entityId
      * @param {Object} model - mongoose model
      *
      * @returns {promise}
@@ -17,6 +17,13 @@ var Validation = {
     isEntityValid: function (entityId, model) {
         var deferred = Q.defer();
         var error;
+
+        if (entityId === '') {
+            logger.info('Given entities is empty and considered as valid');
+            deferred.resolve(entityId);
+
+            return deferred.promise;
+        }
 
         if (!isIdValid(entityId)) {
             error = {
@@ -127,7 +134,7 @@ var Validation = {
     /**
      * Check userId is in given array of ids
      * @params {ObjectId || string} userId
-     * @params {Objects[] || ObjectId[] || string} ownerIds
+     * @params {Objects || ObjectId[] || string} ownerIds
      * @params {ObjectsId[] || string[]} ownerIds._id
      *
      * @returns {boolean}
@@ -152,7 +159,7 @@ var Validation = {
 
 /**
  * Check whether given id is valid
- * @param {ObjectId} id
+ * @param {ObjectId | string} id
  *
  * @returns {boolean}
  */
