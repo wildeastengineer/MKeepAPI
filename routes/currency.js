@@ -4,7 +4,7 @@ var currencyController = require('../controllers/currency.js');
 var currencyRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/currencies')
         .get(authenticate, function (req, res) {
-            currencyController.getAll(req.user)
+            currencyController.getAll()
                 .then(function (currencies) {
                     res.json(currencies);
                 })

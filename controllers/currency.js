@@ -3,7 +3,7 @@ var _ = require('underscore');
 var Logger = require('../libs/log');
 var Q = require('q');
 /// Models
-var Currency = require('../models/currency');
+var CurrencyModel = require('../models/currency');
 /// Local variables
 var logger = Logger(module);
 
@@ -13,20 +13,35 @@ var user = {
 };
 
 var currencyController = {
+    /**
+     * Get get all currencies
+     *
+     * @returns {promise}
+     */
     getAll: function () {
         var deferred = Q.defer();
 
-        Currency.find(
-            {
-                _owner: user._id
-            })
+        CurrencyModel.find({})
             .exec(function (error, currencies) {
-                if (error) {
+                if (!currencies) {
+                    error = {
+                        status: 404,
+                        message: 'Currencies weren\'t found:'
+                    };
+                    logger.error(error);
                     deferred.reject(error);
+
                     return;
                 }
 
-                deferred.resolve(currencies);
+                if (error) {
+                    logger.error('Currencies weren\'t found');
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('Currencies were successfully found');
+                    deferred.resolve(currencies);
+                }
             });
 
         return deferred.promise;
@@ -68,6 +83,7 @@ var currencyController = {
 
         return deferred.promise;
     },
+
     post: function (globalCurrencyId) {
         var currency;
         var deferred = Q.defer();
@@ -82,7 +98,7 @@ var currencyController = {
                     return;
                 }
 
-                currency = new Currency();
+                currency = new CurrencyModel();
                 _.extend(currency, {
                     _owner: user._id,
                     name: globalCurrency.name,
@@ -107,7 +123,7 @@ var currencyController = {
         return deferred.promise;
     },
     remove: function (id, callback) {
-        Currency.remove(
+        CurrencyModel.remove(
             {
                 _id: id,
                 _owner: user._id
@@ -119,7 +135,7 @@ var currencyController = {
                     return;
                 }
 
-                Currency.find(
+                CurrencyModel.find(
                     {
                         _owner: user._id
                     })
@@ -130,7 +146,7 @@ var currencyController = {
     getGlobals: function () {
         var deferred = Q.defer();
 
-        Currency.find(
+        CurrencyModel.find(
             {
                 _owner: 0
             })
@@ -150,7 +166,7 @@ var currencyController = {
 
         console.log('getGlobalById', id);
 
-        Currency.findOne({
+        CurrencyModel.findOne({
             _id: id,
             _owner: 0
         })
@@ -166,7 +182,7 @@ var currencyController = {
         return deferred.promise;
     },
     addGlobal: function (currencyData) {
-        var currency = new Currency();
+        var currency = new CurrencyModel();
         var deferred = Q.defer();
 
         _.extend(currency, currencyData, {
