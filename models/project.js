@@ -32,8 +32,7 @@ ProjectSchema = new Schema({
     mainCurrency: {
         type: Schema.Types.ObjectId,
         ref: 'Currency',
-        required: true,
-        default: null
+        required: true
     },
     currencies: [{
         type: Schema.Types.ObjectId,

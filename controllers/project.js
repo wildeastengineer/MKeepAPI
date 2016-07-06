@@ -29,18 +29,13 @@ var projectController = {
     post: function (data) {
         var deferred = Q.defer();
         var newProject;
-        console.log(data);
 
         //TODO: validate every entity before set it to project
         newProject = new ProjectModel({
             name: data.name,
             owners: [data.userId],
             users: [data.userId],
-            accounts: data.accounts ? [data.accounts]: [],
-            currencies: data.currencies ? [data.currencies]: [],
             mainCurrency: data.mainCurrency,
-            categories: data.categories ? [data.categories]: [],
-            widgets: data.widgets ? [data.widgets]: [],
             created: new Date(),
             createdBy: data.userId,
             modifiedBy: data.userId
@@ -111,14 +106,8 @@ var projectController = {
         var deferred = Q.defer();
 
             ProjectModel.findOne({
-                $and: [
-                    {
-                        users: data.userId
-                    },
-                    {
-                        _id: data.id
-                    }
-                ]
+                users: data.userId,
+                _id: data.id
             })
                 .populate('owners users currencies mainCurrency createdBy modifiedBy')
                 .exec(function (error, project) {

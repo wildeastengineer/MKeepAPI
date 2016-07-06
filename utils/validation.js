@@ -134,7 +134,7 @@ var Validation = {
     /**
      * Check userId is in given array of ids
      * @params {ObjectId || string} userId
-     * @params {Objects || ObjectId[] || string} ownerIds
+     * @params {Object || ObjectId[] || string} ownerIds
      * @params {ObjectsId[] || string[]} ownerIds._id
      *
      * @returns {boolean}
