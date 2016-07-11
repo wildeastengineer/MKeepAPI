@@ -54,12 +54,33 @@ var currenciesCreation = {
 
         currencyCollection = db.collection(collectionName);
 
-        currencyCollection.ensureIndex({
-                iso: 1
-            }, {
-                unique: true
+        currencyCollection.indexes()
+            .then(function (indexes) {
+                var indexCreationDeferred;
+                var hasIsoIndex = false;
+                var i;
+
+                for (i = 0; i < indexes.length; i++) {
+                    if (indexes[i].name === 'iso_1') {
+                        hasIsoIndex = true;
+                        break;
+                    }
+                }
+
+                if (hasIsoIndex) {
+                    indexCreationDeferred = Q.defer();
+                    indexCreationDeferred.resolve();
+
+                    return indexCreationDeferred;
+                }
+
+                return currencyCollection.createIndex({
+                    iso: 1
+                }, {
+                    unique: true
+                });
             })
-            .then(function (indexName) {
+            .then(function () {
                 return currencyCollection.find({}, {
                     iso: 1,
                     _id: 0
@@ -93,7 +114,7 @@ var currenciesCreation = {
                 }
 
                 currencyCollection.insertMany(currenciesForAdding)
-                    .then(function (result) {
+                    .then(function () {
                         deferred.resolve();
                     })
                     .catch(function (err) {
