@@ -10,6 +10,13 @@ var passport = require('passport');
 var app = express();
 var logger = Logger(module);
 var port = config.get('port');
+/// Mongoose plugins
+var beautifyUnique = require('mongoose-beautiful-unique-validation');
+var idValidator = require('mongoose-id-validator');
+
+// register global mongoose plugins
+mongoose.plugin(idValidator); // validate ref docs existence
+mongoose.plugin(beautifyUnique); // convert mongodb unfriendly duplicate key error to mongoose validation error
 
 // configuration ===============================================================
 mongoose.connect(config.get('database:uri')); // connect to our database
