@@ -3,6 +3,8 @@ var mongoose = require('mongoose');
 /// Local variables
 var Currency;
 var Schema = mongoose.Schema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 var CurrencySchema = new Schema({
     iso: {
@@ -20,6 +22,8 @@ var CurrencySchema = new Schema({
         default: Date.now
     }
 });
+
+CurrencySchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Currency) {
     Currency = mongoose.model('Currency');

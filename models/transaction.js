@@ -1,6 +1,5 @@
 /// Libs
 var mongoose = require('mongoose');
-var mongoosePaginate = require('mongoose-paginate');
 /// Models
 var Account = require('./account');
 var Category = require('./category');
@@ -9,6 +8,9 @@ var User = require('./auth/user');
 /// Local variables
 var Schema = mongoose.Schema;
 var Transaction;
+/// Plugins
+var mongoosePaginate = require('mongoose-paginate');
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 var TransactionSchema = new Schema({
     _owner: 'String',
@@ -57,6 +59,7 @@ var TransactionSchema = new Schema({
 });
 
 TransactionSchema.plugin(mongoosePaginate);
+TransactionSchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Transaction) {
     Transaction = mongoose.model('Transaction');

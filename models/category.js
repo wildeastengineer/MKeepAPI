@@ -5,6 +5,8 @@ var User = require('./auth/user');
 /// Local variables
 var Category;
 var Schema = mongoose.Schema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 var CategorySchema = new Schema({
     _owner: 'String',
@@ -39,6 +41,9 @@ var CategorySchema = new Schema({
         ref: 'User'
     }
 });
+
+CategorySchema.plugin(notFoundErrorHandler);
+
 
 if (mongoose.models.Category) {
     Category = mongoose.model('Category');

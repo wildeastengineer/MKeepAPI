@@ -6,6 +6,8 @@ var User = require('./auth/user');
 /// Local variables
 var Account;
 var Schema = mongoose.Schema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 var AccountSchema = new Schema({
     _owner: 'String',
@@ -41,6 +43,8 @@ var AccountSchema = new Schema({
         ref: 'User'
     }
 });
+
+AccountSchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Account) {
     Account = mongoose.model('Account');

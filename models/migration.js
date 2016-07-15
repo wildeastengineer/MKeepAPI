@@ -3,6 +3,8 @@ var mongoose = require('mongoose');
 /// Local variables
 var Migration;
 var Schema = mongoose.Schema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 var MigrationSchema = new Schema({
     name: {
@@ -24,6 +26,8 @@ var MigrationSchema = new Schema({
         required: true
     }
 });
+
+MigrationSchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Migration) {
     Migration = mongoose.model('Migration');

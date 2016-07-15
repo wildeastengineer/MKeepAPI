@@ -10,6 +10,8 @@ var Widget = require('./widget');
 var Schema = mongoose.Schema;
 var Project;
 var ProjectSchema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 ProjectSchema = new Schema({
     owners: [{
@@ -31,8 +33,7 @@ ProjectSchema = new Schema({
     }],
     mainCurrency: {
         type: Schema.Types.ObjectId,
-        ref: 'Currency',
-        required: true
+        ref: 'Currency'
     },
     currencies: [{
         type: Schema.Types.ObjectId,
@@ -64,6 +65,8 @@ ProjectSchema = new Schema({
         ref: 'User'
     }
 });
+
+ProjectSchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Project) {
     Project = mongoose.model('Project');

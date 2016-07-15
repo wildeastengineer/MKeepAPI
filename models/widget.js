@@ -6,6 +6,8 @@ var User = require('./auth/user');
 var Schema = mongoose.Schema;
 var Widget;
 var WidgetSchema;
+/// Plugins
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
 
 WidgetSchema = new Schema({
     name: {
@@ -31,6 +33,8 @@ WidgetSchema = new Schema({
         ref: 'User'
     }
 });
+
+WidgetSchema.plugin(notFoundErrorHandler);
 
 if (mongoose.models.Widget) {
     Widget = mongoose.model('Widget');
