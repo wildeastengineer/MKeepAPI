@@ -23,17 +23,6 @@ var currencyController = {
 
         CurrencyModel.find({})
             .exec(function (error, currencies) {
-                if (!currencies) {
-                    error = {
-                        status: 404,
-                        message: 'Currencies weren\'t found:'
-                    };
-                    logger.error(error);
-                    deferred.reject(error);
-
-                    return;
-                }
-
                 if (error) {
                     logger.error('Currencies weren\'t found');
                     logger.error(error);
@@ -56,21 +45,10 @@ var currencyController = {
     getById: function (id) {
         var deferred = Q.defer();
 
-        Currency.findOne({
+        CurrencyModel.findOne({
             _id: id
         })
             .exec(function (error, currency) {
-                if (!currency) {
-                    error = {
-                        status: 404,
-                        message: 'Currency with given id wasn\'t found: ' + id
-                    };
-                    logger.error(error);
-                    deferred.reject(error);
-
-                    return;
-                }
-
                 if (error) {
                     logger.error('Currency with given id wasn\'t found: ' + id);
                     logger.error(error);
