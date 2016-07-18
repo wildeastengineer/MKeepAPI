@@ -44,7 +44,6 @@ var CategorySchema = new Schema({
 
 CategorySchema.plugin(notFoundErrorHandler);
 
-
 if (mongoose.models.Category) {
     Category = mongoose.model('Category');
 } else {

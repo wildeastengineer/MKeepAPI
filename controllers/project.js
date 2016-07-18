@@ -1,7 +1,6 @@
 /// Libs
 var Logger = require('../libs/log');
 var Q = require('q');
-var mongoose = require('mongoose');
 /// Models
 var UserModel = require('../models/auth/user');
 var ProjectModel = require('../models/project');
@@ -245,13 +244,13 @@ var projectController = {
             .exec(function (error, doc) {
                 if (error) {
                     logger.error(error);
-                    logger.error('Project main currency was not updated: ' + data.id);
+                    logger.error('Project was not renamed: ' + data.id);
                     deferred.reject(error);
 
                     return;
                 }
 
-                logger.info('Project name was successfully changed: ' + data.id);
+                logger.info('Project was successfully renamed: ' + data.id);
                 deferred.resolve(doc.name);
             });
 
