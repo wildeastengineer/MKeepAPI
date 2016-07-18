@@ -51,8 +51,8 @@ server.exchange(
             }
         });
 
-        var tokenValue = crypto.randomBytes(32).toString('base64');
-        var refreshTokenValue = crypto.randomBytes(32).toString('base64');
+        var tokenValue = crypto.randomBytes(16).toString('hex');
+        var refreshTokenValue = crypto.randomBytes(16).toString('hex');
         var token = new AccessTokenModel({
             token: tokenValue,
             clientId: client.clientId,
