@@ -1,4 +1,3 @@
-/// Libs
 /// Controllers
 var projectController = require('../controllers/project.js');
 

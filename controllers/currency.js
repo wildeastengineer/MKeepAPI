@@ -4,13 +4,9 @@ var Logger = require('../libs/log');
 var Q = require('q');
 /// Models
 var CurrencyModel = require('../models/currency');
+var ProjectModel = require('../models/project');
 /// Local variables
 var logger = Logger(module);
-
-// ToDo: remove this when auth is implemented
-var user = {
-    _id: 777
-};
 
 var currencyController = {
     /**
@@ -27,10 +23,10 @@ var currencyController = {
                     logger.error('Currencies weren\'t found');
                     logger.error(error);
                     deferred.reject(error);
-                } else {
-                    logger.info('Currencies were successfully found');
-                    deferred.resolve(currencies);
                 }
+
+                logger.info('Currencies were successfully found');
+                deferred.resolve(currencies);
             });
 
         return deferred.promise;
@@ -53,132 +49,89 @@ var currencyController = {
                     logger.error('Currency with given id wasn\'t found: ' + id);
                     logger.error(error);
                     deferred.reject(error);
-                } else {
-                    logger.info('Currency with given id was successfully found: ' + id);
-                    deferred.resolve(currency);
-                }
-        });
-
-        return deferred.promise;
-    },
-
-    post: function (globalCurrencyId) {
-        var currency;
-        var deferred = Q.defer();
-
-        this.getGlobalById(globalCurrencyId)
-            .then(function (globalCurrency) {
-                if (!globalCurrency) {
-                    deferred.reject({
-                        message: 'Global currency with id="' + globalCurrencyId + '" does not exist.'
-                    });
-
-                    return;
                 }
 
-                currency = new CurrencyModel();
-                _.extend(currency, {
-                    _owner: user._id,
-                    name: globalCurrency.name,
-                    icon: globalCurrency.icon,
-                    globalId: globalCurrencyId
-                });
-
-                //ToDo: add already existing validation by globalId
-                currency.save(function (error, newCurrency) {
-                    if (error) {
-                        deferred.reject(error);
-                        return;
-                    }
-
-                    deferred.resolve(newCurrency);
-                });
-            })
-            .fail(function (error) {
-                deferred.reject(error);
-            });
-
-        return deferred.promise;
-    },
-    remove: function (id, callback) {
-        CurrencyModel.remove(
-            {
-                _id: id,
-                _owner: user._id
-            },
-            function (err, result) {
-                if (err) {
-                    callback(err);
-
-                    return;
-                }
-
-                CurrencyModel.find(
-                    {
-                        _owner: user._id
-                    })
-                    .exec(callback);
-            }
-        );
-    },
-    getGlobals: function () {
-        var deferred = Q.defer();
-
-        CurrencyModel.find(
-            {
-                _owner: 0
-            })
-            .exec(function (error, globalCurrencies) {
-                if (error) {
-                    deferred.reject(error);
-                    return;
-                }
-
-                deferred.resolve(globalCurrencies);
-            });
-
-        return deferred.promise;
-    },
-    getGlobalById: function (id) {
-        var deferred = Q.defer();
-
-        console.log('getGlobalById', id);
-
-        CurrencyModel.findOne({
-            _id: id,
-            _owner: 0
-        })
-            .exec(function (error, currency) {
-                if (error) {
-                    deferred.reject(error);
-                    return;
-                }
-
+                logger.info('Currency with given id was successfully found: ' + id);
                 deferred.resolve(currency);
+
+        });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update currencies array in given project
+     * @param {Object} data
+     * @param {ObjectId | string} data.id - project id
+     * @param {ObjectId | string} data.userId
+     * @param {ObjectId[] | string[]} data.currencies
+     *
+     * @returns {promise}
+     */
+    updateProjectCurrencies: function (data) {
+        var deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            currencies: data.currencies
+        }, {
+            runValidators: true
+        })
+            .populate('currencies')
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Project currencies were not updated: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Project currencies were successfully updated: ' + data.id);
+                deferred.resolve(doc.currencies);
             });
 
         return deferred.promise;
     },
-    addGlobal: function (currencyData) {
-        var currency = new CurrencyModel();
+
+    /**
+     * Update main project currency
+     * @param {Object} data
+     * @param {ObjectId | string} data.id - project id
+     * @param {ObjectId | string} data.userId
+     * @param {ObjectId | string} data.mainCurrency
+     *
+     * @returns {promise}
+     */
+    updateProjectMainCurrency: function (data) {
         var deferred = Q.defer();
 
-        _.extend(currency, currencyData, {
-            _owner: 0,
-            global: 0
-        });
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            mainCurrency: data.mainCurrency
+        }, {
+            runValidators: true
+        })
+            .populate('mainCurrency')
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Project main currency was not updated: ' + data.id);
+                    deferred.reject(error);
 
-        currency.save(function (error, newCurrency) {
-            if (error) {
-                deferred.reject(error);
-                return;
-            }
+                    return;
+                }
 
-            deferred.resolve(newCurrency);
-        });
+                logger.info('Project main currency was successfully changed: ' + data.id);
+                deferred.resolve(doc.mainCurrency);
+            });
 
         return deferred.promise;
-    }
+    },
 };
 
 module.exports = currencyController;

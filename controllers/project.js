@@ -5,6 +5,7 @@ var Q = require('q');
 var UserModel = require('../models/auth/user');
 var ProjectModel = require('../models/project');
 /// Controllers
+var CurrencyController = require('./currency');
 /// Local variables
 var logger = Logger(module);
 /// Private functions
@@ -148,7 +149,7 @@ var projectController = {
     },
 
     /**
-     * Add currencies array to given project
+     * Update currencies array in given project
      * @param {Object} data
      * @param {ObjectId | string} data.id - project id
      * @param {ObjectId | string} data.userId
@@ -157,31 +158,7 @@ var projectController = {
      * @returns {promise}
      */
     updateCurrencies: function (data) {
-        var deferred = Q.defer();
-
-        ProjectModel.findOneAndUpdate({
-            _id: data.id,
-            owners: data.userId
-        }, {
-            currencies: data.currencies
-        }, {
-            runValidators: true
-        })
-            .populate('currencies')
-            .exec(function (error, doc) {
-                if (error) {
-                    logger.error(error);
-                    logger.error('Project currencies were not updated: ' + data.id);
-                    deferred.reject(error);
-
-                    return;
-                }
-
-                logger.info('Project currencies were successfully updated: ' + data.id);
-                deferred.resolve(doc.currencies);
-            });
-
-        return deferred.promise;
+        return CurrencyController.updateProjectCurrencies(data);
     },
 
     /**
@@ -194,31 +171,7 @@ var projectController = {
      * @returns {promise}
      */
     updateMainCurrency: function (data) {
-        var deferred = Q.defer();
-
-        ProjectModel.findOneAndUpdate({
-            _id: data.id,
-            owners: data.userId
-        }, {
-            mainCurrency: data.mainCurrency
-        }, {
-            runValidators: true
-        })
-            .populate('mainCurrency')
-            .exec(function (error, doc) {
-                if (error) {
-                    logger.error(error);
-                    logger.error('Project main currency was not updated: ' + data.id);
-                    deferred.reject(error);
-
-                    return;
-                }
-
-                logger.info('Project main currency was successfully changed: ' + data.id);
-                deferred.resolve(doc.mainCurrency);
-            });
-
-        return deferred.promise;
+        return CurrencyController.updateProjectMainCurrency(data);
     },
 
     /**
