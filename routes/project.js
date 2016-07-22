@@ -2,8 +2,8 @@
 /// Controllers
 var projectController = require('../controllers/project.js');
 
-var ProjectRegisterRoutes = function (router, authenticate, sendError) {
-    router.post('/projects', authenticate, function (req, res) {
+var ProjectRegisterRoutes = function (router, authenticate) {
+    router.post('/projects', authenticate, function (req, res, next) {
         projectController.post({
             name: req.body.name,
             userId: req.user._id,
@@ -13,11 +13,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(project);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 
-    router.get('/projects', authenticate, function (req, res) {
+    router.get('/projects', authenticate, function (req, res, next) {
         projectController.getAll({
             userId: req.user._id
         })
@@ -25,11 +25,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(projects);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 
-    router.get('/projects/:id', authenticate, function (req, res) {
+    router.get('/projects/:id', authenticate, function (req, res, next) {
         projectController.getById({
             id: req.params.id,
             userId: req.user._id
@@ -38,11 +38,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(project);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 
-    router.post('/projects/:id/currencies/update', authenticate, function (req, res) {
+    router.post('/projects/:id/currencies/update', authenticate, function (req, res, next) {
         projectController.updateCurrencies({
             id: req.params.id,
             userId: req.user._id,
@@ -52,11 +52,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(currencies);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 
-    router.post('/projects/:id/currencies/main', authenticate, function (req, res) {
+    router.post('/projects/:id/currencies/main', authenticate, function (req, res, next) {
         projectController.updateMainCurrency({
             id: req.params.id,
             userId: req.user._id,
@@ -66,11 +66,11 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(currencies);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 
-    router.post('/projects/:id/rename', authenticate, function (req, res) {
+    router.post('/projects/:id/rename', authenticate, function (req, res, next) {
         projectController.rename({
             id: req.params.id,
             userId: req.user._id,
@@ -80,7 +80,7 @@ var ProjectRegisterRoutes = function (router, authenticate, sendError) {
                 res.json(name);
             })
             .fail(function (error) {
-                sendError(error, res);
+                next(error);
             });
     });
 };

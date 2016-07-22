@@ -13,6 +13,10 @@ var port = config.get('port');
 /// Mongoose plugins
 var beautifyUnique = require('mongoose-beautiful-unique-validation');
 var idValidator = require('mongoose-id-validator');
+/// Express plugins
+var errorHandler = require('./utils/expressPlugins/errorHandler.js');
+var methodNotAllowedErrorHandler = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
+var notFoundErrorHandler = require('./utils/expressPlugins/notFoundErrorHandler.js');
 
 // register global mongoose plugins
 mongoose.plugin(idValidator); // validate ref docs existence
@@ -39,10 +43,15 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
 require('./routes/routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
-app.use(function(req, res, next) {
-    res.status(404).redirect('/');
-});
+
+// error handlers that pass error to final handler
+app.use(methodNotAllowedErrorHandler);
+app.use(notFoundErrorHandler);
+
+// final error handler
+app.use(errorHandler);
 
 // launch ======================================================================
 migrator.run(config.get('database:uri') + '/' +config.get('database:name'))

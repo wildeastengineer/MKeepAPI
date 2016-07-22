@@ -24,24 +24,15 @@ module.exports = function (app, router) {
         });
     });
 
-    userRoutes.register(router, authenticate, sendError);
+    userRoutes.register(router, authenticate);
 
-    accountRoutes.register(router, authenticate, sendError);
-    categoryRoutes.register(router, authenticate, sendError);
-    currencyRoutes.register(router, authenticate, sendError);
-    dashboardRoutes.register(router, authenticate, sendError);
-    transactionRoutes.register(router, authenticate, sendError);
-    projectRoutes.register(router, authenticate, sendError);
+    accountRoutes.register(router, authenticate);
+    categoryRoutes.register(router, authenticate);
+    currencyRoutes.register(router, authenticate);
+    dashboardRoutes.register(router, authenticate);
+    transactionRoutes.register(router, authenticate);
+    projectRoutes.register(router, authenticate);
 
     // All of our routes will be prefixed with '/api'
     app.use(config.get('baseUrl'), router);
 };
-
-function sendError(error, response) {
-    if (error) {
-        response.status(error.status || 500);
-        response.send({
-            message: error.message
-        });
-    }
-}
