@@ -15,73 +15,85 @@ var logger = Logger(module);
 var exchangeRateServiceCreation = {
     execute: function (db) {
         var collectionName = 'exchangerateservices';
-        var currencyCollection;
-        var currenciesList;
-
         var deferred = Q.defer();
+        var exchangeRateServiceCollection;
+        var exchangeRateServiceList = [
+            {
+                name: 'Центральный банк Российской Федерации',
+                abbreviation: 'CBR',
+                url: 'http://www.cbr.ru/scripts/XML_daily_eng.asp',
+                lastUpdate: null,
+                updateTime: '14:00:00 GMT+0300',
+                base: 'RUB',
+                rates: {},
+                created: new Date()
+            },
+            {
+                name: 'European Central Bank',
+                abbreviation: 'ECB',
+                url: 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml',
+                lastUpdate: null,
+                updateTime: '16:00:00 GMT+0100',
+                base: 'EUR',
+                rates: {},
+                created: new Date()
+            },
+            {
+                name: 'Open Exchange Rates API (forex)',
+                abbreviation: 'OER',
+                url: 'https://openexchangerates.org/api/latest.json?app_id=f30c1cbbe48445d3af6a995d7fd9f30b',
+                lastUpdate: null,
+                updatePeriod: 3600, //seconds
+                base: 'USD',
+                rates: {},
+                created: new Date()
+            }
+        ];
 
-        currencyCollection = db.collection(collectionName);
-
-        currencyCollection.indexes()
-            .then(function (indexes) {
-                var indexCreationDeferred;
-                var hasIsoIndex = false;
-                var i;
-
-                for (i = 0; i < indexes.length; i++) {
-                    if (indexes[i].name === 'iso_1') {
-                        hasIsoIndex = true;
-                        break;
-                    }
-                }
-
-                if (hasIsoIndex) {
-                    indexCreationDeferred = Q.defer();
-                    indexCreationDeferred.resolve();
-
-                    return indexCreationDeferred;
-                }
-
-                return currencyCollection.createIndex({
-                    iso: 1
+        exchangeRateServiceCollection = db.collection(collectionName);
+        
+        exchangeRateServiceCollection.createIndex({
+                    name: 1,
+                    abbreviation: 1,
+                    url: 1
                 }, {
                     unique: true
-                });
+                })
+            .catch(function (error) {
+                deferred.reject(error);
+
+                return deferred.promise;
             })
             .then(function () {
-                return currencyCollection.find({}, {
-                    iso: 1,
+                return exchangeRateServiceCollection.find({}, {
+                    abbreviation: 1,
                     _id: 0
                 }).toArray();
             })
             .then(function (docs) {
-                var currenciesForAdding = [];
-                var currenciesInDb = [];
                 var i;
+                var servicesForAdding = [];
+                var servicesInDb = [];
 
                 for (i = 0; i < docs.length; i++) {
-                    currenciesInDb.push(docs[i].iso);
+                    servicesInDb.push(docs[i].abbreviation);
                 }
 
-                for (i = 0; i < currenciesList.length; i++) {
-                    if (currenciesInDb.indexOf(currenciesList[i]) === -1) {
-                        currenciesForAdding.push({
-                            iso: currenciesList[i],
-                            created: new Date(),
-                            modified: new Date()
-                        });
+                for (i = 0; i < exchangeRateServiceList.length; i++) {
+                    if (servicesInDb.indexOf(exchangeRateServiceList[i].abbreviation) === -1) {
+                        servicesForAdding.push(exchangeRateServiceList[i]);
                     }
                 }
 
-                if (currenciesForAdding.length === 0) {
+                if (servicesForAdding.length === 0) {
                     logger.info('Collection "${collection}" already has all necessary docs'
-                        .replace('${collection}', collectionName));
+                            .replace('${collection}', collectionName));
                     deferred.resolve();
 
                     return deferred.promise;
                 }
 
-                currencyCollection.insertMany(currenciesForAdding)
+                exchangeRateServiceCollection.insertMany(servicesForAdding)
                     .then(function () {
                         deferred.resolve();
                     })
@@ -94,4 +106,4 @@ var exchangeRateServiceCreation = {
     }
 };
 
-module.exports = currenciesCreation;
+module.exports = exchangeRateServiceCreation;

@@ -12,8 +12,10 @@ var ExchangeRateServiceSchema = new Schema({
         unique: true,
         required: true
     },
-    app_id: {
-        type: String
+    abbreviation: {
+        type: String,
+        unique: true,
+        required: true
     },
     url: {
         type: String,
@@ -24,7 +26,7 @@ var ExchangeRateServiceSchema = new Schema({
         type: Date,
         required: true
     },
-    // updating period in ms: 24 * 60 * 60 * 1000 use it if update time is not specified
+    // updating period in s: 60 * 60 use it if update time is not specified
     updatePeriod: {
         type: Number
     },
