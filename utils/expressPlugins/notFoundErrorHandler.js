@@ -1,5 +1,3 @@
-var _ = require('underscore');
-
 var notFoundErrorHandler = function(req, res, next) {
     var error = new Error();
 
