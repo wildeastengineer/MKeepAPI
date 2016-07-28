@@ -23,6 +23,8 @@ var currencyController = {
                     logger.error('Currencies weren\'t found');
                     logger.error(error);
                     deferred.reject(error);
+
+                    return;
                 }
 
                 logger.info('Currencies were successfully found');
@@ -49,11 +51,12 @@ var currencyController = {
                     logger.error('Currency with given id wasn\'t found: ' + id);
                     logger.error(error);
                     deferred.reject(error);
+
+                    return;
                 }
 
                 logger.info('Currency with given id was successfully found: ' + id);
                 deferred.resolve(currency);
-
         });
 
         return deferred.promise;
@@ -131,7 +134,7 @@ var currencyController = {
             });
 
         return deferred.promise;
-    },
+    }
 };
 
 module.exports = currencyController;
