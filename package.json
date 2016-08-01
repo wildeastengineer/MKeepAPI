@@ -6,6 +6,7 @@
         "body-parser": "1.0.1",
         "crypto": "0.0.3",
         "express": "4.0.0",
+        "moment": "^2.14.1",
         "mongodb": "2.1.21",
         "mongoose": "4.5.3",
         "mongoose-beautiful-unique-validation": "3.0.0",
@@ -19,7 +20,9 @@
         "passport-http-bearer": "^1.0.1",
         "passport-oauth2-client-password": "^0.1.2",
         "q": "1.4.1",
+        "request": "2.74.0",
         "underscore": "^1.8.3",
-        "winston": "^2.2.0"
+        "winston": "^2.2.0",
+        "xmldom": "^0.1.22"
     }
 }

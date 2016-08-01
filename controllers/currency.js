@@ -5,6 +5,8 @@ var Q = require('q');
 /// Models
 var CurrencyModel = require('../models/currency');
 var ProjectModel = require('../models/project');
+/// Controllers
+var ExchangeRateServiceController = require('./exchangerateservice.js');
 /// Local variables
 var logger = Logger(module);
 
@@ -134,6 +136,26 @@ var currencyController = {
             });
 
         return deferred.promise;
+    },
+
+    /**
+     * Get exchange currency rate by given service id
+     *
+     * @param {ObjectId | string} id
+     *
+     * @returns {promise}
+     */
+    getCurrencyExchangeRate: function (id) {
+        return ExchangeRateServiceController.getCurrencyExchangeRate(id);
+    },
+
+    /**
+     * Get all exchange currency rate services
+     *
+     * @returns {promise}
+     */
+    getAllCurrencyExchangeServices: function () {
+        return ExchangeRateServiceController.getAll();
     }
 };
 

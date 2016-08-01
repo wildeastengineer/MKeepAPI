@@ -1,3 +1,8 @@
+/// Libs
+var Logger = require('../../libs/log');
+/// Local variables
+var logger = Logger(module);
+
 var errorHandler = function(err, req, res, next) {
     var i;
 
@@ -28,6 +33,7 @@ var errorHandler = function(err, req, res, next) {
         }
     }
 
+    logger.error(err);
     res.status(500).send('Unhandled error');
 };
 
