@@ -16,38 +16,104 @@ validateEmail = function (email) {
     return reg.test(email)
 };
 
+/**
+ * User mongoose schema.
+ * @class models/UserSchema
+ */
 UserSchema = new Schema({
+    /**
+     * The user name.
+     *
+     * @type String
+     * @memberof models/UserSchema
+     */
     username: {
         type: String,
         unique: true,
         required: true,
         validate: [validateEmail, 'Please fill a valid email address']
     },
+
+    /**
+     * The hash os password.
+     *
+     * @type String
+     * @memberof models/UserSchema
+     */
     hashedPassword: {
         type: String,
         required: true
     },
+
+    /**
+     * The salt.
+     *
+     * @type String
+     * @memberof models/UserSchema
+     */
     salt: {
         type: String,
         required: true
     },
+
+    /**
+     * The creation date.
+     *
+     * @type Date
+     * @memberof models/UserSchema
+     */
     created: {
         type: Date
     },
+
+    /**
+     * The password recovery token.
+     *
+     * @type String
+     * @memberof models/UserSchema
+     */
     passRecoveryToken: {
         type: String
     },
+
+    /**
+     * The password recovery token creation date.
+     *
+     * @type Date
+     * @memberof models/UserSchema
+     */
     passRecoveryCreatedAt: {
         type: Date
     },
+
+    /**
+     * The date of the last user modification.
+     *
+     * @type Date
+     * @memberof models/UserSchema
+     */
     modified: {
         type: Date,
         default: Date.now
     },
+
+    /**
+     * The list of projects links.
+     *
+     * @type ObjectId[]
+     * @memberof models/UserSchema
+     */
     projects: [{
         type: Schema.Types.ObjectId,
         ref: 'Project'
     }],
+
+    /**
+     * The used language abbr.
+     *
+     * @type String
+     * @memberof models/UserSchema
+     */
     lang: {
         type: String,
         enum: ['en', 'ru'],
@@ -55,11 +121,23 @@ UserSchema = new Schema({
     }
 });
 
+/**
+ * @name userId
+ * @type String
+ * @memberof models/UserSchema
+ * @virtual
+ */
 UserSchema.virtual('userId')
     .get(function () {
         return this.id;
     });
 
+/**
+ * @name password
+ * @type String
+ * @memberof models/UserSchema
+ * @virtual
+ */
 UserSchema.virtual('password')
     .set(function (password) {
         this._plainPassword = password;
@@ -71,7 +149,9 @@ UserSchema.virtual('password')
     });
 
 /**
- * Encrypt password
+ * @function
+ * @name encryptPassword
+ * @memberof models/UserSchema
  *
  * @param {string} password
  *
@@ -86,7 +166,9 @@ UserSchema.methods.encryptPassword = function (password) {
 };
 
 /**
- * Check password
+ * @function
+ * @name checkPassword
+ * @memberof models/UserSchema
  *
  * @param {string} password
  *
