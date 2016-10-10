@@ -19,6 +19,10 @@ Install Nodemon:
 ```
 $ sudo npm install nodemon -g
 ```
+Install Gulp:
+```
+$ sudo npm install --global gulp-cli
+```
 
 ### Installation
 Check out the code
