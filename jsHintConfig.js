@@ -33,4 +33,4 @@ var jshintConfig = {
     // when your code is running inside of the Node runtime environment
 };
 
-mode.exports = jshintConfig;
+module.exports = jshintConfig;

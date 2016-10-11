@@ -26,9 +26,20 @@
         "xmldom": "^0.1.22"
     },
     "devDependencies": {
+        "gulp": "^3.9.1",
+        "gulp-jshint": "^2.0.1",
         "gulp-shell": "^0.5.2",
         "jsdoc": "^3.4.2",
+        "jshint": "^2.9.3",
+        "jshint-stylish": "^2.2.1",
+        "precommit-hook": "^3.0.0",
         "rimraf": "^2.5.4",
         "run-sequence": "^1.2.2"
-    }
+    },
+    "scripts": {
+        "jshint": "gulp jshint"
+    },
+    "pre-commit": [
+        "jshint"
+    ]
 }
