@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Libs
+var _ = require('underscore');
+var Logger = require('../libs/log');
+var Q = require('q');
+/// Models
+var UserModel = require('../models/auth/user');
+/// Local variables
+var logger = Logger(module);
+var userController = {
+    /**
+     * Create new user
+     *
+     * @param {Object} data
+     * @param {string} data.username - email in fact
+     * @param {string} data.password
+     *
+     * @returns {promise}
+     */
+    createUser: function (data) {
+        var deferred = Q.defer();
+
+        UserModel.findOne(
+            {
+                username: data.username
+            },
+            function (error, user) {
+                var newUser;
+
+                if (error) {
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (user) {
+                    logger.error('User with this email doesn\'t exist');
+                    deferred.reject(new Error('User with this email already exists'));
+
+                    return;
+                }
+
+                newUser = new UserModel({
+                    username: data.username,
+                    password: data.password,
+                    created: new Date()
+                });
+
+                newUser.save(function (error, user) {
+                    if (error) {
+                        logger.error(error);
+                        deferred.reject(error);
+                    } else {
+                        logger.info('New User has been successfully created: ' + user);
+                        deferred.resolve(_.pick(user, 'username', 'created'));
+                    }
+                });
+            }
+        );
+
+        return deferred.promise;
+    },
+    /**
+     * Changes password of existing user
+     *
+     * @param {Object} data
+     * @param {string} data.username - email in fact
+     * @param {string} data.newPassword
+     *
+     * @returns {promise}
+     */
+    changePassword: function (data) {
+        var deferred = Q.defer();
+        var result = {
+            success: true,
+            message: 'Password has been successfully changed for {user}'.replace('{user}', data.username)
+        };
+
+        UserModel.findOne(
+            {
+                username: data.username
+            },
+            function (error, user) {
+                if (error) {
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (!user) {
+                    logger.error('Cannot change password. User with this email doesn\'t exist: ' + user.username);
+                    deferred.reject(new Error('Cannot change password. User with this email doesn\'t exist: '
+                            + user.username));
+
+                    return;
+                }
+
+                user.password = data.newPassword;
+
+                user.save(function (error) {
+                    if (error) {
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    logger.info(result.message);
+                    deferred.resolve(result);
+                });
+            }
+        );
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get user by given id
+     * @param {Object} data
+     * @param {ObjectId | string} data.id
+     *
+     * @returns {promise}
+     */
+    getById: function (data) {
+        var deferred = Q.defer();
+
+        UserModel.findOne({
+            _id: data.id
+        })
+            .exec(function (error, user) {
+                if (!user) {
+                    error = {
+                        status: 404,
+                        message: 'User with given id wasn\'t found: ' + data.id
+                    };
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (error) {
+                    logger.error('User with given id wasn\'t found: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('User with given id was successfully found: ' + data.id);
+                    deferred.resolve(user);
+                }
+            });
+
+        return deferred.promise;
+    }
+};
+
+module.exports = userController;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

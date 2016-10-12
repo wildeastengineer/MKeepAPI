@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/project.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/project.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Controllers
+var projectController = require('../controllers/project.js');
+
+/**
+ * Projects routes.
+ * @class routes/Project
+ */
+var ProjectRegisterRoutes = function (router, authenticate) {
+    /**
+     * Create new project.
+     *
+     * @function
+     * @name POST: /projects
+     * @memberof routes/Project
+     *
+     * @param {String} name - Project's name
+     * @param {String} mainCurrency - Project's main currency id
+     *
+     * @returns {models/ProjectSchema} project - Created project.
+     */
+    router.post('/projects', authenticate, function (req, res, next) {
+        projectController.post({
+            name: req.body.name,
+            mainCurrency: req.body.mainCurrency,
+            userId: req.user._id
+        })
+            .then(function (project) {
+                res.json(project);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Get list of all projects.
+     *
+     * @function
+     * @name GET: /projects
+     * @memberof routes/Project
+     *
+     * @returns {models/ProjectSchema[]} projects - All available projects.
+     */
+    router.get('/projects', authenticate, function (req, res, next) {
+        projectController.getAll({
+            userId: req.user._id
+        })
+            .then(function (projects) {
+                res.json(projects);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Get project by id.
+     *
+     * @function
+     * @name GET: /projects/:id
+     * @memberof routes/Project
+     *
+     * @returns {models/ProjectSchema} project
+     */
+    router.get('/projects/:id', authenticate, function (req, res, next) {
+        projectController.getById({
+            id: req.params.id,
+            userId: req.user._id
+        })
+            .then(function (project) {
+                res.json(project);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Update project's currencies list
+     *
+     * @function
+     * @name POST: /projects/:id/currencies/update
+     * @memberof routes/Project
+     *
+     * @param {String[]} currencies - Array of currencies id
+     *
+     * @returns {models/CurrencySchema[]} currencies - New project's currencies list.
+     */
+    router.post('/projects/:id/currencies/update', authenticate, function (req, res, next) {
+        projectController.updateCurrencies({
+            id: req.params.id,
+            userId: req.user._id,
+            currencies: req.body.currencies
+        })
+            .then(function (currencies) {
+                res.json(currencies);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Update project's main currency
+     *
+     * @function
+     * @name POST: /projects/:id/currencies/main
+     * @memberof routes/Project
+     *
+     * @param {String} mainCurrency - New main currency id
+     *
+     * @returns {models/CurrencySchema} currency - New project's main currency.
+     */
+    router.post('/projects/:id/currencies/main', authenticate, function (req, res, next) {
+        projectController.updateMainCurrency({
+            id: req.params.id,
+            userId: req.user._id,
+            mainCurrency: req.body.mainCurrency
+        })
+            .then(function (currency) {
+                res.json(currency);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Update project's name
+     *
+     * @function
+     * @name POST: /projects/:id/rename
+     * @memberof routes/Project
+     *
+     * @param {String} name - Project's new name
+     *
+     * @returns {String} name - New project's name.
+     */
+    router.post('/projects/:id/rename', authenticate, function (req, res, next) {
+        projectController.rename({
+            id: req.params.id,
+            userId: req.user._id,
+            name: req.body.name
+        })
+            .then(function (name) {
+                res.json(name);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+};
+
+module.exports = {
+    register: ProjectRegisterRoutes
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

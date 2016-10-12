@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Libs
+var config = require('../libs/config');
+var emailSender = require('../utils/emailSender');
+var oauth2 = require('../libs/oauth2');
+var url = require('url');
+/// Controllers
+var passRecovery = require('../controllers/passRecovery.js');
+var userController = require('../controllers/user.js');
+
+/**
+ * Users routes.
+ * @class routes/User
+ */
+var userRegisterRoutes = function (router, authenticate, sendError) {
+    /**
+     * Create new user.
+     *
+     * @function
+     * @name POST: /registration
+     * @memberof routes/User
+     *
+     * @param {String} username
+     * @param {String} password
+     *
+     * @returns {models/UserSchema} user - Created user.
+     */
+    router.post('/registration', function (req, res) {
+        userController.createUser({
+            username: req.body.username,
+            password: req.body.password
+        })
+            .then(function (user) {
+                res.json(user);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
+
+    // Register authentication routes
+
+    /**
+     * Authenticate user.
+     *
+     * @function
+     * @name POST: /authenticate
+     * @memberof routes/User
+     */
+    router.post('/authenticate', oauth2.token);
+
+    /**
+     * Get user's profile.
+     *
+     * @function
+     * @name GET: /profile
+     * @memberof routes/User
+     *
+     * @returns {Object} info - User info.
+     * @returns {string} info.user_id
+     * @returns {string} info.name
+     * @returns {object} info.scope
+     */
+    router.get('/profile', authenticate, function (req, res) {
+        res.json({
+            user_id: req.user.userId,
+            name: req.user.username,
+            scope: req.authInfo.scope
+        });
+    });
+
+    /**
+     * Request password recovery token.
+     *
+     * @function
+     * @name POST: /send-recover-password-token
+     * @memberof routes/User
+     *
+     * @param {String} username
+     *
+     * @returns {Object} result
+     * @returns {Boolean} result.success
+     * @returns {String} result.message
+     */
+    router.post('/send-recover-password-token', function (req, res) {
+        passRecovery.createPassRecoveryToken(req.body.username)
+            .then(function (token) {
+                var redirectUrl;
+
+                redirectUrl = url.parse(req.body.redirectUrl, true);
+                redirectUrl.query.username = req.body.username;
+                redirectUrl.query.token = token.token;
+
+                redirectUrl = url.format({
+                    protocol: redirectUrl.protocol,
+                    hostname: redirectUrl.hostname,
+                    port: redirectUrl.port,
+                    pathname: redirectUrl.pathname,
+                    query: redirectUrl.query
+                });
+
+                return emailSender.passwordRecovery(req.body.username, redirectUrl);
+            })
+            .then(function (result) {
+                res.json(result);
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
+
+    /**
+     * Change user's password.
+     *
+     * @function
+     * @name POST: /recover-password
+     * @memberof routes/User
+     *
+     * @param {String} username
+     * @param {String} newPassword
+     * @param {String} token
+     *
+     * @returns {Object} result
+     * @returns {Boolean} result.success
+     * @returns {String} result.message
+     */
+    router.post('/recover-password', function (req, res) {
+        passRecovery.isPasswordRecoveryTokenExisting(req.body.token)
+            .then(function () {
+                passRecovery.removePassRecoveryToken(req.body.token)
+            })
+            .then(function () {
+                return userController.changePassword({
+                    username: req.body.username,
+                    newPassword: req.body.newPassword
+                })
+            })
+            .then(function (result) {
+                res.json(result)
+            })
+            .fail(function (error) {
+                sendError(error, res);
+            });
+    });
+};
+
+module.exports = {
+    register: userRegisterRoutes
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
