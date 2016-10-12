@@ -10,20 +10,28 @@ var CurrencyController = require('./currency');
 var logger = Logger(module);
 /// Private functions
 
+/**
+ * Projects controller.
+ * @class controllers/Project
+ */
 var projectController = {
-
     /**
-     * Create new blank project
-     * @params {Object} data
-     * @params {string} data.name
-     * @params {ObjectId | string} data.userId
-     * @params [Object[]] data.accounts
-     * @params [ObjectId[] | string[]] data.currencies
-     * @params {ObjectId | string} data.mainCurrency
-     * @params [Object[]] data.categories
-     * @params [Object[]] data.widgets
+     * Create new project
      *
-     * @returns {promise}
+     * @function
+     * @name post
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {String} data.name
+     * @param {(ObjectId|String)} data.userId
+     * @param {Object[]} [data.accounts]
+     * @param {(ObjectId[]|String[])} [data.currencies]
+     * @param {(ObjectId|String)} [data.mainCurrency]
+     * @param {Object[]} [data.categories]
+     * @param {Object[]} [data.widgets]
+     *
+     * @returns {Promise<models/ProjectSchema|Error>}
      */
     post: function (data) {
         var deferred = Q.defer();
@@ -87,12 +95,17 @@ var projectController = {
     },
 
     /**
-     * Get project by given id
-     * @param {Object} data
-     * @param {ObjectId | string} data.id
-     * @param {ObjectId | string} data.userId
+     * Get project by id
      *
-     * @returns {promise}
+     * @function
+     * @name getById
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<models/ProjectSchema|Error>}
      */
     getById: function (data) {
         var deferred = Q.defer();
@@ -119,11 +132,16 @@ var projectController = {
     },
 
     /**
-     * Get get all projects
-     * @param {Object} data
-     * @param {ObjectId | string} data.userId
+     * Get list of all projects
      *
-     * @returns {promise}
+     * @function
+     * @name getAll
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<models/ProjectSchema[]|Error>}
      */
     getAll: function (data) {
         var deferred = Q.defer();
@@ -150,12 +168,17 @@ var projectController = {
 
     /**
      * Update currencies array in given project
-     * @param {Object} data
-     * @param {ObjectId | string} data.id - project id
-     * @param {ObjectId | string} data.userId
-     * @param {ObjectId[] | string[]} data.currencies
      *
-     * @returns {promise}
+     * @function
+     * @name updateCurrencies
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise<models/CurrencySchema[]|Error>}
      */
     updateCurrencies: function (data) {
         return CurrencyController.updateProjectCurrencies(data);
@@ -163,12 +186,17 @@ var projectController = {
 
     /**
      * Update main project currency
-     * @param {Object} data
-     * @param {ObjectId | string} data.id - project id
-     * @param {ObjectId | string} data.userId
-     * @param {ObjectId | string} data.mainCurrency
      *
-     * @returns {promise}
+     * @function
+     * @name updateMainCurrency
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.mainCurrency
+     *
+     * @returns {Promise<models/CurrencySchema|Error>}
      */
     updateMainCurrency: function (data) {
         return CurrencyController.updateProjectMainCurrency(data);
@@ -176,12 +204,17 @@ var projectController = {
 
     /**
      * Rename project with given name
-     * @param {Object} data
-     * @param {ObjectId | string} data.id - project id
-     * @param {ObjectId | string} data.userId
-     * @param {string} data.name
      *
-     * @returns {promise}
+     * @function
+     * @name updateMainCurrency
+     * @memberof controllers/Project
+     *
+     * @param {Object} rename
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {String} data.name
+     *
+     * @returns {Promise<String|Error>} - New project name
      */
     rename: function (data) {
         var deferred = Q.defer();

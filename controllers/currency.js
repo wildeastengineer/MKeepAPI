@@ -10,11 +10,19 @@ var ExchangeRateServiceController = require('./exchangerateservice.js');
 /// Local variables
 var logger = Logger(module);
 
+/**
+ * Currencies controller.
+ * @class controllers/Currency
+ */
 var currencyController = {
     /**
      * Get get all currencies
      *
-     * @returns {promise}
+     * @function
+     * @name getAll
+     * @memberof controllers/Currency
+     *
+     * @returns {Promise<models/CurrencySchema[]|Error>}
      */
     getAll: function () {
         var deferred = Q.defer();
@@ -38,9 +46,14 @@ var currencyController = {
 
     /**
      * Get currency by given id
-     * @param {ObjectId | string} id
      *
-     * @returns {promise}
+     * @function
+     * @name getById
+     * @memberof controllers/Currency
+     *
+     * @param {(ObjectId|String)} id
+     *
+     * @returns {Promise<models/CurrencySchema|Error>}
      */
     getById: function (id) {
         var deferred = Q.defer();
@@ -66,12 +79,17 @@ var currencyController = {
 
     /**
      * Update currencies array in given project
-     * @param {Object} data
-     * @param {ObjectId | string} data.id - project id
-     * @param {ObjectId | string} data.userId
-     * @param {ObjectId[] | string[]} data.currencies
      *
-     * @returns {promise}
+     * @function
+     * @name updateProjectCurrencies
+     * @memberof controllers/Currency
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise<models/CurrencySchema[]|Error>}
      */
     updateProjectCurrencies: function (data) {
         var deferred = Q.defer();
@@ -103,12 +121,17 @@ var currencyController = {
 
     /**
      * Update main project currency
-     * @param {Object} data
-     * @param {ObjectId | string} data.id - project id
-     * @param {ObjectId | string} data.userId
-     * @param {ObjectId | string} data.mainCurrency
      *
-     * @returns {promise}
+     * @function
+     * @name updateProjectMainCurrency
+     * @memberof controllers/Currency
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.mainCurrency
+     *
+     * @returns {Promise<models/CurrencySchema|Error>}
      */
     updateProjectMainCurrency: function (data) {
         var deferred = Q.defer();
@@ -141,9 +164,13 @@ var currencyController = {
     /**
      * Get exchange currency rate by given service id
      *
-     * @param {ObjectId | string} id
+     * @function
+     * @name getCurrencyExchangeRate
+     * @memberof controllers/Currency
      *
-     * @returns {promise}
+     * @param {(ObjectId|String)} id
+     *
+     * @returns {Promise<Object|Error>}
      */
     getCurrencyExchangeRate: function (id) {
         return ExchangeRateServiceController.getCurrencyExchangeRate(id);
@@ -152,7 +179,11 @@ var currencyController = {
     /**
      * Get all exchange currency rate services
      *
-     * @returns {promise}
+     * @function
+     * @name getAllCurrencyExchangeServices
+     * @memberof controllers/Currency
+     *
+     * @returns {Promise<Object[]|Error>}
      */
     getAllCurrencyExchangeServices: function () {
         return ExchangeRateServiceController.getAll();

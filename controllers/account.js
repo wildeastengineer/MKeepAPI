@@ -1,12 +1,27 @@
 var Account = require('../models/account');
 var Transaction = require('../models/transaction');
 
-// ToDo: remove this when auth is implemented
-var user = {
-    _id: 777
-};
-
-var accountController = {
+/**
+ * Accounts controller.
+ * @class controllers/Account
+ */
+module.exports = {
+    /**
+     * Get list of all accounts
+     *
+     * @function
+     * @name getAll
+     * @memberof controllers/Account
+     *
+     * @param {getAllAccountsCallback} callback
+     */
+    /**
+     * This callback is displayed as a global member.
+     * @callback getAllAccountsCallback
+     * @memberof controllers/Account
+     *
+     * @param {models/AccountSchema[]} data
+     */
     getAll: function (callback) {
         Account.find(
             {
@@ -148,5 +163,3 @@ var accountController = {
         );
     }
 };
-
-module.exports = accountController;
