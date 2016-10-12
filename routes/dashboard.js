@@ -1,8 +1,21 @@
 /// Controllers
 var dashboardController = require('../controllers/dashboard.js');
 
+/**
+ * Dashboard routes.
+ * @class routes/Dashboard
+ */
 var dashboardRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/dashboard')
+        /**
+         * Get dashboard info
+         *
+         * @function
+         * @name GET: /dashboard
+         * @memberof routes/Dashboard
+         *
+         * @returns {Object} dashboardData
+         */
         .get(authenticate, function (req, res) {
             dashboardController.getData(
                 function (err, dashboardData) {

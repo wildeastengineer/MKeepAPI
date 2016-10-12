@@ -7,7 +7,23 @@ var url = require('url');
 var passRecovery = require('../controllers/passRecovery.js');
 var userController = require('../controllers/user.js');
 
+/**
+ * Users routes.
+ * @class routes/User
+ */
 var userRegisterRoutes = function (router, authenticate, sendError) {
+    /**
+     * Create new user.
+     *
+     * @function
+     * @name POST: /registration
+     * @memberof routes/User
+     *
+     * @param {String} username
+     * @param {String} password
+     *
+     * @returns {models/UserSchema} user - Created user.
+     */
     router.post('/registration', function (req, res) {
         userController.createUser({
             username: req.body.username,
@@ -22,8 +38,28 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
     });
 
     // Register authentication routes
+
+    /**
+     * Authenticate user.
+     *
+     * @function
+     * @name POST: /authenticate
+     * @memberof routes/User
+     */
     router.post('/authenticate', oauth2.token);
 
+    /**
+     * Get user's profile.
+     *
+     * @function
+     * @name GET: /profile
+     * @memberof routes/User
+     *
+     * @returns {Object} info - User info.
+     * @returns {string} info.user_id
+     * @returns {string} info.name
+     * @returns {object} info.scope
+     */
     router.get('/profile', authenticate, function (req, res) {
         res.json({
             user_id: req.user.userId,
@@ -32,6 +68,19 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
         });
     });
 
+    /**
+     * Request password recovery token.
+     *
+     * @function
+     * @name POST: /send-recover-password-token
+     * @memberof routes/User
+     *
+     * @param {String} username
+     *
+     * @returns {Object} result
+     * @returns {Boolean} result.success
+     * @returns {String} result.message
+     */
     router.post('/send-recover-password-token', function (req, res) {
         passRecovery.createPassRecoveryToken(req.body.username)
             .then(function (token) {
@@ -58,7 +107,22 @@ var userRegisterRoutes = function (router, authenticate, sendError) {
                 sendError(error, res);
             });
     });
-    
+
+    /**
+     * Change user's password.
+     *
+     * @function
+     * @name POST: /recover-password
+     * @memberof routes/User
+     *
+     * @param {String} username
+     * @param {String} newPassword
+     * @param {String} token
+     *
+     * @returns {Object} result
+     * @returns {Boolean} result.success
+     * @returns {String} result.message
+     */
     router.post('/recover-password', function (req, res) {
         passRecovery.isPasswordRecoveryTokenExisting(req.body.token)
             .then(function () {

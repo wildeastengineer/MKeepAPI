@@ -1,7 +1,20 @@
 /// Controllers
 var currencyController = require('../controllers/currency.js');
 
+/**
+ * Currencies routes.
+ * @class routes/Currency
+ */
 var currencyRegisterRoutes = function (router, authenticate) {
+    /**
+     * Get the list of all global currencies
+     *
+     * @function
+     * @name GET: /currencies
+     * @memberof routes/Currency
+     *
+     * @returns {models/CurrencySchema[]} currencies
+     */
     router.get('/currencies', authenticate, function (req, res, next) {
         currencyController.getAll()
             .then(function (currencies) {
@@ -12,6 +25,15 @@ var currencyRegisterRoutes = function (router, authenticate) {
             });
     });
 
+    /**
+     * Get currency exchange rates services
+     *
+     * @function
+     * @name GET: /currencies/exchange-rate
+     * @memberof routes/Currency
+     *
+     * @returns {Object[]} rates
+     */
     router.get('/currencies/exchange-rate', authenticate, function (req, res,next) {
         currencyController.getAllCurrencyExchangeServices()
             .then(function (rates) {
@@ -22,6 +44,15 @@ var currencyRegisterRoutes = function (router, authenticate) {
             });
     });
 
+    /**
+     * Get currency exchange rates
+     *
+     * @function
+     * @name GET: /currencies/exchange-rate/:serviceId
+     * @memberof routes/Currency
+     *
+     * @returns {Object} rates
+     */
     router.get('/currencies/exchange-rate/:serviceId', authenticate, function (req, res, next) {
         currencyController.getCurrencyExchangeRate(req.params.serviceId)
             .then(function (rate) {
@@ -32,6 +63,15 @@ var currencyRegisterRoutes = function (router, authenticate) {
             });
     });
 
+    /**
+     * Get currency by id
+     *
+     * @function
+     * @name GET: /currencies/:id
+     * @memberof routes/Currency
+     *
+     * @returns {models/CurrencySchema} currency
+     */
     router.get('/currencies/:id', authenticate, function (req, res, next) {
         currencyController.getById(req.params.id)
             .then(function (currency) {

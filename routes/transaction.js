@@ -1,8 +1,24 @@
 /// Controllers
 var transactionController = require('../controllers/transaction.js');
 
+/**
+ * Transactions routes.
+ * @class routes/Transaction
+ */
 var transactionRegisterRoutes = function (router, authenticate, sendError) {
     router.route('/transactions')
+        /**
+         * Get list of transactions.
+         *
+         * @function
+         * @name GET: /transactions
+         * @memberof routes/Transaction
+         *
+         * @param {Number} page
+         * @param {Number} perPage
+         *
+         * @returns {models/TransactionSchema[]} transactions
+         */
         .get(authenticate, function (req, res) {
             transactionController.getAll(
                 {
@@ -21,6 +37,24 @@ var transactionRegisterRoutes = function (router, authenticate, sendError) {
                 }
             );
         })
+
+        /**
+         * Create new transaction.
+         *
+         * @function
+         * @name POST: /transactions
+         * @memberof routes/Transaction
+         *
+         * @param {Date} date
+         * @param {String} category
+         * @param {Number} value
+         * @param {String} type - 'income' | 'expense'
+         * @param {String} accountSource
+         * @param {String} accountDestination
+         * @param {String} note
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
         .post(authenticate, function (req, res) {
             transactionController.post(
                 {
@@ -45,6 +79,15 @@ var transactionRegisterRoutes = function (router, authenticate, sendError) {
         });
 
     router.route('/transactions/:transaction_id')
+        /**
+         * Get transaction by id.
+         *
+         * @function
+         * @name GET: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
         .get(authenticate, function (req, res) {
             transactionController.getById(
                 req.params.transaction_id,
@@ -59,6 +102,24 @@ var transactionRegisterRoutes = function (router, authenticate, sendError) {
                 }
             );
         })
+
+        /**
+         * Update transaction by id.
+         *
+         * @function
+         * @name PUT: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @param {Date} date
+         * @param {String} category
+         * @param {Number} value
+         * @param {String} type - 'income' | 'expense'
+         * @param {String} accountSource
+         * @param {String} accountDestination
+         * @param {String} note
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
         .put(authenticate, function (req, res) {
             transactionController.update(
                 req.params.transaction_id,
@@ -82,6 +143,16 @@ var transactionRegisterRoutes = function (router, authenticate, sendError) {
                 }
             );
         })
+
+        /**
+         * Remove transaction by id.
+         *
+         * @function
+         * @name DELETE: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
         .delete(authenticate, function (req, res) {
             transactionController.remove(
                 req.params.transaction_id,

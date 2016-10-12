@@ -3,6 +3,12 @@ var rimraf = require('rimraf');
 var runSequence = require('run-sequence');
 var shell = require('gulp-shell');
 
+var folders = [
+    'controllers',
+    'models',
+    'routes'
+];
+
 gulp.task('docs', function (callback) {
     runSequence(
         'docs:clean',
@@ -19,5 +25,5 @@ gulp.task('docs:generate', shell.task([
     'node_modules/jsdoc/jsdoc.js ' +
     '-d docs ' +             // output directory
     './README.md ' +        // to include README.md as index contents
-    '-r controllers models'
+    '-r ' + folders.join(' ')
 ]));
