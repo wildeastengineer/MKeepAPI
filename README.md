@@ -67,9 +67,25 @@ MongoDB:
 $ sudo service mongod start
 ```
 App:
+
+To launch develop version of the server:
+
 ```
-$ nodemon server.js
+$ gulp
 ```
+
+To build production version of the application (it will be built in `./build` directory):
+
+```
+$ gulp build:build
+```
+
+To launch production version of the server (NOTE: prod version should be built for it):
+
+```
+$ gulp build
+```
+
 Try to send *GET* request to `localhost:8080/api`
 
 REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/postman-rest-client-short/mkhojklkhkdaghjjfdnphfphiaiohkef)
