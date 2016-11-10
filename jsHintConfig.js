@@ -1,4 +1,6 @@
-var jshintConfig = {
+'use strict';
+
+let jshintConfig = {
     maxerr: 100,            // the maximum amount of warnings JSHint will produce before giving up
     undef: true,            // prohibits the use of explicitly undeclared variables
     unused: true,           // warns when you define and never use your variables
