@@ -95,3 +95,18 @@ REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/post
 
 - restart mongo: `$ sudo service mongod restart`
 - stop mongo: `$ sudo service mongod stop`
+
+### Tests
+
+# Preparation
+
+All test specs are placed in `./test` directory
+
+All unit tests are run by default when `build` command is called. 
+Only "public" tests are performed on the files in `build` directory.
+Build will be successfully done if all tests are passed
+
+All unit tests are run on pre-commit hook on the files from `src` directory.
+It is possible to do a commit if all tests are passed.
+
+To run all tests during development process just call `gulp test`

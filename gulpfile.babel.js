@@ -8,6 +8,7 @@ const runSequence = require('run-sequence');
 
 require('./gulp-tasks/gulp-build')(gulp, config);
 require('./gulp-tasks/gulp-docs')(gulp, config);
+require('./gulp-tasks/gulp-test')(gulp, config);
 
 gulp.task('default', function () {
     var stream = nodemon({
@@ -34,6 +35,14 @@ gulp.task('build', function (callback) {
         'build:transpile',
         'build:copy-dependencies',
         'build:start',
+        callback
+    );
+});
+
+gulp.task('test', (callback) => {
+    runSequence(
+        'test:unit-public',
+        'test:all',
         callback
     );
 });

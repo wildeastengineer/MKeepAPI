@@ -10,6 +10,7 @@
         "jsHintConfig.js",
         "gulpfile.js",
         "/**/*.json",
-        "/**/*.htm"
+        "/**/*.htm",
+        "test"
     ]
 }

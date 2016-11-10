@@ -1,5 +1,7 @@
 'use strict';
 
+const jasmineConfig = require('../test/jasmineConfig');
+
 let config = {
     buildFolder: 'build',
     sourceFolder: 'src',
@@ -20,7 +22,8 @@ let config = {
         'controllers',
         'models',
         'routes'
-    ]
+    ],
+    jasmine: jasmineConfig
 };
 
 config.filesToJsHint = config.filesToJsHint.map((file) => {
