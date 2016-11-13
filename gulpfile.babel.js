@@ -31,7 +31,7 @@ gulp.task('default', function () {
 gulp.task('build', function (callback) {
     runSequence(
         'build:clean',
-        'build:build',
+        'build:transpile',
         'build:copy-dependencies',
         'build:start',
         callback

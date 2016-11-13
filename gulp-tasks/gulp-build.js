@@ -11,7 +11,7 @@ module.exports = function (gulp, config) {
         `rm -rf ${config.buildFolder} && mkdir ${config.buildFolder}`
     ]));
 
-    gulp.task('build:build', () => {
+    gulp.task('build:transpile', () => {
         return gulp.src(`${config.sourceFolder}/**/*`)
             .pipe(cache.filter()) // remember files
             .pipe(babel()) // here babel takes config from .babelrc

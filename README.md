@@ -77,7 +77,7 @@ $ gulp
 To build production version of the application (it will be built in `./build` directory):
 
 ```
-$ gulp build:build
+$ gulp build:transpile
 ```
 
 To launch production version of the server (NOTE: prod version should be built for it):
