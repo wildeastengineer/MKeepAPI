@@ -39,6 +39,7 @@
     "gulp-nodemon": "^2.2.1",
     "gulp-npm-files": "^0.1.3",
     "gulp-shell": "^0.5.2",
+    "gulp-strip-code": "^0.1.4",
     "jasmine-expect": "^3.0.1",
     "jasmine-spec-reporter": "^2.7.0",
     "jsdoc": "^3.4.2",

@@ -5,7 +5,7 @@ const jasmineConfig = require('../test/jasmineConfig');
 let config = {
     buildFolder: 'build',
     sourceFolder: 'src',
-    filesToJsHint: [
+    filesToTest: [
         'controllers/*.js',
         'fixtures/*.js',
         'libs/*.js',
@@ -26,7 +26,7 @@ let config = {
     jasmine: jasmineConfig
 };
 
-config.filesToJsHint = config.filesToJsHint.map((file) => {
+config.filesToJsHint = config.filesToTest.map((file) => {
     return `${config.sourceFolder}/${file}`;
 });
 
