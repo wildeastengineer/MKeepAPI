@@ -286,7 +286,7 @@ function isUpdateRequired (exchangeRateService) {
         nextUpdateTime = moment(exchangeRateService.updateTime, 'HH-mm-ss');
 
         if (currentTime.isAfter(nextUpdateTime)) {
-            nextUpdateTime = nextUpdateTime.add(1, 'd');
+            nextUpdateTime = nextUpdateTime.add(1, 'd'); // each rate services with update time is updated once a day
         }
 
         if (lastUpdateTime.isBefore(moment(nextUpdateTime).subtract(1, 'd'))) {

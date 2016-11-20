@@ -3,9 +3,7 @@
 const root = require('rootrequire');
 const currencyController = require(`${root}/${process.env.TEST_SRC}/controllers/currency.js`);
 
-require('jasmine-expect');
-
-describe('Test public methods of Currency controller', () => {
+describe('Test PUBLIC methods of Currency controller', () => {
     let currency;
 
     it('Should Get All Currencies', (done) => {
@@ -16,12 +14,12 @@ describe('Test public methods of Currency controller', () => {
 
                 currency = currencies[0];
 
-                done()
+                done();
             })
             .fail((error) => {
                 expect(error).toBe(null);
 
-                done()
+                done();
             });
     });
 
@@ -34,12 +32,12 @@ describe('Test public methods of Currency controller', () => {
                 expect(currency).toHaveDate('created');
                 expect(currency.iso).toBe('AUD');
 
-                done()
+                done();
             })
             .fail((error) => {
                 expect(error).toBe(null);
 
-                done()
+                done();
             });
     });
 });
