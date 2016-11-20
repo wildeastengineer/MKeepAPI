@@ -31,7 +31,7 @@ gulp.task('default', function () {
 });
 
 gulp.task('strip-test-code', function(){
-    return gulp.src([`${config.buildFolder}/**/*`, `!${config.buildFolder}/node_modules/**/*`])
+    return gulp.src([`${config.buildFolder}/**/*`])
         .pipe(stripCode({
             start_comment: "start-test-code",
             end_comment: "end-test-code"
@@ -43,10 +43,9 @@ gulp.task('build', function (callback) {
     runSequence(
         'build:clean',
         'build:transpile',
-        'build:copy-dependencies',
-        'test:unit',
+        'test:unit-build',
         'strip-test-code',
-        'build:start',
+        //'build:start',
         (err) => {
             //if any error happened in the previous tasks, exit with a code > 0
             if (err) {
@@ -66,7 +65,7 @@ gulp.task('build', function (callback) {
 
 gulp.task('test', (callback) => {
     runSequence(
-        'test:all',
+        'test:all-src',
         callback
     );
 });

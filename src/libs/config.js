@@ -4,7 +4,9 @@ let nconf = require('nconf');
 nconf.argv()
     .env()
     .file({
-        file: './src/config.json'
+        file: 'config.json',
+        dir: __dirname,
+        search: true
     });
 
 module.exports = nconf;

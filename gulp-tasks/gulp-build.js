@@ -12,7 +12,7 @@ module.exports = function (gulp, config) {
     ]));
 
     gulp.task('build:transpile', () => {
-        return gulp.src(`${config.sourceFolder}/**/*`)
+        return gulp.src([`${config.sourceFolder}/**/*`, 'package.json'])
             .pipe(cache.filter()) // remember files
             .pipe(babel()) // here babel takes config from .babelrc
             .pipe(gulp.dest(config.buildFolder));

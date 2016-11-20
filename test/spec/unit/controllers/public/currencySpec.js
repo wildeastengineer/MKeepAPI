@@ -1,7 +1,8 @@
 'use strict';
 
-const config = require('../../../../../src/libs/config');
-const currencyController = require('../../../../../src/controllers/currency.js');
+const root = require('rootrequire');
+const config = require(`${root}/${process.env.TEST_SRC}/libs/config`);
+const currencyController = require(`${root}/${process.env.TEST_SRC}/controllers/currency.js`);
 const mongoose = require('mongoose');
 
 require('jasmine-expect');
@@ -16,10 +17,16 @@ describe('Test public methods of Currency controller', () => {
 
     beforeAll(function () {
         mongoose.connect(`${config.get('database:uri')}:${config.get('database:port')}
-            /${config.get('database:name')}`);
+            /${config.get('database:name')}`, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+            });
     });
 
-    beforeEach(() => {});
+    beforeEach(() => {
+
+    });
 
     it('Should Get All Currencies', (done) => {
         currencyController.getAll()
