@@ -1,6 +1,15 @@
+'use strict';
+
 // Libraries
 const jasmine = require('gulp-jasmine');
+const mongoose = require('mongoose');
 const SpecReporter = require('jasmine-spec-reporter');
+
+function disconnectFromDb () {
+    mongoose.connection.close(() => {
+        console.log('Disconnect from Data Base')
+    });
+}
 
 module.exports = function (gulp, config) {
     gulp.task('test:all-src', () => {
@@ -11,6 +20,9 @@ module.exports = function (gulp, config) {
                 config: config.jasmine,
                 reporter: new SpecReporter()
             }))
+            .on('end', () => {
+                disconnectFromDb();
+            });
     });
 
     gulp.task('test:unit-build', () => {
@@ -23,5 +35,8 @@ module.exports = function (gulp, config) {
                 config: config.jasmine,
                 reporter: new SpecReporter()
             }))
+            .on('end', () => {
+                disconnectFromDb();
+            });
     });
 };
