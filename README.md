@@ -77,12 +77,6 @@ $ gulp
 To build production version of the application (it will be built in `./build` directory):
 
 ```
-$ gulp build:transpile
-```
-
-To launch production version of the server (NOTE: prod version should be built for it):
-
-```
 $ gulp build
 ```
 
@@ -103,7 +97,6 @@ REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/post
 All test specs are placed in `./test` directory
 
 All unit tests are run by default when `build` command is called. 
-Only "public" tests are performed on the files in `build` directory.
 Build will be successfully done if all tests are passed
 
 All unit tests are run on pre-commit hook on the files from `src` directory.

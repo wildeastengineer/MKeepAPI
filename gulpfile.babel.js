@@ -45,7 +45,6 @@ gulp.task('build', function (callback) {
         'build:transpile',
         'test:unit-build',
         'strip-test-code',
-        //'build:start',
         (err) => {
             //if any error happened in the previous tasks, exit with a code > 0
             if (err) {
@@ -65,7 +64,7 @@ gulp.task('build', function (callback) {
 
 gulp.task('test', (callback) => {
     runSequence(
-        'test:all-src',
+        'test:src',
         callback
     );
 });

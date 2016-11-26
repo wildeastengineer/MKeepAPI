@@ -12,7 +12,7 @@ function disconnectFromDb () {
 }
 
 module.exports = function (gulp, config) {
-    gulp.task('test:all-src', () => {
+    gulp.task('test:src', () => {
         process.env.TEST_SRC = config.sourceFolder;
 
         return gulp.src(config.jasmine.getSpecs())
@@ -30,6 +30,22 @@ module.exports = function (gulp, config) {
 
         return gulp.src(config.jasmine.getSpecs({
             level: 'unit'
+        }))
+            .pipe(jasmine({
+                config: config.jasmine,
+                reporter: new SpecReporter()
+            }))
+            .on('end', () => {
+                disconnectFromDb();
+            });
+    });
+
+    gulp.task('test:unit-private-src', () => {
+        process.env.TEST_SRC = config.buildFolder;
+
+        return gulp.src(config.jasmine.getSpecs({
+            level: 'unit',
+            type: 'private'
         }))
             .pipe(jasmine({
                 config: config.jasmine,
