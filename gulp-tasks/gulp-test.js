@@ -22,6 +22,9 @@ module.exports = function (gulp, config) {
             }))
             .on('end', () => {
                 disconnectFromDb();
+            })
+            .on('error', () => {
+                disconnectFromDb();
             });
     });
 
@@ -36,6 +39,9 @@ module.exports = function (gulp, config) {
                 reporter: new SpecReporter()
             }))
             .on('end', () => {
+                disconnectFromDb();
+            })
+            .on('error', () => {
                 disconnectFromDb();
             });
     });
@@ -52,6 +58,9 @@ module.exports = function (gulp, config) {
                 reporter: new SpecReporter()
             }))
             .on('end', () => {
+                disconnectFromDb();
+            })
+            .on('error', () => {
                 disconnectFromDb();
             });
     });

@@ -1,6 +1,7 @@
 // Libraries
 const config = require('./gulp-tasks/config');
 const gulp = require('gulp');
+const guppy = require('git-guppy')(gulp);
 const nodemon = require('gulp-nodemon');
 const jshint = require('gulp-jshint');
 const jshintConfig = require('./jshintConfig');
@@ -83,3 +84,5 @@ gulp.task('jshint', function () {
         .pipe(jshint.reporter('jshint-stylish'))
         .pipe(jshint.reporter('fail'));
 });
+
+gulp.task('pre-commit', ['test']); // add jshint task when we fix all code style errors
