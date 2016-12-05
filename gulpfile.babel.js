@@ -16,7 +16,7 @@ gulp.task('default', function () {
     var stream = nodemon({
         script: `${config.sourceFolder}/server.js`,
         execMap: {
-            js: 'babel-node'
+            js: './node_modules/.bin/babel-node'
         },
         verbose: true,
         ext: 'html js json'
@@ -34,8 +34,8 @@ gulp.task('default', function () {
 gulp.task('strip-test-code', function(){
     return gulp.src([`${config.buildFolder}/**/*`])
         .pipe(stripCode({
-            start_comment: "start-test-code",
-            end_comment: "end-test-code"
+            start_comment: 'start-test-code',
+            end_comment: 'end-test-code'
         }))
         .pipe(gulp.dest(config.buildFolder));
 });
