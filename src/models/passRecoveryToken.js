@@ -1,3 +1,5 @@
+"use strict";
+
 /// Libs
 const config = require('../libs/config');
 const mongoose = require('mongoose');

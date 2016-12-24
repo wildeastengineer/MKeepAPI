@@ -90,6 +90,14 @@ REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/post
 - restart mongo: `$ sudo service mongod restart`
 - stop mongo: `$ sudo service mongod stop`
 
+### Apply fixtures
+
+For creating clients and users run in console:
+
+```
+$ node src/fixtures/createUsers.js
+```
+
 ### Tests
 
 # Preparation

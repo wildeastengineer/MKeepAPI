@@ -1,3 +1,5 @@
+"use strict";
+
 /// Libs
 let mongoose = require('mongoose');
 /// Local variables

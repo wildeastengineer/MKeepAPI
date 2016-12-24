@@ -1,3 +1,5 @@
+"use strict";
+
 /// Libs
 const mongoose = require('mongoose');
 /// Models

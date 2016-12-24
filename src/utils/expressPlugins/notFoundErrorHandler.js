@@ -1,3 +1,5 @@
+"use strict";
+
 let notFoundErrorHandler = function(req, res, next) {
     let error = new Error();
 

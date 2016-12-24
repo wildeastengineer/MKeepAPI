@@ -1,6 +1,8 @@
+"use strict";
+
 /// Libs
 const config = require('../libs/config');
-const Logger = require('./libs/log');
+const Logger = require('../libs/log');
 const mongoose = require('mongoose');
 /// Models
 const AccessTokenModel = require('../models/auth/accessToken');
@@ -23,8 +25,8 @@ let users = [
 
 let clients = config.get('clients');
 
-logger.info('Connect to database:', config.get('mongoose:uri'));
-mongoose.connect(config.get('mongoose:uri'));
+logger.info('Connect to database:', config.get('database:uri'));
+mongoose.connect(config.get('database:uri'));
 
 logger.info('Remove all users');
 UserModel.remove({}, function () {

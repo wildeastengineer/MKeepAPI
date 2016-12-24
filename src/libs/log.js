@@ -1,3 +1,5 @@
+"use strict";
+
 /// Libs
 const winston = require('winston');
 

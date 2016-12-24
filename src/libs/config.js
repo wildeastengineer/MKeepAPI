@@ -1,3 +1,5 @@
+"use strict";
+
 /// Libs
 let nconf = require('nconf');
 

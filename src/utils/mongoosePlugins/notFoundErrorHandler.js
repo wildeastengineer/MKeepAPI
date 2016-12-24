@@ -1,3 +1,5 @@
+"use strict";
+
 let notFoundErrorHandler = function (schema) {
     let hooks = [
         // 'count', - is not included here because count query is used in doc ref validation plugin

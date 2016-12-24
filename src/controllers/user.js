@@ -34,7 +34,7 @@ let userController = {
                 }
 
                 if (user) {
-                    logger.error('User with this email doesn\'t exist');
+                    logger.error('User with this email already exist');
                     deferred.reject(new Error('User with this email already exists'));
 
                     return;
