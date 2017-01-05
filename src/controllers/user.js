@@ -34,8 +34,12 @@ let userController = {
                 }
 
                 if (user) {
-                    logger.error('User with this email already exist');
-                    deferred.reject(new Error('User with this email already exists'));
+                    error = {
+                        name: 'ValidationError',
+                        message: 'User with this email already exist'
+                    };
+                    logger.error(error);
+                    deferred.reject(error);
 
                     return;
                 }
@@ -131,7 +135,7 @@ let userController = {
             .exec(function (error, user) {
                 if (!user) {
                     error = {
-                        status: 404,
+                        name: 'NotFoundError',
                         message: 'User with given id wasn\'t found: ' + data.id
                     };
                     logger.error(error);
