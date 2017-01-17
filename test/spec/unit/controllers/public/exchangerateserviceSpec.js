@@ -30,7 +30,7 @@ describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
                 expect(exchangeRateService).toHaveString('name');
                 expect(exchangeRateService).toHaveString('abbreviation');
                 expect(exchangeRateService).toHaveString('url');
-                expect(exchangeRateService).toHaveDate('lastUpdate');
+                expect(exchangeRateService).toHaveMember('lastUpdate');
                 expect(exchangeRateService).toHaveString('base');
                 expect(exchangeRateService).toHaveObject('rates');
                 expect(exchangeRateService).toHaveDate('created');
