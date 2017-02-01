@@ -181,7 +181,24 @@ let projectController = {
      * @returns {Promise<models/CurrencySchema[]|Error>}
      */
     updateCurrencies: function (data) {
-        return CurrencyController.updateProjectCurrencies(data);
+        const that = this;
+        let deferred = Q.defer();
+
+        CurrencyController.updateProjectCurrencies(data)
+            .then(function () {
+                that.getById(data)
+                    .then(function (project) {
+                        deferred.resolve(project.currencies);
+                    })
+                    .fail(function (error) {
+                        deferred.reject(error);
+                    });
+            })
+            .fail(function (error) {
+                deferred.reject(error);
+            });
+
+        return deferred.promise;
     },
 
     /**
