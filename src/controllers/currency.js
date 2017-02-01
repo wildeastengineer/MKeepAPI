@@ -94,6 +94,18 @@ let currencyController = {
     updateProjectCurrencies: function (data) {
         let deferred = Q.defer();
 
+        if (!data.currencies) {
+            const error = {
+                name: 'ValidationError',
+                message: 'User with this email already exist'
+            };
+
+            logger.error(error);
+            deferred.reject(error);
+
+            return deferred.promise;
+        }
+
         ProjectModel.findOneAndUpdate({
             _id: data.id,
             owners: data.userId
