@@ -79,14 +79,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * Update project's currencies list
      *
      * @function
-     * @name POST: /projects/:id/currencies/update
+     * @name POST: /projects/:id/currencies
      * @memberof routes/Project
      *
      * @param {String[]} currencies - Array of currencies id
      *
      * @returns {models/CurrencySchema[]} currencies - New project's currencies list.
      */
-    router.post('/projects/:id/currencies/update', authenticate, function (req, res, next) {
+    router.post('/projects/:id/currencies', authenticate, function (req, res, next) {
         projectController.updateCurrencies({
             id: req.params.id,
             userId: req.user._id,
