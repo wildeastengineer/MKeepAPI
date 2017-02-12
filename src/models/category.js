@@ -15,7 +15,6 @@ const notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHand
  * @class models/CategorySchema
  */
 let CategorySchema = new Schema({
-    _owner: 'String',
 
     /**
      * The name of category.
@@ -47,8 +46,7 @@ let CategorySchema = new Schema({
      * @memberof models/CategorySchema
      */
     parent: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category'
+        type: Schema.Types.ObjectId
     },
 
     /**

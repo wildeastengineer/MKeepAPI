@@ -91,13 +91,12 @@ ProjectSchema = new Schema({
     /**
      * The project categories links.
      *
-     * @type ObjectId[]
+     * @type Category[]
      * @memberof models/ProjectSchema
      */
-    categories: [{
-        type: Schema.Types.ObjectId,
-        ref: Category
-    }],
+    categories: [
+        Category.schema
+    ],
 
     /**
      * The project widgets links.

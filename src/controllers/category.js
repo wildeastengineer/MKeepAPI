@@ -1,93 +1,119 @@
-const Category = require('../models/category');
+//// Libs
+const Logger = require('../libs/log');
+const Q = require('q');
+/// Models
+const CategoryModel = require('../models/category');
+const ProjectModel = require('../models/project');
+/// Controllers
+/// Local variables
+let logger = Logger(module);
 
-// ToDo: remove this when auth is implemented
-let user = {
-    _id: 777
-};
-
+/**
+ * Categories controller.
+ * @class categoryController
+ */
 let categoryController = {
-    getAll: function (callback) {
-        Category.find(
-            {
-                _owner: user._id
-            })
-            .populate('parent')
-            .exec(callback);
-    },
-    getById: function (id, callback) {
-        Category.findOne({
-            _id: id,
-            _owner: user._id
-        })
-            .populate('parent')
-            .exec(callback);
-    },
-    getIncome: function (callback) {
-        Category.find({
-            _owner: user._id,
-            income: true
-        })
-            .populate('parent')
-            .exec(callback);
-    },
-    getExpense: function (callback) {
-        Category.find({
-            _owner: user._id,
-            income: false
-        })
-            .populate('parent')
-            .exec(callback);
-    },
-    post: function (data, callback) {
-        let category = new Category();
 
-        category._owner = user._id;
-        category.name = data.name;
-        category.parent = data.parent;
-        category.income = data.income;
+    /**
+     * Add given category to project categories
+     *
+     * @function
+     * @name put
+     * @memberof controllers/Category
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {Object} data.category
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    put: function (data) {
+        let deferred = Q.defer();
 
-        category.save(callback);
-    },
-    update: function (id, data, callback) {
-        Category.findOne(
-            {
-                _id: id,
-                _owner: user._id
-            },
-            function (err, category) {
-                if (err) {
-                    callback(err);
+        if (!data.category) {
+            const error = {
+                name: 'ValidationError',
+                message: 'Project category were not specified'
+            };
+
+            logger.error(error);
+            deferred.reject(error);
+
+            return deferred.promise;
+        }
+
+        //TODO: figure out why populate for categories.parent won't work and why validation on parent won't work iether
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            $push:{
+                categories: {
+                    name: data.category.name,
+                    categoryType: data.category.categoryType,
+                    parent: data.category.parent,
+                    created: new Date(),
+                    createdBy: data.userId,
+                    modifiedBy: data.userId,
+                    modified: new Date()
+                }
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Category was not added to project: ' + data.id);
+                    deferred.reject(error);
 
                     return;
                 }
 
-                category.name = data.name || category.name;
-                category.parent = data.parent;
-                category.save(callback);
-            }
-        );
+                logger.info('Category was successfully added to project: ' + data.id);
+                //TODO: better way to return what was added since returning the last in the list
+                // might be added by another call in theory
+                deferred.resolve(doc.categories.pop());
+            });
+
+        return deferred.promise;
     },
-    remove: function (id, callback) {
-        Category.remove(
-            {
-                _id: id,
-                _owner: user._id
-            },
-            function (err, result) {
-                if (err) {
-                    callback(err);
+
+    /**
+     * Get get all project categories
+     *
+     * @function
+     * @name getAll
+     * @memberof controllers/Currency
+     * @param {(ObjectId|String)} data.id - project id
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    getAll: function (data) {
+        let deferred = Q.defer();
+
+        ProjectModel.findOne({
+            _id: data.id
+        })
+            .exec(function (error, projects) {
+                if (error) {
+                    logger.error('Categories of the project with given id were\'t found: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
 
                     return;
                 }
 
-                Category.find(
-                    {
-                        _owner: user._id
-                    })
-                    .populate('parent')
-                    .exec(callback);
-            }
-        );
+                logger.info('Categories of the project with given id were successfully found: ' + data.id);
+                deferred.resolve(projects.categories);
+            });
+
+        return deferred.promise;
     }
 };
 

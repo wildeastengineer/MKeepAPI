@@ -76,6 +76,28 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
+     * Get project categories by project id.
+     *
+     * @function
+     * @name GET: /projects/:id/categories
+     * @memberof routes/Project
+     *
+     * @returns {models/CategorySchema[]} categories
+     */
+    router.get('/projects/:id/categories', authenticate, function (req, res, next) {
+        projectController.getCategories({
+            id: req.params.id,
+            userId: req.user._id
+        })
+            .then(function (categories) {
+                res.json(categories);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
      * Update project's currencies list
      *
      * @function
@@ -94,6 +116,37 @@ let ProjectRegisterRoutes = function (router, authenticate) {
         })
             .then(function (currencies) {
                 res.json(currencies);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Add new category to project's categories
+     *
+     * @function
+     * @name PUT: /projects/:id/categories
+     * @memberof routes/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {Object} data.category
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {models/CategorySchema} category - New add category to given project
+     */
+    router.put('/projects/:id/categories', authenticate, function (req, res, next) {
+        projectController.addCategory({
+            id: req.params.id,
+            userId: req.user._id,
+            category: req.body.category
+        })
+            .then(function (category) {
+                res.json(category);
             })
             .fail(function (error) {
                 next(error);

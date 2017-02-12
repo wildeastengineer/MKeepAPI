@@ -97,7 +97,7 @@ let currencyController = {
         if (!data.currencies) {
             const error = {
                 name: 'ValidationError',
-                message: 'User with this email already exist'
+                message: 'Project currencies were not specified'
             };
 
             logger.error(error);

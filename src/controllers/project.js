@@ -5,6 +5,7 @@ const Q = require('q');
 const UserModel = require('../models/auth/user');
 const ProjectModel = require('../models/project');
 /// Controllers
+const CategoryController = require('./category');
 const CurrencyController = require('./currency');
 /// Local variables
 let logger = Logger(module);
@@ -223,10 +224,10 @@ let projectController = {
      * Rename project with given name
      *
      * @function
-     * @name updateMainCurrency
+     * @name rename
      * @memberof controllers/Project
      *
-     * @param {Object} rename
+     * @param {Object} data
      * @param {(ObjectId|String)} data.id - project id
      * @param {(ObjectId|String)} data.userId
      * @param {String} data.name
@@ -258,6 +259,41 @@ let projectController = {
             });
 
         return deferred.promise;
+    },
+
+    /**
+     * Add given category to project categories
+     *
+     * @function
+     * @name addCategory
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {Object} data.category
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    addCategory: function (data) {
+        return CategoryController.put(data);
+    },
+
+    /**
+     * Get get all project categories
+     *
+     * @function
+     * @name getCategories
+     * @memberof controllers/Currency
+     * @param {(ObjectId|String)} data.id - project id
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    getCategories: function (data) {
+        return CategoryController.getAll(data);
     }
 };
 
