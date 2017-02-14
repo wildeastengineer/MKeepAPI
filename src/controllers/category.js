@@ -6,7 +6,7 @@ const CategoryModel = require('../models/category');
 const ProjectModel = require('../models/project');
 /// Controllers
 /// Local variables
-let logger = Logger(module);
+const logger = Logger(module);
 
 /**
  * Categories controller.
@@ -31,7 +31,7 @@ let categoryController = {
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
-    put: function (data) {
+    put(data) {
         let deferred = Q.defer();
 
         if (!data.category) {
@@ -94,7 +94,7 @@ let categoryController = {
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
-    getAll: function (data) {
+    getAll(data) {
         let deferred = Q.defer();
 
         ProjectModel.findOne({
