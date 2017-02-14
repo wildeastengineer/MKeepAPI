@@ -8,7 +8,7 @@ const ProjectModel = require('../models/project');
 const CategoryController = require('./category');
 const CurrencyController = require('./currency');
 /// Local variables
-let logger = Logger(module);
+const logger = Logger(module);
 /// Private functions
 
 /**
@@ -34,7 +34,7 @@ let projectController = {
      *
      * @returns {Promise<models/ProjectSchema|Error>}
      */
-    post: function (data) {
+    post(data) {
         let deferred = Q.defer();
         let newProject;
 
@@ -108,7 +108,7 @@ let projectController = {
      *
      * @returns {Promise<models/ProjectSchema|Error>}
      */
-    getById: function (data) {
+    getById(data) {
         let deferred = Q.defer();
 
             ProjectModel.findOne({
@@ -144,7 +144,7 @@ let projectController = {
      *
      * @returns {Promise<models/ProjectSchema[]|Error>}
      */
-    getAll: function (data) {
+    getAll(data) {
         let deferred = Q.defer();
 
         ProjectModel.find({
@@ -181,7 +181,7 @@ let projectController = {
      *
      * @returns {Promise<models/CurrencySchema[]|Error>}
      */
-    updateCurrencies: function (data) {
+    updateCurrencies(data) {
         const that = this;
         let deferred = Q.defer();
 
@@ -216,7 +216,7 @@ let projectController = {
      *
      * @returns {Promise<models/CurrencySchema|Error>}
      */
-    updateMainCurrency: function (data) {
+    updateMainCurrency(data) {
         return CurrencyController.updateProjectMainCurrency(data);
     },
 
@@ -234,7 +234,7 @@ let projectController = {
      *
      * @returns {Promise<String|Error>} - New project name
      */
-    rename: function (data) {
+    rename(data) {
         let deferred = Q.defer();
 
         ProjectModel.findOneAndUpdate({
@@ -278,7 +278,7 @@ let projectController = {
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
-    addCategory: function (data) {
+    addCategory(data) {
         return CategoryController.put(data);
     },
 
@@ -292,7 +292,7 @@ let projectController = {
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
-    getCategories: function (data) {
+    getCategories(data) {
         return CategoryController.getAll(data);
     }
 };
