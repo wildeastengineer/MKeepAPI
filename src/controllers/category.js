@@ -12,7 +12,7 @@ const logger = Logger(module);
  * Categories controller.
  * @class categoryController
  */
-let categoryController = {
+module.exports = {
 
     /**
      * Add given category to project categories
@@ -31,6 +31,7 @@ let categoryController = {
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
+
     put(data) {
         let deferred = Q.defer();
 
@@ -51,7 +52,7 @@ let categoryController = {
             _id: data.id,
             owners: data.userId
         }, {
-            $push:{
+            $push: {
                 categories: {
                     name: data.category.name,
                     categoryType: data.category.categoryType,
@@ -116,5 +117,3 @@ let categoryController = {
         return deferred.promise;
     }
 };
-
-module.exports = categoryController;

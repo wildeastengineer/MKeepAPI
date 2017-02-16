@@ -15,7 +15,7 @@ const logger = Logger(module);
  * Projects controller.
  * @class controllers/Project
  */
-let projectController = {
+module.exports = {
     /**
      * Create new project
      *
@@ -111,23 +111,23 @@ let projectController = {
     getById(data) {
         let deferred = Q.defer();
 
-            ProjectModel.findOne({
-                users: data.userId,
-                _id: data.id
-            })
-                .populate('owners users currencies mainCurrency createdBy modifiedBy')
-                .exec(function (error, project) {
-                    if (error) {
-                        logger.error('Project with given id wasn\'t found: ' + data.id);
-                        logger.error(error);
-                        deferred.reject(error);
+        ProjectModel.findOne({
+            users: data.userId,
+            _id: data.id
+        })
+            .populate('owners users currencies mainCurrency createdBy modifiedBy')
+            .exec(function (error, project) {
+                if (error) {
+                    logger.error('Project with given id wasn\'t found: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
 
-                        return;
-                    }
+                    return;
+                }
 
-                    logger.info('Project with given id was successfully found: ' + data.id);
-                    deferred.resolve(project);
-                });
+                logger.info('Project with given id was successfully found: ' + data.id);
+                deferred.resolve(project);
+            });
 
         return deferred.promise;
     },
@@ -296,5 +296,3 @@ let projectController = {
         return CategoryController.getAll(data);
     }
 };
-
-module.exports = projectController;
