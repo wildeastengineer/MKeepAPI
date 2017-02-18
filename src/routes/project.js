@@ -98,6 +98,34 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
+     * Update given project categories
+     *
+     * @function
+     * @name PATCH: /projects/:id/categories/:categoryId
+     * @memberof routes/Project
+     *
+     * @returns {models/CurrencySchema[]} category - new category
+     */
+    router.patch('/projects/:id/categories/:categoryId', authenticate, function (req, res, next) {
+        projectController.updateCategory({
+            id: req.params.id,
+            userId: req.user._id,
+            category: {
+                id: req.params.categoryId,
+                name: req.body.category.name,
+                categoryType: req.body.category.categoryType,
+                parent: req.body.category.parent
+            }
+        })
+            .then(function (category) {
+                res.json(category);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
      * Update project's currencies list
      *
      * @function

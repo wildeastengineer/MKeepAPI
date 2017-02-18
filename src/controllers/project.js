@@ -287,12 +287,31 @@ module.exports = {
      *
      * @function
      * @name getCategories
-     * @memberof controllers/Currency
+     * @memberof controllers/Category
      * @param {(ObjectId|String)} data.id - project id
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
     getCategories(data) {
         return CategoryController.getAll(data);
+    },
+
+    /**
+     * Update given project categories
+     *
+     * @function
+     * @name updateCategory
+     * @memberof controllers/Category
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.category
+     * @param {(ObjectId|String)} data.category.id
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    updateCategory(data) {
+        return CategoryController.updateCategory(data);
     }
 };

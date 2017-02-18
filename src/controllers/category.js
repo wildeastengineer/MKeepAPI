@@ -27,7 +27,6 @@ module.exports = {
      * @param {String} data.category.name
      * @param {String} data.category.categoryType
      * @param {?(ObjectId|String)} data.category.parent
-     * @param {(ObjectId[]|String[])} data.currencies
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
      */
@@ -90,7 +89,7 @@ module.exports = {
      *
      * @function
      * @name getAll
-     * @memberof controllers/Currency
+     * @memberof controllers/Category
      * @param {(ObjectId|String)} data.id - project id
      *
      * @returns {Promise<models/CategorySchema[]|Error>}
@@ -112,6 +111,78 @@ module.exports = {
 
                 logger.info('Categories of the project with given id were successfully found: ' + data.id);
                 deferred.resolve(projects.categories);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update given project categories
+     *
+     * @function
+     * @name updateCategory
+     * @memberof controllers/Category
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.category
+     * @param {(ObjectId|String)} data.category.id
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    updateCategory(data) {
+        let deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId,
+            'categories._id': data.category.id
+        }, {
+            $set: {
+                'categories.$.name': data.category.name,
+                'categories.$.categoryType': data.category.categoryType,
+                'categories.$.parent': data.category.parent,
+                'categories.$.modifiedBy': data.userId,
+                'categories.$.modified': new Date()
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec(function (error, doc) {
+                let updatedCategory;
+
+                if (error) {
+                    logger.error(error);
+                    logger.error('Category of the project with given id was not updated: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                for (let i = 0; i < doc.categories.length; i++) {
+                    if (doc.categories[i]._id.toString() === data.category.id.toString()) {
+                        updatedCategory = doc.categories[i];
+
+                        break;
+                    }
+
+                    if (i + 1 === doc.categories.length) {
+                        error = {
+                            name: 'NotFoundError',
+                            message: 'Category of the project with given id was not found after updating: ' + data.id
+                        };
+
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return deferred.promise;
+                    }
+                }
+
+                logger.info('Category of the project with given id was successfully changed: ' + data.id);
+                deferred.resolve(updatedCategory);
             });
 
         return deferred.promise;
