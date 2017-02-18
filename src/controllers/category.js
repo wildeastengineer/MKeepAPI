@@ -23,12 +23,13 @@ module.exports = {
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
      * @param {String} data.category.name
      * @param {String} data.category.categoryType
      * @param {?(ObjectId|String)} data.category.parent
      *
-     * @returns {Promise<models/CategorySchema[]|Error>}
+     * @returns {Promise<models/CategorySchema|Error>}
      */
 
     put(data) {
@@ -117,19 +118,20 @@ module.exports = {
     },
 
     /**
-     * Update given project categories
+     * Update given project category
      *
      * @function
      * @name updateCategory
      * @memberof controllers/Category
      * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
      * @param {(ObjectId|String)} data.category.id
      * @param {String} data.category.name
      * @param {String} data.category.categoryType
      * @param {?(ObjectId|String)} data.category.parent
      *
-     * @returns {Promise<models/CategorySchema[]|Error>}
+     * @returns {Promise<models/CategorySchema|Error>}
      */
     updateCategory(data) {
         let deferred = Q.defer();
@@ -179,6 +181,51 @@ module.exports = {
 
                 logger.info('Category of the project with given id was successfully changed: ' + data.id);
                 deferred.resolve(updatedCategory);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Delete given project category
+     *
+     * @function
+     * @name deleteCategory
+     * @memberof controllers/Category
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.categoryId
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    deleteCategory(data) {
+        let deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId,
+            'categories._id': data.categoryId
+        }, {
+            $pull: {
+                categories: {
+                    _id: data.categoryId
+                }
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Category of the project with given id was not deleted: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Category of the project with given id was successfully deleted: ' + data.id);
+                deferred.resolve();
             });
 
         return deferred.promise;

@@ -104,7 +104,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @name PATCH: /projects/:id/categories/:categoryId
      * @memberof routes/Project
      *
-     * @returns {models/CurrencySchema[]} category - new category
+     * @returns {models/CategorySchema} category - new category
      */
     router.patch('/projects/:id/categories/:categoryId', authenticate, function (req, res, next) {
         projectController.updateCategory({
@@ -119,6 +119,60 @@ let ProjectRegisterRoutes = function (router, authenticate) {
         })
             .then(function (category) {
                 res.json(category);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Add new category to project's category
+     *
+     * @function
+     * @name PUT: /projects/:id/categories
+     * @memberof routes/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {Object} data.category
+     * @param {String} data.category.name
+     * @param {String} data.category.categoryType
+     * @param {?(ObjectId|String)} data.category.parent
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {models/CategorySchema} category - New add category to given project
+     */
+    router.put('/projects/:id/categories', authenticate, function (req, res, next) {
+        projectController.addCategory({
+            id: req.params.id,
+            userId: req.user._id,
+            category: req.body.category
+        })
+            .then(function (category) {
+                res.json(category);
+            })
+            .fail(function (error) {
+                next(error);
+            });
+    });
+
+    /**
+     * Delete given project category
+     *
+     * @function
+     * @name DELETE: /projects/:id/categories/:categoryId
+     * @memberof routes/Project
+     *
+     * @returns {void}
+     */
+    router.delete('/projects/:id/categories/:categoryId', authenticate, function (req, res, next) {
+        projectController.deleteCategory({
+            id: req.params.id,
+            userId: req.user._id,
+            categoryId: req.params.categoryId
+        })
+            .then(function () {
+                res.json();
             })
             .fail(function (error) {
                 next(error);
@@ -144,37 +198,6 @@ let ProjectRegisterRoutes = function (router, authenticate) {
         })
             .then(function (currencies) {
                 res.json(currencies);
-            })
-            .fail(function (error) {
-                next(error);
-            });
-    });
-
-    /**
-     * Add new category to project's categories
-     *
-     * @function
-     * @name PUT: /projects/:id/categories
-     * @memberof routes/Project
-     *
-     * @param {Object} data
-     * @param {(ObjectId|String)} data.id - Project's id
-     * @param {Object} data.category
-     * @param {String} data.category.name
-     * @param {String} data.category.categoryType
-     * @param {?(ObjectId|String)} data.category.parent
-     * @param {(ObjectId[]|String[])} data.currencies
-     *
-     * @returns {models/CategorySchema} category - New add category to given project
-     */
-    router.put('/projects/:id/categories', authenticate, function (req, res, next) {
-        projectController.addCategory({
-            id: req.params.id,
-            userId: req.user._id,
-            category: req.body.category
-        })
-            .then(function (category) {
-                res.json(category);
             })
             .fail(function (error) {
                 next(error);

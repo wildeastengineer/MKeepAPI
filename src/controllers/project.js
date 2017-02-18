@@ -270,13 +270,13 @@ module.exports = {
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
      * @param {String} data.category.name
      * @param {String} data.category.categoryType
      * @param {?(ObjectId|String)} data.category.parent
-     * @param {(ObjectId[]|String[])} data.currencies
      *
-     * @returns {Promise<models/CategorySchema[]|Error>}
+     * @returns {Promise<models/CategorySchema|Error>}
      */
     addCategory(data) {
         return CategoryController.put(data);
@@ -303,15 +303,32 @@ module.exports = {
      * @name updateCategory
      * @memberof controllers/Category
      * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
      * @param {(ObjectId|String)} data.category.id
      * @param {String} data.category.name
      * @param {String} data.category.categoryType
      * @param {?(ObjectId|String)} data.category.parent
      *
-     * @returns {Promise<models/CategorySchema[]|Error>}
+     * @returns {Promise<models/CategorySchema|Error>}
      */
     updateCategory(data) {
         return CategoryController.updateCategory(data);
+    },
+
+    /**
+     * Delete given project categories
+     *
+     * @function
+     * @name deleteCategory
+     * @memberof controllers/Category
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.categoryId
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    deleteCategory(data) {
+        return CategoryController.deleteCategory(data);
     }
 };
