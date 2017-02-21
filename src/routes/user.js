@@ -58,7 +58,9 @@ let userRegisterRoutes = function (router, authenticate) {
      * @returns {models/UserSchema} user
      */
     router.get('/profile', authenticate, function (req, res, next) {
-        userController.getById(req.user._id)
+        userController.getById({
+            id: req.user._id
+        })
             .then(function (user) {
                 res.json(user);
             })
