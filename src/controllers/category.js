@@ -161,24 +161,20 @@ module.exports = {
                     return;
                 }
 
-                for (let i = 0; i < doc.categories.length; i++) {
-                    if (doc.categories[i]._id.toString() === data.category.id.toString()) {
-                        updatedCategory = doc.categories[i];
+                updatedCategory = doc.categories.find(function (category) {
+                    return category._id.toString() === data.category.id.toString()
+                });
 
-                        break;
-                    }
+                if (!updatedCategory) {
+                    error = {
+                        name: 'NotFoundError',
+                        message: 'Category of the project with given id was not found after updating: ' + data.id
+                    };
 
-                    if (i + 1 === doc.categories.length) {
-                        error = {
-                            name: 'NotFoundError',
-                            message: 'Category of the project with given id was not found after updating: ' + data.id
-                        };
+                    logger.error(error);
+                    deferred.reject(error);
 
-                        logger.error(error);
-                        deferred.reject(error);
-
-                        return deferred.promise;
-                    }
+                    return deferred.promise;
                 }
 
                 logger.info('Category of the project with given id was successfully changed: ' + data.id);
