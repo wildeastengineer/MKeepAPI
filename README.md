@@ -98,9 +98,9 @@ For creating clients and users run in console:
 $ node src/fixtures/createUsers.js
 ```
 
-### Tests
+# Tests
 
-# Preparation
+### Unit Tests
 
 All test specs are placed in `./test` directory
 
@@ -111,3 +111,14 @@ All unit tests are run on pre-commit hook on the files from `src` directory.
 It is possible to do a commit if all tests are passed.
 
 To run all tests during development process just call `gulp test`
+
+### SoapUI Tests (web API tests)
+
+For web API tests MK uses [SoapUI Open Source](https://www.soapui.org/open-source.html)
+To run tests:
+
+- Install [SoapUI Open Source](https://www.soapui.org/getting-started/installing-soapui.html)
+- Import SoapUI project (it is presented as xml file) that is stored in `./test/soapUI/MP_API.xml`
+- Launch existing test suite (double click on test suite to open launcher)
+
+(!) Please make sure that all tests pass before you push any changes related to web API
