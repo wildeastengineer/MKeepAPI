@@ -23,7 +23,7 @@ let userController = {
             {
                 username: data.username
             },
-            function (error, user) {
+            (error, user) => {
                 let newUser;
 
                 if (error) {
@@ -50,7 +50,7 @@ let userController = {
                     created: new Date()
                 });
 
-                newUser.save(function (error, user) {
+                newUser.save((error, user) => {
                     if (error) {
                         logger.error(error);
                         deferred.reject(error);
@@ -84,7 +84,7 @@ let userController = {
             {
                 username: data.username
             },
-            function (error, user) {
+            (error, user) => {
                 if (error) {
                     logger.error(error);
                     deferred.reject(error);
@@ -102,7 +102,7 @@ let userController = {
 
                 user.password = data.newPassword;
 
-                user.save(function (error) {
+                user.save((error) => {
                     if (error) {
                         logger.error(error);
                         deferred.reject(error);
@@ -132,7 +132,7 @@ let userController = {
         UserModel.findOne({
             _id: data.id
         })
-            .exec(function (error, user) {
+            .exec((error, user) => {
                 if (!user) {
                     error = {
                         name: 'NotFoundError',

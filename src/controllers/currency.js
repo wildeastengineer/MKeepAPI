@@ -28,7 +28,7 @@ let currencyController = {
         let deferred = Q.defer();
 
         CurrencyModel.find({})
-            .exec(function (error, currencies) {
+            .exec((error, currencies) => {
                 if (error) {
                     logger.error('Currencies weren\'t found');
                     logger.error(error);
@@ -61,7 +61,7 @@ let currencyController = {
         CurrencyModel.findOne({
             _id: id
         })
-            .exec(function (error, currency) {
+            .exec((error, currency) => {
                 if (error) {
                     logger.error('Currency with given id wasn\'t found: ' + id);
                     logger.error(error);
@@ -115,10 +115,10 @@ let currencyController = {
             runValidators: true
         })
             .populate('currencies')
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 if (error) {
-                    logger.error(error);
                     logger.error('Project currencies were not updated: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
@@ -157,10 +157,10 @@ let currencyController = {
             runValidators: true
         })
             .populate('mainCurrency')
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 if (error) {
-                    logger.error(error);
                     logger.error('Project main currency was not updated: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;

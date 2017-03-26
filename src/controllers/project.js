@@ -48,7 +48,7 @@ module.exports = {
             modifiedBy: data.userId
         });
 
-        newProject.save(function (error, project) {
+        newProject.save((error, project) => {
             if (error) {
                 logger.error('New project hasn\'t been created');
                 logger.error(error);
@@ -67,17 +67,17 @@ module.exports = {
             }, {
                 runValidators: true
             })
-                .exec(function (error, doc) {
+                .exec((error, doc) => {
                     if (error) {
-                        logger.error(error);
                         logger.error('Project with given id wasn\'t added to user: ' + data.userId);
+                        logger.error(error);
                         deferred.reject(error);
 
                         return;
                     }
 
                     ProjectModel.populate(project, 'owners users currencies mainCurrency createdBy modifiedBy',
-                        function (error, project) {
+                        (error, project) => {
                             if (error) {
                                 logger.error('New project cannot be populated');
                                 logger.error(error);
@@ -116,7 +116,7 @@ module.exports = {
             _id: data.id
         })
             .populate('owners users currencies mainCurrency createdBy modifiedBy')
-            .exec(function (error, project) {
+            .exec((error, project) => {
                 if (error) {
                     logger.error('Project with given id wasn\'t found: ' + data.id);
                     logger.error(error);
@@ -151,7 +151,7 @@ module.exports = {
             users: data.userId
         })
             .populate('owners users currencies mainCurrency createdBy modifiedBy')
-            .exec(function (error, projects) {
+            .exec((error, projects) => {
                 if (error) {
                     logger.error('Projects with given user weren\'t found: ' + data.userId);
                     logger.error(error);
@@ -186,16 +186,16 @@ module.exports = {
         let deferred = Q.defer();
 
         CurrencyController.updateProjectCurrencies(data)
-            .then(function () {
+            .then(() => {
                 that.getById(data)
-                    .then(function (project) {
+                    .then((project) => {
                         deferred.resolve(project.currencies);
                     })
-                    .fail(function (error) {
+                    .fail((error) => {
                         deferred.reject(error);
                     });
             })
-            .fail(function (error) {
+            .fail((error) => {
                 deferred.reject(error);
             });
 
@@ -245,10 +245,10 @@ module.exports = {
         }, {
             runValidators: true
         })
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 if (error) {
-                    logger.error(error);
                     logger.error('Project was not renamed: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;

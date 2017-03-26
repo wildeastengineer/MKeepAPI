@@ -15,12 +15,12 @@ let currencyRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CurrencySchema[]} currencies
      */
-    router.get('/currencies', authenticate, function (req, res, next) {
+    router.get('/currencies', authenticate, (req, res, next) => {
         currencyController.getAll()
-            .then(function (currencies) {
+            .then((currencies) => {
                 res.json(currencies);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -34,12 +34,12 @@ let currencyRegisterRoutes = function (router, authenticate) {
      *
      * @returns {Object[]} rates
      */
-    router.get('/currencies/exchange-rate', authenticate, function (req, res,next) {
+    router.get('/currencies/exchange-rate', authenticate, (req, res,next) => {
         currencyController.getAllCurrencyExchangeServices()
-            .then(function (rates) {
+            .then((rates) => {
                 res.json(rates);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -53,9 +53,9 @@ let currencyRegisterRoutes = function (router, authenticate) {
      *
      * @returns {Object} rates
      */
-    router.get('/currencies/exchange-rate/:serviceId', authenticate, function (req, res, next) {
+    router.get('/currencies/exchange-rate/:serviceId', authenticate, (req, res, next) => {
         currencyController.getCurrencyExchangeRate(req.params.serviceId)
-            .then(function (rate) {
+            .then((rate) => {
                 res.json(rate);
             })
             .fail(function (error) {
@@ -74,10 +74,10 @@ let currencyRegisterRoutes = function (router, authenticate) {
      */
     router.get('/currencies/:id', authenticate, function (req, res, next) {
         currencyController.getById(req.params.id)
-            .then(function (currency) {
+            .then((currency) => {
                 res.json(currency);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });

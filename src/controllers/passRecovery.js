@@ -22,7 +22,7 @@ let passRecoveryController = {
             {
                 username: username
             },
-            function (error, user) {
+            (error, user) => {
                 let newPassRecoveryToken;
                 let token;
 
@@ -49,7 +49,7 @@ let passRecoveryController = {
                     created: new Date()
                 });
 
-                newPassRecoveryToken.save(function (error, token) {
+                newPassRecoveryToken.save((error, token) => {
                     if (error) {
                         logger.error(error);
                         deferred.reject(error);
@@ -84,7 +84,7 @@ let passRecoveryController = {
             {
                 token: token
             },
-            function (error, token) {
+            (error, token) => {
                 if (error) {
                     logger.error(error);
                     deferred.reject(error);
@@ -121,7 +121,7 @@ let passRecoveryController = {
             {
                 token: token
             },
-            function (error, token) {
+            (error, token) => {
                 if (error) {
                     logger.error(error);
                     deferred.reject(error);

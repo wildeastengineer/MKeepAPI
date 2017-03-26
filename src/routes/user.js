@@ -24,15 +24,15 @@ let userRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/UserSchema} user - Created user.
      */
-    router.post('/registration', function (req, res, next) {
+    router.post('/registration', (req, res, next) => {
         userController.createUser({
             username: req.body.username,
             password: req.body.password
         })
-            .then(function (user) {
+            .then((user) => {
                 res.json(user);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -57,14 +57,14 @@ let userRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/UserSchema} user
      */
-    router.get('/profile', authenticate, function (req, res, next) {
+    router.get('/profile', authenticate, (req, res, next) => {
         userController.getById({
             id: req.user._id
         })
-            .then(function (user) {
+            .then((user) => {
                 res.json(user);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -82,9 +82,9 @@ let userRegisterRoutes = function (router, authenticate) {
      * @returns {Boolean} result.success
      * @returns {String} result.message
      */
-    router.post('/send-recover-password-token', function (req, res, next) {
+    router.post('/send-recover-password-token', (req, res, next) => {
         passRecovery.createPassRecoveryToken(req.body.username)
-            .then(function (token) {
+            .then((token) => {
                 let redirectUrl;
 
                 redirectUrl = url.parse(req.body.redirectUrl, true);
@@ -101,10 +101,10 @@ let userRegisterRoutes = function (router, authenticate) {
 
                 return emailSender.passwordRecovery(req.body.username, redirectUrl);
             })
-            .then(function (result) {
+            .then((result) => {
                 res.json(result);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -124,21 +124,21 @@ let userRegisterRoutes = function (router, authenticate) {
      * @returns {Boolean} result.success
      * @returns {String} result.message
      */
-    router.post('/recover-password', function (req, res, next) {
+    router.post('/recover-password', (req, res, next) => {
         passRecovery.isPasswordRecoveryTokenExisting(req.body.token)
-            .then(function () {
+            .then(() => {
                 passRecovery.removePassRecoveryToken(req.body.token)
             })
-            .then(function () {
+            .then(() => {
                 return userController.changePassword({
                     username: req.body.username,
                     newPassword: req.body.newPassword
                 })
             })
-            .then(function (result) {
+            .then((result) => {
                 res.json(result)
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
