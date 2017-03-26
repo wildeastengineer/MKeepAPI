@@ -21,7 +21,7 @@ let exchangeRateServiceController = {
         let deferred = Q.defer();
 
         ExchangeRateServiceModel.find({})
-            .exec(function (error, exchangeRateServices) {
+            .exec((error, exchangeRateServices) => {
                 if (error) {
                     logger.error('Exchange rate services weren\'t found');
                     logger.error(error);
@@ -50,7 +50,7 @@ let exchangeRateServiceController = {
         ExchangeRateServiceModel.findOne({
             _id: id
         })
-            .exec(function (error, exchangeRateService) {
+            .exec((error, exchangeRateService) => {
                 if (error) {
                     logger.error('Exchange rate service with given id wasn\'t found: ' + id);
                     logger.error(error);
@@ -75,7 +75,7 @@ let exchangeRateServiceController = {
         let deferred = Q.defer();
 
         this.getById(id)
-            .then(function (exchangeRateService) {
+            .then((exchangeRateService) => {
                 if (!isUpdateRequired(exchangeRateService)){
                     deferred.resolve(exchangeRateService);
 
@@ -83,11 +83,11 @@ let exchangeRateServiceController = {
                 }
 
                 requestCurrencyRates(exchangeRateService.url)
-                    .then(function (response) {
+                    .then((response) => {
                         exchangeRateService.rates = getRates(exchangeRateService.abbreviation, response);
                         exchangeRateService.lastUpdate = new Date();
 
-                        exchangeRateService.save(function (error) {
+                        exchangeRateService.save((error) => {
                             if (error) {
                                 logger.error(error);
                                 deferred.reject(error);
@@ -99,7 +99,7 @@ let exchangeRateServiceController = {
                         });
                     })
             })
-            .fail(function(error) {
+            .fail((error) => {
                 logger.error(error);
                 deferred.reject(error);
             });
@@ -129,7 +129,7 @@ let exchangeRateServiceController = {
 function requestCurrencyRates (url) {
     let deferred = Q.defer();
 
-    request.get(url, function (error, response, body) {
+    request.get(url, (error, response, body) => {
         if (error) {
             logger.error('Failed to request exchange rate from "${service}"'
                 .replace('${service}', url));

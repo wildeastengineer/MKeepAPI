@@ -67,10 +67,10 @@ module.exports = {
             runValidators: true,
             new: true //return the modified document rather than the original
         })
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 if (error) {
-                    logger.error(error);
                     logger.error('Category was not added to project: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
@@ -101,7 +101,7 @@ module.exports = {
         ProjectModel.findOne({
             _id: data.id
         })
-            .exec(function (error, projects) {
+            .exec((error, projects) => {
                 if (error) {
                     logger.error('Categories of the project with given id were\'t found: ' + data.id);
                     logger.error(error);
@@ -152,12 +152,12 @@ module.exports = {
             runValidators: true,
             new: true //return the modified document rather than the original
         })
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 let updatedCategory;
 
                 if (error) {
-                    logger.error(error);
                     logger.error('Category of the project with given id was not updated: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;
@@ -215,10 +215,10 @@ module.exports = {
             runValidators: true,
             new: true //return the modified document rather than the original
         })
-            .exec(function (error, doc) {
+            .exec((error, doc) => {
                 if (error) {
-                    logger.error(error);
                     logger.error('Category of the project with given id was not deleted: ' + data.id);
+                    logger.error(error);
                     deferred.reject(error);
 
                     return;

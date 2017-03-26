@@ -18,16 +18,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/ProjectSchema} project - Created project.
      */
-    router.post('/projects', authenticate, function (req, res, next) {
+    router.post('/projects', authenticate, (req, res, next) => {
         projectController.post({
             name: req.body.name,
             mainCurrency: req.body.mainCurrency,
             userId: req.user._id
         })
-            .then(function (project) {
+            .then((project) => {
                 res.json(project);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -41,14 +41,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/ProjectSchema[]} projects - All available projects.
      */
-    router.get('/projects', authenticate, function (req, res, next) {
+    router.get('/projects', authenticate, (req, res, next) => {
         projectController.getAll({
             userId: req.user._id
         })
-            .then(function (projects) {
+            .then((projects) => {
                 res.json(projects);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -62,15 +62,15 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/ProjectSchema} project
      */
-    router.get('/projects/:id', authenticate, function (req, res, next) {
+    router.get('/projects/:id', authenticate, (req, res, next) => {
         projectController.getById({
             id: req.params.id,
             userId: req.user._id
         })
-            .then(function (project) {
+            .then((project) => {
                 res.json(project);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -84,15 +84,15 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CategorySchema[]} categories
      */
-    router.get('/projects/:id/categories', authenticate, function (req, res, next) {
+    router.get('/projects/:id/categories', authenticate, (req, res, next) => {
         projectController.getCategories({
             id: req.params.id,
             userId: req.user._id
         })
-            .then(function (categories) {
+            .then((categories) => {
                 res.json(categories);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -106,7 +106,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CategorySchema} category - new category
      */
-    router.patch('/projects/:id/categories/:categoryId', authenticate, function (req, res, next) {
+    router.patch('/projects/:id/categories/:categoryId', authenticate, (req, res, next) => {
         projectController.updateCategory({
             id: req.params.id,
             userId: req.user._id,
@@ -117,10 +117,10 @@ let ProjectRegisterRoutes = function (router, authenticate) {
                 parent: req.body.category.parent
             }
         })
-            .then(function (category) {
+            .then((category) => {
                 res.json(category);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -142,16 +142,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CategorySchema} category - New add category to given project
      */
-    router.put('/projects/:id/categories', authenticate, function (req, res, next) {
+    router.put('/projects/:id/categories', authenticate, (req, res, next) => {
         projectController.addCategory({
             id: req.params.id,
             userId: req.user._id,
             category: req.body.category
         })
-            .then(function (category) {
+            .then((category) => {
                 res.json(category);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -165,16 +165,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {void}
      */
-    router.delete('/projects/:id/categories/:categoryId', authenticate, function (req, res, next) {
+    router.delete('/projects/:id/categories/:categoryId', authenticate, (req, res, next) => {
         projectController.deleteCategory({
             id: req.params.id,
             userId: req.user._id,
             categoryId: req.params.categoryId
         })
-            .then(function () {
+            .then(() => {
                 res.json();
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -190,16 +190,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CurrencySchema[]} currencies - New project's currencies list.
      */
-    router.post('/projects/:id/currencies', authenticate, function (req, res, next) {
+    router.post('/projects/:id/currencies', authenticate, (req, res, next) => {
         projectController.updateCurrencies({
             id: req.params.id,
             userId: req.user._id,
             currencies: req.body.currencies
         })
-            .then(function (currencies) {
+            .then((currencies) => {
                 res.json(currencies);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -215,16 +215,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {models/CurrencySchema} currency - New project's main currency.
      */
-    router.post('/projects/:id/currencies/main', authenticate, function (req, res, next) {
+    router.post('/projects/:id/currencies/main', authenticate, (req, res, next) => {
         projectController.updateMainCurrency({
             id: req.params.id,
             userId: req.user._id,
             mainCurrency: req.body.mainCurrency
         })
-            .then(function (currency) {
+            .then((currency) => {
                 res.json(currency);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
@@ -240,16 +240,16 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      *
      * @returns {String} name - New project's name.
      */
-    router.post('/projects/:id/rename', authenticate, function (req, res, next) {
+    router.post('/projects/:id/rename', authenticate, (req, res, next) => {
         projectController.rename({
             id: req.params.id,
             userId: req.user._id,
             name: req.body.name
         })
-            .then(function (name) {
+            .then((name) => {
                 res.json(name);
             })
-            .fail(function (error) {
+            .fail((error) => {
                 next(error);
             });
     });
