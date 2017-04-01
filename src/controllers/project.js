@@ -182,24 +182,7 @@ module.exports = {
      * @returns {Promise<models/CurrencySchema[]|Error>}
      */
     updateCurrencies(data) {
-        const that = this;
-        let deferred = Q.defer();
-
-        CurrencyController.updateProjectCurrencies(data)
-            .then(() => {
-                that.getById(data)
-                    .then((project) => {
-                        deferred.resolve(project.currencies);
-                    })
-                    .fail((error) => {
-                        deferred.reject(error);
-                    });
-            })
-            .fail((error) => {
-                deferred.reject(error);
-            });
-
-        return deferred.promise;
+        return CurrencyController.updateProjectCurrencies(data);
     },
 
     /**
@@ -243,7 +226,8 @@ module.exports = {
         }, {
             name: data.name
         }, {
-            runValidators: true
+            runValidators: true,
+            new: true //return the modified document rather than the original
         })
             .exec((error, doc) => {
                 if (error) {
