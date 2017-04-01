@@ -149,7 +149,7 @@ testRunner.testCase.testSuite.setPropertyValue("new_project_name", newProjectNam
 testRun = getRequestTestStep().run(testRunner, context)
 
 // validate recived response
-assert testRun.response.responseContent == newProjectName
+assert testRun.response.responseContent == "\"${newProjectName}\""
 
 /// PRIVATE FUNCTIONS
 def getRequestTestStep() {
@@ -260,7 +260,7 @@ def getRequestTestStep() {
 	return requestTestStep
 }</script></con:config></con:testStep><con:testStep type="restrequest" name="Request 1 1" id="3642e57f-ab06-4951-9b42-b36e14fa5ca2" disabled="true"><con:settings/><con:config service="http://localhost:8080" resourcePath="/api/projects/{id}/categories" methodName="PUT - Add new Category to Project" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Request 1 1" id="b8fedb59-565e-4440-a852-1a21cab7e529" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://localhost:8080</con:endpoint><con:request>{
 	"category": {
-		"name": "New Category - 1491055986303",
+		"name": "New Category - 1491073657811",
 		"categoryType" : "income",
 		"parent": null
 	}
@@ -314,7 +314,7 @@ def getRequestTestStep() {
 	return requestTestStep
 }</script></con:config></con:testStep><con:testStep type="restrequest" name="Request 1" id="81d1819c-7064-48a5-96a3-7fff1cdb6bd5" disabled="true"><con:settings/><con:config service="http://localhost:8080" resourcePath="/api/projects/{id}/categories/{categoryId}" methodName="PATCH - Update given category" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Request 1" id="e13bb3c8-ffe9-469c-abec-529ca97a3e4c" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://localhost:8080</con:endpoint><con:request>{
 	"category": {
-		"name": "Updated name Category - 1491055986539",
+		"name": "Updated name Category - 1491073658028",
 		"categoryType" : "expense",
 		"parent": null
 	}
@@ -329,4 +329,4 @@ def getRequestTestStep() {
   <con:entry key="currencyId" value="${#TestSuite#project_category}"/>
   <con:entry key="categoryId" value="${#TestSuite#project_category}"/>
   <con:entry key="access_token" value="${#TestSuite#access_token}"/>
-</con:parameters></con:restRequest></con:config></con:testStep><con:properties/></con:testCase><con:properties><con:property><con:name>username</con:name><con:value>SoapUI-1491055982892</con:value></con:property><con:property><con:name>password</con:name><con:value>123456</con:value></con:property><con:property><con:name>access_token</con:name><con:value>5c5b4919a3830b0f3c969865d9625c04</con:value></con:property><con:property><con:name>project_id</con:name><con:value>58dfb571f69a6a2fd38694cb</con:value></con:property><con:property><con:name>new_project_name</con:name><con:value>New Project name - 1491055985487</con:value></con:property><con:property><con:name>project_currencies</con:name><con:value>["578c6ef6832cff3b2cca138f", "578c6ef6832cff3b2cca13a1", "578c6ef6832cff3b2cca139b", "578c6ef6832cff3b2cca139c"]</con:value></con:property><con:property><con:name>project_mainCurrency</con:name><con:value>578c6ef6832cff3b2cca139c</con:value></con:property><con:property><con:name>project_category</con:name><con:value>58dfb572f69a6a2fd38694da</con:value></con:property></con:properties></con:testSuite><con:properties><con:property><con:name>client_id</con:name><con:value>MKWebAppV1</con:value></con:property><con:property><con:name>client_secret</con:name><con:value>mbO2FdS451lEz0fM8FlSM3n1rbokBSyy</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</con:parameters></con:restRequest></con:config></con:testStep><con:properties/></con:testCase><con:properties><con:property><con:name>username</con:name><con:value>SoapUI-1491073655317</con:value></con:property><con:property><con:name>password</con:name><con:value>123456</con:value></con:property><con:property><con:name>access_token</con:name><con:value>9bc42c44ccbac2c983083b8409a7ebba</con:value></con:property><con:property><con:name>project_id</con:name><con:value>58dffa78de0bf934fcda1563</con:value></con:property><con:property><con:name>new_project_name</con:name><con:value>New Project name - 1491073657028</con:value></con:property><con:property><con:name>project_currencies</con:name><con:value>["578c6ef6832cff3b2cca1395", "578c6ef6832cff3b2cca1390", "578c6ef6832cff3b2cca1392", "578c6ef6832cff3b2cca139c", "578c6ef6832cff3b2cca13ad"]</con:value></con:property><con:property><con:name>project_mainCurrency</con:name><con:value>578c6ef6832cff3b2cca13ad</con:value></con:property><con:property><con:name>project_category</con:name><con:value>58dffa79de0bf934fcda1572</con:value></con:property></con:properties></con:testSuite><con:properties><con:property><con:name>client_id</con:name><con:value>MKWebAppV1</con:value></con:property><con:property><con:name>client_secret</con:name><con:value>mbO2FdS451lEz0fM8FlSM3n1rbokBSyy</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
