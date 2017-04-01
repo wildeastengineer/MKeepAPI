@@ -112,7 +112,8 @@ let currencyController = {
         }, {
             currencies: data.currencies
         }, {
-            runValidators: true
+            runValidators: true,
+            new: true //return the modified document rather than the original
         })
             .populate('currencies')
             .exec((error, doc) => {
@@ -154,7 +155,8 @@ let currencyController = {
         }, {
             mainCurrency: data.mainCurrency
         }, {
-            runValidators: true
+            runValidators: true,
+            new: true //return the modified document rather than the original
         })
             .populate('mainCurrency')
             .exec((error, doc) => {
