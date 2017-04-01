@@ -55,7 +55,7 @@ describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
                 expect(exchangeRate.url).toBe(exchangeRateServices.cbr.url);
                 expect(exchangeRate.updateTime).toBe(exchangeRateServices.cbr.updateTime);
                 expect(exchangeRate.rates).toBeNonEmptyObject();
-                expect(Object.keys(exchangeRate.rates).length).toBe(33);
+                expect(Object.keys(exchangeRate.rates).length).toBe(34);
 
                 done();
             })
@@ -95,7 +95,7 @@ describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
                 expect(exchangeRate.url).toBe(exchangeRateServices.oer.url);
                 expect(exchangeRate.updatePeriod).toBe(exchangeRateServices.oer.updatePeriod);
                 expect(exchangeRate.rates).toBeNonEmptyObject();
-                expect(Object.keys(exchangeRate.rates).length).toBe(172);
+                expect(Object.keys(exchangeRate.rates).length).toBe(170);
 
                 done();
             })
