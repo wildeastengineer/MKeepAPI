@@ -183,14 +183,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * Update project's currencies list
      *
      * @function
-     * @name POST: /projects/:id/currencies
+     * @name PATCH: /projects/:id/currencies
      * @memberof routes/Project
      *
      * @param {String[]} currencies - Array of currencies id
      *
      * @returns {models/CurrencySchema[]} currencies - New project's currencies list.
      */
-    router.post('/projects/:id/currencies', authenticate, (req, res, next) => {
+    router.patch('/projects/:id/currencies', authenticate, (req, res, next) => {
         projectController.updateCurrencies({
             id: req.params.id,
             userId: req.user._id,
@@ -208,14 +208,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * Update project's main currency
      *
      * @function
-     * @name POST: /projects/:id/currencies/main
+     * @name PATCH: /projects/:id/currencies/main
      * @memberof routes/Project
      *
      * @param {String} mainCurrency - New main currency id
      *
      * @returns {models/CurrencySchema} currency - New project's main currency.
      */
-    router.post('/projects/:id/currencies/main', authenticate, (req, res, next) => {
+    router.patch('/projects/:id/currencies/main', authenticate, (req, res, next) => {
         projectController.updateMainCurrency({
             id: req.params.id,
             userId: req.user._id,
@@ -233,14 +233,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * Update project's name
      *
      * @function
-     * @name POST: /projects/:id/rename
+     * @name PATCH: /projects/:id/rename
      * @memberof routes/Project
      *
      * @param {String} name - Project's new name
      *
      * @returns {String} name - New project's name.
      */
-    router.post('/projects/:id/rename', authenticate, (req, res, next) => {
+    router.patch('/projects/:id/rename', authenticate, (req, res, next) => {
         projectController.rename({
             id: req.params.id,
             userId: req.user._id,
