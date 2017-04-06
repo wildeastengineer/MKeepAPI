@@ -56,7 +56,7 @@ let passRecoveryController = {
 
                         return;
                     } else {
-                        logger.info('New password recovery token has been successfully created: ' + token);
+                        logger.info('New password recovery token has been successfully created: ' + token.userId);
                         deferred.resolve(token);
                     }
                 });
@@ -136,7 +136,7 @@ let passRecoveryController = {
                     return;
                 }
 
-                logger.info('Password recovery token has been successfully deleted: ' + token);
+                logger.info('Password recovery token has been successfully deleted: ' + token.userId);
                 deferred.resolve(token);
             });
 

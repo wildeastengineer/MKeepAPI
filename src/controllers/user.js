@@ -55,7 +55,7 @@ let userController = {
                         logger.error(error);
                         deferred.reject(error);
                     } else {
-                        logger.info('New User has been successfully created: ' + user);
+                        logger.info('New User has been successfully created: ' + user._id);
                         deferred.resolve(_.pick(user, 'username', 'created'));
                     }
                 });

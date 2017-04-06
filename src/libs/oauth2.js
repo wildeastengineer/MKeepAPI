@@ -77,7 +77,8 @@ server.exchange(
             }
 
             done(null, tokenValue, refreshTokenValue, {
-                'expires_in': config.get('security:tokenLife')
+                'expires_in': config.get('security:tokenLife'),
+                'userProfile': user
             });
         });
     });
@@ -158,7 +159,8 @@ server.exchange(
                 }
 
                 done(null, tokenValue, refreshTokenValue, {
-                    'expires_in': config.get('security:tokenLife')
+                    'expires_in': config.get('security:tokenLife'),
+                    'userProfile': user
                 });
             });
         });

@@ -110,6 +110,12 @@ UserSchema = new Schema({
         ref: 'Project'
     }],
 
+    activeProject: {
+        type: Schema.Types.ObjectId,
+        ref: 'Project',
+        default: null
+    },
+
     /**
      * The used language abbr.
      *
@@ -179,6 +185,22 @@ UserSchema.methods.encryptPassword = function (password) {
 UserSchema.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
+
+/**
+ * @memberof models/UserSchema
+ *
+ * @returns {void}
+ */
+UserSchema.set('toJSON', {
+    transform: function(doc, ret, options) {
+        delete ret.hashedPassword;
+        delete ret.salt;
+        delete ret.passRecoveryToken;
+        delete ret.passRecoveryCreatedAt;
+
+        return ret;
+    }
+});
 
 if (mongoose.models.User) {
     User = mongoose.model('User');
