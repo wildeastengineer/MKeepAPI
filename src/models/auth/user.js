@@ -9,7 +9,6 @@ const Project = require('../project');
 let Schema = mongoose.Schema;
 let User;
 let UserSchema;
-
 let validateEmail;
 
 validateEmail = function (email) {
@@ -44,7 +43,8 @@ UserSchema = new Schema({
      */
     hashedPassword: {
         type: String,
-        required: true
+        required: true,
+        hideField: true
     },
 
     /**
@@ -55,7 +55,8 @@ UserSchema = new Schema({
      */
     salt: {
         type: String,
-        required: true
+        required: true,
+        hideField: true
     },
 
     /**
@@ -75,7 +76,8 @@ UserSchema = new Schema({
      * @memberof models/UserSchema
      */
     passRecoveryToken: {
-        type: String
+        type: String,
+        hideField: true
     },
 
     /**
@@ -85,7 +87,8 @@ UserSchema = new Schema({
      * @memberof models/UserSchema
      */
     passRecoveryCreatedAt: {
-        type: Date
+        type: Date,
+        hideField: true
     },
 
     /**
@@ -185,22 +188,6 @@ UserSchema.methods.encryptPassword = function (password) {
 UserSchema.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
-
-/**
- * @memberof models/UserSchema
- *
- * @returns {void}
- */
-UserSchema.set('toJSON', {
-    transform: function(doc, ret, options) {
-        delete ret.hashedPassword;
-        delete ret.salt;
-        delete ret.passRecoveryToken;
-        delete ret.passRecoveryCreatedAt;
-
-        return ret;
-    }
-});
 
 if (mongoose.models.User) {
     User = mongoose.model('User');
