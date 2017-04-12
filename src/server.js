@@ -13,6 +13,7 @@ let port = config.get('port');
 /// Mongoose plugins
 const beautifyUnique = require('mongoose-beautiful-unique-validation');
 const idValidator = require('mongoose-id-validator');
+const hideDocumentFields = require('./utils/mongoosePlugins/hideDocumentFields.js');
 /// Express plugins
 const errorHandler = require('./utils/expressPlugins/errorHandler.js');
 const methodNotAllowedErrorHandler = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
@@ -21,6 +22,7 @@ const notFoundErrorHandler = require('./utils/expressPlugins/notFoundErrorHandle
 // register global mongoose plugins
 mongoose.plugin(idValidator); // validate ref docs existence
 mongoose.plugin(beautifyUnique); // convert mongodb unfriendly duplicate key error to mongoose validation error
+mongoose.plugin(hideDocumentFields);
 
 // configuration ===============================================================
 mongoose.connect(config.get('database:uri')); // connect to our database
