@@ -19,7 +19,8 @@ let userController = {
      * @param {string} data.password
      * @param {string} data.clientId
      *
-     * @returns {promise}
+     * @returns {Promise.<Object, Error>} user's profile with access and refresh tokens
+     * if fulfilled, or an error if rejected.
      */
     createUser: function (data) {
         let deferred = Q.defer();
@@ -85,8 +86,17 @@ let userController = {
 
         return deferred.promise;
 
+        /**
+         * Create new access token
+         *
+         * @param {string} userId
+         * @param {string} clientId
+         *
+         * @returns {Promise.<string, Error>} access token
+         * if fulfilled, or an error if rejected.
+         */
         function createAccessToken(userId, clientId) {
-            let accessTokenValue = crypto.randomBytes(16).toString('hex');
+            const accessTokenValue = crypto.randomBytes(16).toString('hex');
             let deferred = Q.defer();
             let newAccessToken = new AccessTokenModel({
                 token: accessTokenValue,
@@ -95,7 +105,6 @@ let userController = {
             });
 
             newAccessToken.save(function (error, token) {
-
                 if (error) {
                     logger.error(error);
                     deferred.reject(error);
@@ -108,9 +117,18 @@ let userController = {
             return deferred.promise;
         }
 
+        /**
+         * Create new refresh token
+         *
+         * @param {string} userId
+         * @param {string} clientId
+         *
+         * @returns {Promise.<string, Error>} refresh token
+         * if fulfilled, or an error if rejected.
+         */
         function createRefreshToken(userId, clientId) {
             let deferred = Q.defer();
-            let refreshTokenValue = crypto.randomBytes(16).toString('hex');
+            const refreshTokenValue = crypto.randomBytes(16).toString('hex');
             let newRefreshToken = new RefreshTokenModel({
                 token: refreshTokenValue,
                 clientId: clientId,
@@ -118,7 +136,6 @@ let userController = {
             });
 
             newRefreshToken.save(function (error, token) {
-
                 if (error) {
                     logger.error(error);
                     deferred.reject(error);
