@@ -21,13 +21,15 @@ let userRegisterRoutes = function (router, authenticate) {
      *
      * @param {String} username
      * @param {String} password
+     * @param {String} client_id
      *
      * @returns {models/UserSchema} user - Created user.
      */
     router.post('/registration', (req, res, next) => {
         userController.createUser({
             username: req.body.username,
-            password: req.body.password
+            password: req.body.password,
+            clientId: req.body.client_id
         })
             .then((user) => {
                 res.json(user);

@@ -1,9 +1,13 @@
 /// Libs
+const config = require('../libs/config');
+const crypto = require('crypto');
 const _ = require('underscore');
 const Logger = require('../libs/log');
 const Q = require('q');
 /// Models
 const UserModel = require('../models/auth/user');
+const AccessTokenModel = require('../models/auth/accessToken');
+const RefreshTokenModel = require('../models/auth/refreshToken');
 /// Local variables
 let logger = Logger(module);
 let userController = {
@@ -13,6 +17,7 @@ let userController = {
      * @param {Object} data
      * @param {string} data.username - email in fact
      * @param {string} data.password
+     * @param {string} data.clientId
      *
      * @returns {promise}
      */
@@ -36,7 +41,7 @@ let userController = {
                 if (user) {
                     error = {
                         name: 'ValidationError',
-                        message: 'User with this email already exist'
+                        message: `User with this email ${data.username} already exist`
                     };
                     logger.error(error);
                     deferred.reject(error);
@@ -54,15 +59,77 @@ let userController = {
                     if (error) {
                         logger.error(error);
                         deferred.reject(error);
-                    } else {
-                        logger.info('New User has been successfully created: ' + user._id);
-                        deferred.resolve(user);
+
+                        return;
                     }
+
+                    Q.all([createAccessToken(user._id, data.clientId), createRefreshToken(user._id, data.clientId)])
+                        .catch(function (error) {
+                            logger.error(error);
+                            deferred.reject(error);
+                        })
+                        .done(function(tokens) {
+                            let response = {};
+
+                            response.access_token = tokens[0];
+                            response.refresh_token = tokens[1];
+                            response.expires_in = config.get('security:tokenLife');
+                            response.userProfile = user;
+
+                            logger.info('New User has been successfully created: ' + user._id);
+                            deferred.resolve(response);
+                        });
                 });
             }
         );
 
         return deferred.promise;
+
+        function createAccessToken(userId, clientId) {
+            let accessTokenValue = crypto.randomBytes(16).toString('hex');
+            let deferred = Q.defer();
+            let newAccessToken = new AccessTokenModel({
+                token: accessTokenValue,
+                clientId: clientId,
+                userId: userId
+            });
+
+            newAccessToken.save(function (error, token) {
+
+                if (error) {
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('New Access Token created for user: ' + userId);
+                    deferred.resolve(token.token);
+                }
+            });
+
+            return deferred.promise;
+        }
+
+        function createRefreshToken(userId, clientId) {
+            let deferred = Q.defer();
+            let refreshTokenValue = crypto.randomBytes(16).toString('hex');
+            let newRefreshToken = new RefreshTokenModel({
+                token: refreshTokenValue,
+                clientId: clientId,
+                userId:  userId
+            });
+
+            newRefreshToken.save(function (error, token) {
+
+                if (error) {
+                    logger.error(error);
+                    deferred.reject(error);
+                } else {
+                    logger.info('New Refresh Token created for user: ' + userId);
+                    deferred.resolve(token.token);
+                }
+            });
+
+            return deferred.promise;
+        }
     },
     /**
      * Changes password of existing user
