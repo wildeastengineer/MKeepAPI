@@ -54,7 +54,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Get project by id.
+     * Get project by id and setup active project for given user
      *
      * @function
      * @name GET: /projects/:id

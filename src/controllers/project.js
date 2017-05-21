@@ -96,7 +96,7 @@ module.exports = {
     },
 
     /**
-     * Get project by id
+     * Get project by id and setup active project for given user
      *
      * @function
      * @name getById
@@ -126,7 +126,27 @@ module.exports = {
                 }
 
                 logger.info('Project with given id was successfully found: ' + data.id);
-                deferred.resolve(project);
+
+                UserModel.findOne({
+                    _id: data.userId
+                })
+                    .exec((error, user) => {
+                        if (error) {
+                            logger.error('Cannot find user during getting project by id: ' + data.userId);
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return;
+                        }
+
+                        if (!user.activeProject || user.activeProject.toString() !== project._id.toString()) {
+                            logger.info('Active project was set upped for user: ' + data.userId);
+                            user.activeProject = project._id;
+                            user.save();
+                        }
+
+                        deferred.resolve(project);
+                    });
             });
 
         return deferred.promise;
