@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/transaction.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/transaction.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Libs
+var mongoose = require('mongoose');
+/// Models
+var Account = require('./account');
+var Category = require('./category');
+var Project = require('./project');
+var User = require('./auth/user');
+/// Local variables
+var Schema = mongoose.Schema;
+var Transaction;
+/// Plugins
+var mongoosePaginate = require('mongoose-paginate');
+var notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHandler.js');
+
+/**
+ * Transaction mongoose schema.
+ * @class models/TransactionSchema
+ */
+var TransactionSchema = new Schema({
+    _owner: 'String',
+
+    /**
+     * The category link.
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    category: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category'
+    },
+
+    /**
+     * The account value. - TODO: delete
+     *
+     * @type Number
+     * @memberof models/TransactionSchema
+     */
+    accountValue: Number,
+
+    /**
+     * The transaction value.
+     *
+     * @type Number
+     * @memberof models/TransactionSchema
+     */
+    transactionValue: {
+        type: Number
+    },
+
+    /**
+     * The transaction type. Can be 'income', 'expense' or 'transfer'.
+     *
+     * @type String
+     * @memberof models/TransactionSchema
+     */
+    transactionType: {
+        type: String,
+        enum: ['income', 'expense', 'transfer']
+    },
+
+    /**
+     * The source account link. - TODO: rename
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    accountSource: {
+        type: Schema.Types.ObjectId,
+        ref: 'Account'
+    },
+
+    /**
+     * The destination account link. - TODO: rename
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    accountDestination: {
+        type: Schema.Types.ObjectId,
+        ref: 'Account'
+    },
+
+    /**
+     * The transaction comment.
+     *
+     * @type String
+     * @memberof models/TransactionSchema
+     */
+    note: String,
+
+    /**
+     * The project link.
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    projectId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Project'
+    },
+
+    /**
+     * The transaction creation date.
+     *
+     * @type Date
+     * @memberof models/TransactionSchema
+     */
+    created: {
+        type: Date,
+        required: true
+    },
+
+    /**
+     * The transaction creation author link.
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+
+    /**
+     * The last transaction modification date.
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    modified: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+
+    /**
+     * The last transaction modification author link.
+     *
+     * @type ObjectId
+     * @memberof models/TransactionSchema
+     */
+    modifiedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }
+});
+
+TransactionSchema.plugin(mongoosePaginate);
+TransactionSchema.plugin(notFoundErrorHandler);
+
+if (mongoose.models.Transaction) {
+    Transaction = mongoose.model('Transaction');
+} else {
+    Transaction = mongoose.model('Transaction', TransactionSchema);
+}
+
+module.exports = Transaction;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

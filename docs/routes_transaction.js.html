@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: routes/transaction.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: routes/transaction.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Controllers
+var transactionController = require('../controllers/transaction.js');
+
+/**
+ * Transactions routes.
+ * @class routes/Transaction
+ */
+var transactionRegisterRoutes = function (router, authenticate, sendError) {
+    router.route('/transactions')
+        /**
+         * Get list of transactions.
+         *
+         * @function
+         * @name GET: /transactions
+         * @memberof routes/Transaction
+         *
+         * @param {Number} page
+         * @param {Number} perPage
+         *
+         * @returns {models/TransactionSchema[]} transactions
+         */
+        .get(authenticate, function (req, res) {
+            transactionController.getAll(
+                {
+                    page: req.query.page,
+                    perPage: req.query.perPage
+                },
+                function (err, transactions, totalItems) {
+                    if (err) {
+                        sendError(err, res);
+
+                        return;
+                    }
+
+                    res.setHeader('X-Total-Count', totalItems);
+                    res.json(transactions);
+                }
+            );
+        })
+
+        /**
+         * Create new transaction.
+         *
+         * @function
+         * @name POST: /transactions
+         * @memberof routes/Transaction
+         *
+         * @param {Date} date
+         * @param {String} category
+         * @param {Number} value
+         * @param {String} type - 'income' | 'expense'
+         * @param {String} accountSource
+         * @param {String} accountDestination
+         * @param {String} note
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
+        .post(authenticate, function (req, res) {
+            transactionController.post(
+                {
+                    date: req.body.date,
+                    category: req.body.category,
+                    value: req.body.value,
+                    type: req.body.type,
+                    accountSource: req.body.accountSource,
+                    accountDestination: req.body.accountDestination,
+                    note: req.body.note
+                },
+                function (err, transaction) {
+                    if (err) {
+                        sendError(err, res);
+
+                        return;
+                    }
+
+                    res.json(transaction);
+                }
+            );
+        });
+
+    router.route('/transactions/:transaction_id')
+        /**
+         * Get transaction by id.
+         *
+         * @function
+         * @name GET: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
+        .get(authenticate, function (req, res) {
+            transactionController.getById(
+                req.params.transaction_id,
+                function (err, transaction) {
+                    if (err) {
+                        sendError(err, res);
+
+                        return;
+                    }
+
+                    res.json(transaction);
+                }
+            );
+        })
+
+        /**
+         * Update transaction by id.
+         *
+         * @function
+         * @name PUT: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @param {Date} date
+         * @param {String} category
+         * @param {Number} value
+         * @param {String} type - 'income' | 'expense'
+         * @param {String} accountSource
+         * @param {String} accountDestination
+         * @param {String} note
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
+        .put(authenticate, function (req, res) {
+            transactionController.update(
+                req.params.transaction_id,
+                {
+                    date: req.body.date,
+                    category: req.body.category,
+                    value: req.body.value,
+                    type: req.body.type,
+                    accountSource: req.body.accountSource,
+                    accountDestination: req.body.accountDestination,
+                    note: req.body.note
+                },
+                function (err, transaction) {
+                    if (err) {
+                        sendError(err, res);
+
+                        return;
+                    }
+
+                    res.json(transaction);
+                }
+            );
+        })
+
+        /**
+         * Remove transaction by id.
+         *
+         * @function
+         * @name DELETE: /transactions/:transaction_id
+         * @memberof routes/Transaction
+         *
+         * @returns {models/TransactionSchema} transaction
+         */
+        .delete(authenticate, function (req, res) {
+            transactionController.remove(
+                req.params.transaction_id,
+                function (err, transaction) {
+                    if (err) {
+                        sendError(err, res);
+
+                        return;
+                    }
+
+                    res.json(transaction);
+                }
+            );
+        });
+};
+
+module.exports = {
+    register: transactionRegisterRoutes
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

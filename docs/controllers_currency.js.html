@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/currency.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/currency.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Libs
+var _ = require('underscore');
+var Logger = require('../libs/log');
+var Q = require('q');
+/// Models
+var CurrencyModel = require('../models/currency');
+var ProjectModel = require('../models/project');
+/// Controllers
+var ExchangeRateServiceController = require('./exchangerateservice.js');
+/// Local variables
+var logger = Logger(module);
+
+/**
+ * Currencies controller.
+ * @class controllers/Currency
+ */
+var currencyController = {
+    /**
+     * Get get all currencies
+     *
+     * @function
+     * @name getAll
+     * @memberof controllers/Currency
+     *
+     * @returns {Promise&lt;models/CurrencySchema[]|Error>}
+     */
+    getAll: function () {
+        var deferred = Q.defer();
+
+        CurrencyModel.find({})
+            .exec(function (error, currencies) {
+                if (error) {
+                    logger.error('Currencies weren\'t found');
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Currencies were successfully found');
+                deferred.resolve(currencies);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get currency by given id
+     *
+     * @function
+     * @name getById
+     * @memberof controllers/Currency
+     *
+     * @param {(ObjectId|String)} id
+     *
+     * @returns {Promise&lt;models/CurrencySchema|Error>}
+     */
+    getById: function (id) {
+        var deferred = Q.defer();
+
+        CurrencyModel.findOne({
+            _id: id
+        })
+            .exec(function (error, currency) {
+                if (error) {
+                    logger.error('Currency with given id wasn\'t found: ' + id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Currency with given id was successfully found: ' + id);
+                deferred.resolve(currency);
+        });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update currencies array in given project
+     *
+     * @function
+     * @name updateProjectCurrencies
+     * @memberof controllers/Currency
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise&lt;models/CurrencySchema[]|Error>}
+     */
+    updateProjectCurrencies: function (data) {
+        var deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            currencies: data.currencies
+        }, {
+            runValidators: true
+        })
+            .populate('currencies')
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Project currencies were not updated: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Project currencies were successfully updated: ' + data.id);
+                deferred.resolve(doc.currencies);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update main project currency
+     *
+     * @function
+     * @name updateProjectMainCurrency
+     * @memberof controllers/Currency
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project's id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.mainCurrency
+     *
+     * @returns {Promise&lt;models/CurrencySchema|Error>}
+     */
+    updateProjectMainCurrency: function (data) {
+        var deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            mainCurrency: data.mainCurrency
+        }, {
+            runValidators: true
+        })
+            .populate('mainCurrency')
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Project main currency was not updated: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Project main currency was successfully changed: ' + data.id);
+                deferred.resolve(doc.mainCurrency);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get exchange currency rate by given service id
+     *
+     * @function
+     * @name getCurrencyExchangeRate
+     * @memberof controllers/Currency
+     *
+     * @param {(ObjectId|String)} id
+     *
+     * @returns {Promise&lt;Object|Error>}
+     */
+    getCurrencyExchangeRate: function (id) {
+        return ExchangeRateServiceController.getCurrencyExchangeRate(id);
+    },
+
+    /**
+     * Get all exchange currency rate services
+     *
+     * @function
+     * @name getAllCurrencyExchangeServices
+     * @memberof controllers/Currency
+     *
+     * @returns {Promise&lt;Object[]|Error>}
+     */
+    getAllCurrencyExchangeServices: function () {
+        return ExchangeRateServiceController.getAll();
+    }
+};
+
+module.exports = currencyController;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

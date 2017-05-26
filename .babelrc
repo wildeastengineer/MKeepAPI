@@ -1,0 +1,16 @@
+{
+    "presets": [
+        "es2015",
+        "stage-2"
+    ],
+    "plugins": [],
+    "ignore": [
+        "node_modules",
+        "README.md",
+        "jsHintConfig.js",
+        "gulpfile.js",
+        "/**/*.json",
+        "/**/*.htm",
+        "test"
+    ]
+}

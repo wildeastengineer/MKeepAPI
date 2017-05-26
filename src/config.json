@@ -1,0 +1,33 @@
+{
+    "port" : 8080,
+    "database": {
+        "uri": "mongodb://localhost",
+        "name": "test",
+        "port": "27017"
+    },
+    "security": {
+        "tokenLife" : 3600
+    },
+    "clients": [
+        {
+            "name": "MK web application v1",
+            "clientId": "MKWebAppV1",
+            "clientSecret": "mbO2FdS451lEz0fM8FlSM3n1rbokBSyy"
+        }
+    ],
+    "host": "localhost",
+    "protocol": "http",
+    "baseUrl": "/api",
+    "emailSender": {
+        "host": "smtp.gmail.com",
+        "port": 465,
+        "secure": true,
+        "auth": {
+            "user": "money.keeper.service@gmail.com",
+            "pass": "moneyKeeper123456"
+        }
+    },
+    "passRecovery": {
+        "tokenLife": "12h"
+    }
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/project.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/project.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/// Libs
+var Logger = require('../libs/log');
+var Q = require('q');
+/// Models
+var UserModel = require('../models/auth/user');
+var ProjectModel = require('../models/project');
+/// Controllers
+var CurrencyController = require('./currency');
+/// Local variables
+var logger = Logger(module);
+/// Private functions
+
+/**
+ * Projects controller.
+ * @class controllers/Project
+ */
+var projectController = {
+    /**
+     * Create new project
+     *
+     * @function
+     * @name post
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {String} data.name
+     * @param {(ObjectId|String)} data.userId
+     * @param {Object[]} [data.accounts]
+     * @param {(ObjectId[]|String[])} [data.currencies]
+     * @param {(ObjectId|String)} [data.mainCurrency]
+     * @param {Object[]} [data.categories]
+     * @param {Object[]} [data.widgets]
+     *
+     * @returns {Promise&lt;models/ProjectSchema|Error>}
+     */
+    post: function (data) {
+        var deferred = Q.defer();
+        var newProject;
+
+        newProject = new ProjectModel({
+            name: data.name,
+            owners: [data.userId],
+            users: [data.userId],
+            mainCurrency: data.mainCurrency,
+            created: new Date(),
+            createdBy: data.userId,
+            modifiedBy: data.userId
+        });
+
+        newProject.save(function (error, project) {
+            if (error) {
+                logger.error('New project hasn\'t been created');
+                logger.error(error);
+                deferred.reject(error);
+
+                return;
+            }
+
+            // Find User and add project id to projects field
+            UserModel.findOneAndUpdate({
+                _id: data.userId
+            }, {
+                $addToSet: {
+                    projects: project._id
+                }
+            }, {
+                runValidators: true
+            })
+                .exec(function (error, doc) {
+                    if (error) {
+                        logger.error(error);
+                        logger.error('Project with given id wasn\'t added to user: ' + data.userId);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    ProjectModel.populate(project, 'owners users currencies mainCurrency createdBy modifiedBy',
+                        function (error, project) {
+                            if (error) {
+                                logger.error('New project cannot be populated');
+                                logger.error(error);
+                                deferred.reject(error);
+
+                                return;
+                            }
+
+                            logger.info('New project has been successfully created: ' + project._id);
+                            deferred.resolve(project);
+                        });
+                });
+        });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get project by id
+     *
+     * @function
+     * @name getById
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise&lt;models/ProjectSchema|Error>}
+     */
+    getById: function (data) {
+        var deferred = Q.defer();
+
+            ProjectModel.findOne({
+                users: data.userId,
+                _id: data.id
+            })
+                .populate('owners users currencies mainCurrency createdBy modifiedBy')
+                .exec(function (error, project) {
+                    if (error) {
+                        logger.error('Project with given id wasn\'t found: ' + data.id);
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    logger.info('Project with given id was successfully found: ' + data.id);
+                    deferred.resolve(project);
+                });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get list of all projects
+     *
+     * @function
+     * @name getAll
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise&lt;models/ProjectSchema[]|Error>}
+     */
+    getAll: function (data) {
+        var deferred = Q.defer();
+
+        ProjectModel.find({
+            users: data.userId
+        })
+            .populate('owners users currencies mainCurrency createdBy modifiedBy')
+            .exec(function (error, projects) {
+                if (error) {
+                    logger.error('Projects with given user weren\'t found: ' + data.userId);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Projects with given user were successfully found: ' + data.userId);
+                deferred.resolve(projects);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update currencies array in given project
+     *
+     * @function
+     * @name updateCurrencies
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId[]|String[])} data.currencies
+     *
+     * @returns {Promise&lt;models/CurrencySchema[]|Error>}
+     */
+    updateCurrencies: function (data) {
+        return CurrencyController.updateProjectCurrencies(data);
+    },
+
+    /**
+     * Update main project currency
+     *
+     * @function
+     * @name updateMainCurrency
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - Project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.mainCurrency
+     *
+     * @returns {Promise&lt;models/CurrencySchema|Error>}
+     */
+    updateMainCurrency: function (data) {
+        return CurrencyController.updateProjectMainCurrency(data);
+    },
+
+    /**
+     * Rename project with given name
+     *
+     * @function
+     * @name updateMainCurrency
+     * @memberof controllers/Project
+     *
+     * @param {Object} rename
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {String} data.name
+     *
+     * @returns {Promise&lt;String|Error>} - New project name
+     */
+    rename: function (data) {
+        var deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            name: data.name
+        }, {
+            runValidators: true
+        })
+            .exec(function (error, doc) {
+                if (error) {
+                    logger.error(error);
+                    logger.error('Project was not renamed: ' + data.id);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Project was successfully renamed: ' + data.id);
+                deferred.resolve(doc.name);
+            });
+
+        return deferred.promise;
+    }
+};
+
+module.exports = projectController;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="controllers_Account.html">controllers/Account</a></li><li><a href="controllers_Currency.html">controllers/Currency</a></li><li><a href="controllers_Project.html">controllers/Project</a></li><li><a href="models_AccessTokenSchema.html">models/AccessTokenSchema</a></li><li><a href="models_AccountSchema.html">models/AccountSchema</a></li><li><a href="models_CategorySchema.html">models/CategorySchema</a></li><li><a href="models_ClientSchema.html">models/ClientSchema</a></li><li><a href="models_CurrencySchema.html">models/CurrencySchema</a></li><li><a href="models_ExchangeRateServiceSchema.html">models/ExchangeRateServiceSchema</a></li><li><a href="models_MigrationSchema.html">models/MigrationSchema</a></li><li><a href="models_PassRecoveryTokenSchema.html">models/PassRecoveryTokenSchema</a></li><li><a href="models_ProjectSchema.html">models/ProjectSchema</a></li><li><a href="models_RefreshTokenSchema.html">models/RefreshTokenSchema</a></li><li><a href="models_TransactionSchema.html">models/TransactionSchema</a></li><li><a href="models_UserSchema.html">models/UserSchema</a></li><li><a href="routes_Account.html">routes/Account</a></li><li><a href="routes_Category.html">routes/Category</a></li><li><a href="routes_Currency.html">routes/Currency</a></li><li><a href="routes_Dashboard.html">routes/Dashboard</a></li><li><a href="routes_Project.html">routes/Project</a></li><li><a href="routes_Transaction.html">routes/Transaction</a></li><li><a href="routes_User.html">routes/User</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Oct 12 2016 09:15:30 GMT+0300 (MSK)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
