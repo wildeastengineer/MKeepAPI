@@ -6,14 +6,16 @@ const Logger = require('./libs/log');
 const migrator = require('./migrations/migrator');
 const mongoose = require('mongoose');
 const passport = require('passport');
+
 /// Local variables
 let app = express();
 let logger = Logger(module);
-let port = config.get('port');
+
 /// Mongoose plugins
 const beautifyUnique = require('mongoose-beautiful-unique-validation');
 const idValidator = require('mongoose-id-validator');
 const hideDocumentFields = require('./utils/mongoosePlugins/hideDocumentFields.js');
+
 /// Express plugins
 const errorHandler = require('./utils/expressPlugins/errorHandler.js');
 const methodNotAllowedErrorHandler = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
@@ -25,7 +27,16 @@ mongoose.plugin(beautifyUnique); // convert mongodb unfriendly duplicate key err
 mongoose.plugin(hideDocumentFields);
 
 // configuration ===============================================================
-mongoose.connect(config.get('database:uri')); // connect to our database
+const env = process.env.NODE_ENV || 'dev';
+
+const appPort = process.env.PORT || config.get(`port:${env}`) || 8080;
+
+const databaseUri = config.get(`database:${env}:uri`);
+const databasePort = config.get(`database:${env}:port`);
+const databaseName = config.get(`database:${env}:name`);
+const databaseUrl = `${databaseUri}:${databasePort}/${databaseName}`;
+
+mongoose.connect(databaseUrl); // connect to our database
 app.use(bodyParser()); // get information from html forms
 app.use(passport.initialize());
 
@@ -55,10 +66,10 @@ app.use(notFoundErrorHandler);
 app.use(errorHandler);
 
 // launch ======================================================================
-migrator.run(config.get('database:uri') + '/' + config.get('database:name'))
+migrator.run(databaseUrl)
     .then(function () {
-        app.listen(port);
-        logger.info('The magic happens on port ' + port);
+        app.listen(appPort);
+        logger.info('The magic happens on port ' + appPort);
     }).fail(function (error) {
         logger.error('Migrations was failed. ', error);
     });
