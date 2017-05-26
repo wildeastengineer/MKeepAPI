@@ -1,6 +1,9 @@
 {
     "name": "mk-api",
-    "main": "server.js",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "NODE_ENV='prod' node src/server.js"
+    },
     "dependencies": {
         "async": "^2.0.0-rc.6",
         "body-parser": "1.0.1",

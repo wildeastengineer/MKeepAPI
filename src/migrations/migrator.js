@@ -21,7 +21,7 @@ let migrator = {
     run: function (dbUrl) {
         let deferred = Q.defer();
 
-        MongoClient.connect(dbUrl, function(err, db) {
+        MongoClient.connect(dbUrl, function (err, db) {
             let migrationCollection;
 
             migrationCollection = db.collection('migrations');
