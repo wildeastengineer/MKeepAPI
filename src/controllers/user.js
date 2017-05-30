@@ -12,7 +12,7 @@ const RefreshTokenModel = require('../models/auth/refreshToken');
 let logger = Logger(module);
 let userController = {
     /**
-     * Create new user
+     * Create new user.
      *
      * @param {Object} data
      * @param {string} data.username - email in fact
@@ -23,7 +23,7 @@ let userController = {
      * if fulfilled, or an error if rejected.
      */
     createUser: function (data) {
-        let deferred = Q.defer();
+        const deferred = Q.defer();
 
         UserModel.findOne(
             {
@@ -64,7 +64,10 @@ let userController = {
                         return;
                     }
 
-                    Q.all([createAccessToken(user._id, data.clientId), createRefreshToken(user._id, data.clientId)])
+                    Q.all([
+                        createAccessToken(user._id, data.clientId),
+                        createRefreshToken(user._id, data.clientId)
+                    ])
                         .catch(function (error) {
                             logger.error(error);
                             deferred.reject(error);
@@ -80,6 +83,7 @@ let userController = {
                             logger.info('New User has been successfully created: ' + user._id);
                             deferred.resolve(response);
                         });
+
                 });
             }
         );
@@ -87,18 +91,17 @@ let userController = {
         return deferred.promise;
 
         /**
-         * Create new access token
+         * Create new access token.
          *
          * @param {string} userId
          * @param {string} clientId
          *
-         * @returns {Promise.<string, Error>} access token
-         * if fulfilled, or an error if rejected.
+         * @returns {Promise.<string, Error>} access token if fulfilled, or an error if rejected.
          */
         function createAccessToken(userId, clientId) {
             const accessTokenValue = crypto.randomBytes(16).toString('hex');
-            let deferred = Q.defer();
-            let newAccessToken = new AccessTokenModel({
+            const deferred = Q.defer();
+            const newAccessToken = new AccessTokenModel({
                 token: accessTokenValue,
                 clientId: clientId,
                 userId: userId
@@ -118,18 +121,17 @@ let userController = {
         }
 
         /**
-         * Create new refresh token
+         * Create new refresh token.
          *
          * @param {string} userId
          * @param {string} clientId
          *
-         * @returns {Promise.<string, Error>} refresh token
-         * if fulfilled, or an error if rejected.
+         * @returns {Promise.<string, Error>} refresh token if fulfilled, or an error if rejected.
          */
         function createRefreshToken(userId, clientId) {
-            let deferred = Q.defer();
+            const deferred = Q.defer();
             const refreshTokenValue = crypto.randomBytes(16).toString('hex');
-            let newRefreshToken = new RefreshTokenModel({
+            const newRefreshToken = new RefreshTokenModel({
                 token: refreshTokenValue,
                 clientId: clientId,
                 userId:  userId
@@ -149,7 +151,7 @@ let userController = {
         }
     },
     /**
-     * Changes password of existing user
+     * Changes password of existing user.
      *
      * @param {Object} data
      * @param {string} data.username - email in fact
@@ -158,7 +160,7 @@ let userController = {
      * @returns {promise}
      */
     changePassword: function (data) {
-        let deferred = Q.defer();
+        const deferred = Q.defer();
         let result = {
             success: true,
             message: 'Password has been successfully changed for {user}'.replace('{user}', data.username)
@@ -204,14 +206,15 @@ let userController = {
     },
 
     /**
-     * Get user by given id
+     * Get user by given id.
+     *
      * @param {Object} data
      * @param {ObjectId | string} data.id
      *
      * @returns {promise}
      */
     getById: function (data) {
-        let deferred = Q.defer();
+        const deferred = Q.defer();
 
         UserModel.findOne({
             _id: data.id
