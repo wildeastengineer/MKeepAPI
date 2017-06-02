@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const Logger = require('../libs/log');
 const Q = require('q');
 /// Local variables
-let logger = Logger(module);
+const logger = Logger(module);
 
 /**
  * Migration that creates Basic clients that are used for authentication process
@@ -12,11 +12,10 @@ let logger = Logger(module);
  *
  * @returns {Promise.<undefined,Error>} returns undefined if fulfilled, or an error if rejected.
  */
-let createBasicUsers = {
+const createBasicUsers = {
     execute: function (db) {
         const collectionName = 'clients';
         const deferred = Q.defer();
-        let clientsCollection;
         const Client = class Client {
             constructor(name, id, secret) {
                 this.name = name;
@@ -29,7 +28,7 @@ let createBasicUsers = {
             new Client('MK mobile application v1', 'MKMobileAppV1', '973fe85ea429112e5261a7413a33220aefebaaf1')
         ];
 
-        clientsCollection = db.collection(collectionName);
+        const clientsCollection = db.collection(collectionName);
 
         clientsCollection.createIndex({
             name: 1,
@@ -44,7 +43,7 @@ let createBasicUsers = {
                 return deferred.promise;
             })
             .then(() => {
-                let clientsToInsert = [];
+                const clientsToInsert = [];
 
                 for (let client of clients) {
                     clientsToInsert.push(insertBasicClient(client));
@@ -74,8 +73,8 @@ let createBasicUsers = {
                         clientId: client.clientId
                     }).then((existingClient)=>{
                         if (existingClient) {
+                            
                             logger.info(`Basic Client '${client.name}' already exists. Don't need to create it`);
-
                             return;
                         }
 
