@@ -242,6 +242,62 @@ let userController = {
             });
 
         return deferred.promise;
+    },
+
+    /**
+     * Update given user
+     *
+     * @function
+     * @name updateUser
+     * @memberof controllers/User
+     * @param {(ObjectId|String)} data.id
+     * @param {String} data.username - user's email
+     * @param {String} data.lang
+     *
+     * @returns {Promise.<Object, Error>} user schema if fulfilled, or an error if rejected.
+     */
+    updateUser (data) {
+        const deferred = Q.defer();
+        console.log(data.id)
+        UserModel.findOneAndUpdate({
+            _id: data.id.toString()
+        }, {
+            $set: {
+                'username': data.username,
+                'lang': data.lang,
+                'modifiedBy': data.id,
+                'modified': new Date()
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec((error, user) => {
+                if (error) {
+                    logger.error('User given id was not updated: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                if (!user) {
+                    error = {
+                        name: 'NotFoundError',
+                        message: 'User with given id was not found after updating: ' + data.id
+                    };
+
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return deferred.promise;
+                }
+
+                logger.info('User with given id was successfully updated: ' + data.id);
+                deferred.resolve(user);
+            });
+
+        return deferred.promise;
     }
 };
 

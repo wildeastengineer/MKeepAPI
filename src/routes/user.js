@@ -72,6 +72,29 @@ let userRegisterRoutes = function (router, authenticate) {
     });
 
     /**
+     * Update given user
+     *
+     * @function
+     * @name PATCH: /profile
+     * @memberof routes/User
+     *
+     * @returns {models/UserSchema} user - updated user
+     */
+    router.patch('/profile', authenticate, (req, res, next) => {
+        userController.updateUser({
+            id: req.user._id,
+            username: req.body.username,
+            lang: req.body.lang
+        })
+            .then((user) => {
+                res.json(user);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
      * Request password recovery token.
      *
      * @function
