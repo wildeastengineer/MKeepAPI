@@ -4,7 +4,13 @@ const mongoose = require('mongoose');
 
 require('jasmine-expect');
 
-mongoose.connect(`${config.get('database:uri')}:${config.get('database:port')}/${config.get('database:name')}`,
+const env = process.env.NODE_ENV || 'dev';
+const databaseUri = config.get(`database:${env}:uri`);
+const databasePort = config.get(`database:${env}:port`);
+const databaseName = config.get(`database:${env}:name`);
+const databaseUrl = `${databaseUri}:${databasePort}/${databaseName}`;
+
+mongoose.connect(databaseUrl,
     (error) => {
 
         if (error) {
