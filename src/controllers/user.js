@@ -251,23 +251,40 @@ let userController = {
      * @name updateUser
      * @memberof controllers/User
      * @param {(ObjectId|String)} data.id
-     * @param {String} data.username - user's email
-     * @param {String} data.lang
+     * @param {?String} data.username - user's email
+     * @param {?String} data.lang
      *
      * @returns {Promise.<Object, Error>} user schema if fulfilled, or an error if rejected.
      */
     updateUser (data) {
         const deferred = Q.defer();
-        console.log(data.id)
-        UserModel.findOneAndUpdate({
-            _id: data.id.toString()
-        }, {
-            $set: {
-                'username': data.username,
-                'lang': data.lang,
-                'modifiedBy': data.id,
-                'modified': new Date()
+        const paramsToSet = {};
+
+        //define params for updating
+        for (let paramName of Object.keys(data)) {
+            if (data[paramName] && paramName !== 'id') {
+                paramsToSet[paramName] = data[paramName]
             }
+        }
+
+        if (_.isEmpty(paramsToSet)) {
+            const error = {
+                name: 'ValidationError',
+                message: 'There are no updates for user : ' + data.id
+            };
+
+            logger.error(error);
+            deferred.reject(error);
+
+            return deferred.promise;
+        }
+
+        paramsToSet.modified = new Date();
+
+        UserModel.findOneAndUpdate({
+            _id: data.id
+        }, {
+            $set: paramsToSet
         }, {
             runValidators: true,
             new: true //return the modified document rather than the original
