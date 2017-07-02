@@ -12,19 +12,21 @@ let app = express();
 let logger = Logger(module);
 
 /// Mongoose plugins
-const beautifyUnique = require('mongoose-beautiful-unique-validation');
-const idValidator = require('mongoose-id-validator');
-const hideDocumentFields = require('./utils/mongoosePlugins/hideDocumentFields.js');
+const beautifyUniqueMongoose = require('mongoose-beautiful-unique-validation');
+const idValidatorMongoose = require('mongoose-id-validator');
+const notFoundErrorHandlerMongoose = require('./utils/mongoosePlugins/notFoundErrorHandler.js');
+const hideDocumentFieldsMongoose = require('./utils/mongoosePlugins/hideDocumentFields.js');
 
 /// Express plugins
-const errorHandler = require('./utils/expressPlugins/errorHandler.js');
-const methodNotAllowedErrorHandler = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
-const notFoundErrorHandler = require('./utils/expressPlugins/notFoundErrorHandler.js');
+const errorHandlerExpress = require('./utils/expressPlugins/errorHandler.js');
+const methodNotAllowedErrorHandlerExpress = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
+const notFoundErrorHandlerExpress = require('./utils/expressPlugins/notFoundErrorHandler.js');
 
 // register global mongoose plugins
-mongoose.plugin(idValidator); // validate ref docs existence
-mongoose.plugin(beautifyUnique); // convert mongodb unfriendly duplicate key error to mongoose validation error
-mongoose.plugin(hideDocumentFields);
+mongoose.plugin(idValidatorMongoose); // validate ref docs existence
+mongoose.plugin(beautifyUniqueMongoose); // convert mongodb unfriendly duplicate key error to mongoose validation error
+mongoose.plugin(hideDocumentFieldsMongoose);
+mongoose.plugin(notFoundErrorHandlerMongoose)
 
 // configuration ===============================================================
 const env = process.env.NODE_ENV || 'dev';
@@ -59,11 +61,11 @@ app.use(function (req, res, next) {
 require('./routes/routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
 
 // error handlers that pass error to final handler
-app.use(methodNotAllowedErrorHandler);
-app.use(notFoundErrorHandler);
+app.use(methodNotAllowedErrorHandlerExpress);
+app.use(notFoundErrorHandlerExpress);
 
 // final error handler
-app.use(errorHandler);
+app.use(errorHandlerExpress);
 
 // launch ======================================================================
 migrator.run(databaseUrl)

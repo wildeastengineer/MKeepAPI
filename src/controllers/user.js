@@ -5,8 +5,9 @@ const _ = require('underscore');
 const Logger = require('../libs/log');
 const Q = require('q');
 /// Models
-const UserModel = require('../models/auth/user');
 const AccessTokenModel = require('../models/auth/accessToken');
+const ClientModel = require('../models/auth/client');
+const UserModel = require('../models/auth/user');
 const RefreshTokenModel = require('../models/auth/refreshToken');
 /// Local variables
 let logger = Logger(module);
@@ -30,9 +31,7 @@ let userController = {
                 username: data.username
             },
             (error, user) => {
-                let newUser;
-
-                if (error) {
+                if (error && error.name.toLowerCase() !== 'NotFoundError'.toLowerCase()) {
                     logger.error(error);
                     deferred.reject(error);
 
@@ -50,7 +49,7 @@ let userController = {
                     return;
                 }
 
-                newUser = new UserModel({
+                const newUser = new UserModel({
                     username: data.username,
                     password: data.password,
                     created: new Date()
@@ -99,23 +98,38 @@ let userController = {
          * @returns {Promise.<string, Error>} access token if fulfilled, or an error if rejected.
          */
         function createAccessToken(userId, clientId) {
-            const accessTokenValue = crypto.randomBytes(16).toString('hex');
             const deferred = Q.defer();
-            const newAccessToken = new AccessTokenModel({
-                token: accessTokenValue,
-                clientId: clientId,
-                userId: userId
-            });
 
-            newAccessToken.save(function (error, token) {
-                if (error) {
-                    logger.error(error);
-                    deferred.reject(error);
-                } else {
-                    logger.info('New Access Token created for user: ' + userId);
-                    deferred.resolve(token.token);
+            ClientModel.findOne(
+                {
+                    clientId: clientId
+                },
+                (error, client) => {
+                    if (error) {
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    const accessTokenValue = crypto.randomBytes(16).toString('hex');
+                    const newAccessToken = new AccessTokenModel({
+                        token: accessTokenValue,
+                        clientId: client.clientId,
+                        userId: userId
+                    });
+
+                    newAccessToken.save(function (error, token) {
+                        if (error) {
+                            logger.error(error);
+                            deferred.reject(error);
+                        } else {
+                            logger.info('New Access Token created for user: ' + userId);
+                            deferred.resolve(token.token);
+                        }
+                    });
                 }
-            });
+            );
 
             return deferred.promise;
         }
@@ -130,22 +144,37 @@ let userController = {
          */
         function createRefreshToken(userId, clientId) {
             const deferred = Q.defer();
-            const refreshTokenValue = crypto.randomBytes(16).toString('hex');
-            const newRefreshToken = new RefreshTokenModel({
-                token: refreshTokenValue,
-                clientId: clientId,
-                userId:  userId
-            });
 
-            newRefreshToken.save(function (error, token) {
-                if (error) {
-                    logger.error(error);
-                    deferred.reject(error);
-                } else {
-                    logger.info('New Refresh Token created for user: ' + userId);
-                    deferred.resolve(token.token);
+            ClientModel.findOne(
+                {
+                    clientId: clientId
+                },
+                (error, client) => {
+                    if (error) {
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    const refreshTokenValue = crypto.randomBytes(16).toString('hex');
+                    const newRefreshToken = new RefreshTokenModel({
+                        token: refreshTokenValue,
+                        clientId: client.clientId,
+                        userId:  userId
+                    });
+
+                    newRefreshToken.save(function (error, token) {
+                        if (error) {
+                            logger.error(error);
+                            deferred.reject(error);
+                        } else {
+                            logger.info('New Refresh Token created for user: ' + userId);
+                            deferred.resolve(token.token);
+                        }
+                    });
                 }
-            });
+            );
 
             return deferred.promise;
         }
