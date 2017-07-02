@@ -67,11 +67,7 @@ let userController = {
                         createAccessToken(user._id, data.clientId),
                         createRefreshToken(user._id, data.clientId)
                     ])
-                        .catch(function (error) {
-                            logger.error(error);
-                            deferred.reject(error);
-                        })
-                        .done(function(tokens) {
+                        .then(function(tokens) {
                             let response = {};
 
                             response.access_token = tokens[0];
@@ -81,8 +77,11 @@ let userController = {
 
                             logger.info('New User has been successfully created: ' + user._id);
                             deferred.resolve(response);
+                        })
+                        .catch(function (error) {
+                            logger.error(error);
+                            deferred.reject(error);
                         });
-
                 });
             }
         );
