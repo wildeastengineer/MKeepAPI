@@ -15,6 +15,26 @@ const ClientPasswordStrategy = require('passport-oauth2-client-password').Strate
 /// Local variables
 let server = oauth2orize.createServer();
 
+/**
+ * Get token value without restricted chars.
+ *
+ * @private
+ *
+ * @returns {string}
+ */
+const getTokenValue = () => {
+    const restrictedChars = ['+', '/', '='];
+    let value;
+
+    value = crypto.randomBytes(32).toString('base64');
+
+    for (let restrictedChar of restrictedChars) {
+        value = value.replace(new RegExp(`\\${restrictedChar}`, 'g'), '');
+    }
+
+    return value
+};
+
 // Exchange username & password for access token.
 server.exchange(
     oauth2orize.exchange.password(function (client, username, password, scope, done) {
@@ -53,8 +73,8 @@ server.exchange(
                 }
             });
 
-            const tokenValue = crypto.randomBytes(16).toString('hex');
-            const refreshTokenValue = crypto.randomBytes(16).toString('hex');
+            const tokenValue = getTokenValue();
+            const refreshTokenValue = getTokenValue();
             const token = new AccessTokenModel({
                 token: tokenValue,
                 clientId: client.clientId,
@@ -134,8 +154,8 @@ server.exchange(
                     }
                 });
 
-                const tokenValue = crypto.randomBytes(32).toString('base64');
-                const refreshTokenValue = crypto.randomBytes(32).toString('base64');
+                const tokenValue = getTokenValue();
+                const refreshTokenValue = getTokenValue();
                 const token = new AccessTokenModel({
                     token: tokenValue,
                     clientId: client.clientId,
