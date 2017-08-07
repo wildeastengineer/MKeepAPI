@@ -68,6 +68,8 @@ app.use(notFoundErrorHandlerExpress);
 app.use(errorHandlerExpress);
 
 // launch ======================================================================
+console.log('Run migrations to:', databaseUrl);
+
 migrator.run(databaseUrl)
     .then(function () {
         app.listen(appPort);
