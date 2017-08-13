@@ -1,17 +1,14 @@
-'use strict';
-
 const entityFolder = '../../../../entity';
 const exchangeRateServices = require(`${entityFolder}/exchangeRateServices`);
 const fs = require('fs');
 const moment = require('moment');
 const root = require('rootrequire');
-const exchangeRateServiceController = require(`${root}/${process.env.TEST_SRC}/controllers/exchangerateservice.js`)
-    .__testOnly__;
+const exchangeRateServiceHelper = require(`${root}/${process.env.TEST_SRC}/utils/helpers/exchangeRateServiceHelper.js`);
 
 describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
     describe('Test requests to External Currency Rate Services', () => {
         it('Should send request to CBR service and get response', (done) => {
-            exchangeRateServiceController.requestCurrencyRates(exchangeRateServices.cbr.url)
+            exchangeRateServiceHelper.requestCurrencyRates(exchangeRateServices.cbr.url)
                 .then((rate) => {
                     expect(rate).toBeNonEmptyString();
 
@@ -25,7 +22,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
         });
 
         it('Should send request to OER (firefox) service and get response', (done) => {
-            exchangeRateServiceController.requestCurrencyRates(exchangeRateServices.oer.url)
+            exchangeRateServiceHelper.requestCurrencyRates(exchangeRateServices.oer.url)
                 .then((rate) => {
                     expect(rate).toBeNonEmptyString();
 
@@ -40,7 +37,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
 
 
         it('Should send request to ECB service and get response', (done) => {
-            exchangeRateServiceController.requestCurrencyRates(exchangeRateServices.ecb.url)
+            exchangeRateServiceHelper.requestCurrencyRates(exchangeRateServices.ecb.url)
                 .then((rate) => {
                     expect(rate).toBeNonEmptyString();
 
@@ -59,7 +56,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
 
         it('Should convert give CBR XML string to currency rate object', (done) => {
             const CBRXmlString = readEntityFile('CBRXmlResponse');
-            rate = exchangeRateServiceController.getCBRRatesObject(CBRXmlString);
+            rate = exchangeRateServiceHelper.getCBRRatesObject(CBRXmlString);
 
             expect(rate).toBeNonEmptyObject();
             expect(rate).toHaveNonEmptyString('EUR');
@@ -71,7 +68,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
 
         it('Should convert give ECB XML string to currency rate object', (done) => {
             const ECBXmlString = readEntityFile('ECBXmlResponse');
-            rate = exchangeRateServiceController.getECBRatesObject(ECBXmlString);
+            rate = exchangeRateServiceHelper.getECBRatesObject(ECBXmlString);
 
             expect(rate).toBeNonEmptyObject();
             expect(rate).toHaveNonEmptyString('RUB');
@@ -83,7 +80,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
 
         it('Should convert give OER XML string to currency rate object', (done) => {
             const OERJsonString = readEntityFile('OERJsonResponse');
-            rate = exchangeRateServiceController.getOERRatesObject(OERJsonString);
+            rate = exchangeRateServiceHelper.getOERRatesObject(OERJsonString);
 
             expect(rate).toBeNonEmptyObject();
             expect(rate).toHaveNumber('RUB');
@@ -107,7 +104,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(true);
@@ -120,7 +117,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 lastUpdate: moment().format()
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(true);
@@ -134,7 +131,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 rates: {}
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(true);
@@ -152,7 +149,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(false);
@@ -170,7 +167,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(false);
@@ -188,7 +185,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(true);
@@ -205,7 +202,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(true);
@@ -222,7 +219,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 }
             };
 
-            result = exchangeRateServiceController.isUpdateRequired(exchangeRateService);
+            result = exchangeRateServiceHelper.isUpdateRequired(exchangeRateService);
 
             expect(result).toBeBoolean();
             expect(result).toBe(false);

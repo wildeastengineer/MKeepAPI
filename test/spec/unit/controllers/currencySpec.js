@@ -1,5 +1,3 @@
-'use strict';
-
 const root = require('rootrequire');
 const currencyController = require(`${root}/${process.env.TEST_SRC}/controllers/currency.js`);
 
