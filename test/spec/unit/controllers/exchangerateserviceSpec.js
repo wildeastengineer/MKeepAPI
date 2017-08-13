@@ -1,8 +1,6 @@
-'use strict';
-
 const root = require('rootrequire');
 const exchangeRateServiceController = require(`${root}/${process.env.TEST_SRC}/controllers/exchangerateservice.js`);
-const exchangeRateServices = require('../../../../entity/exchangeRateServices');
+const exchangeRateServices = require('../../../entity/exchangeRateServices');
 
 describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
     let exchangeRateServiceList;
