@@ -1,9 +1,6 @@
-'use strict';
-
 const jasmineConfig = require('../test/jasmineConfig');
 
 let config = {
-    buildFolder: 'build',
     sourceFolder: 'src',
     filesToTest: [
         'controllers/*.js',

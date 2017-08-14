@@ -1,7 +1,8 @@
+'use strict';
 const root = require('rootrequire');
-const currencyController = require(`${root}/${process.env.TEST_SRC}/controllers/currency.js`);
+const currencyController = require(`${root}/src/controllers/currency.js`);
 
-describe('Test PUBLIC methods of Currency controller', () => {
+describe('Test Currency Controller', () => {
     let currency;
 
     it('Should Get All Currencies', (done) => {

@@ -1,5 +1,5 @@
 const root = require('rootrequire');
-const config = require(`${root}/${process.env.TEST_SRC}/libs/config`);
+const config = require(`${root}/src/libs/config`);
 const mongoose = require('mongoose');
 
 require('jasmine-expect');

@@ -1,6 +1,4 @@
-'use strict';
-
-let jasmineConfig = {
+module.exports = {
     spec_dir: 'test',
     helpers: [
         'helpers/**/*.js'
@@ -22,9 +20,8 @@ let jasmineConfig = {
     getSpecs (suite) {
         suite = suite || {};
         suite.level = suite.level || '';
-        suite.type = suite.type || '';
 
-        let dir = `${this.spec_dir}/spec/${suite.level}/**/${suite.type}/`;
+        let dir = `${this.spec_dir}/spec/${suite.level}/**/`;
 
         if (process.env.TEST_SPECS) {
             return process.env.TEST_SPECS.split(',').map((spec) => {
@@ -38,5 +35,3 @@ let jasmineConfig = {
         return [`${dir}*.js`];
     }
 };
-
-module.exports = jasmineConfig;
