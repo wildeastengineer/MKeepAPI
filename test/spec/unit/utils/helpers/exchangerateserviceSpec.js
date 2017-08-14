@@ -3,9 +3,9 @@ const exchangeRateServices = require(`${entityFolder}/exchangeRateServices`);
 const fs = require('fs');
 const moment = require('moment');
 const root = require('rootrequire');
-const exchangeRateServiceHelper = require(`${root}/${process.env.TEST_SRC}/utils/helpers/exchangeRateServiceHelper.js`);
+const exchangeRateServiceHelper = require(`${root}/src/utils/helpers/exchangeRateServiceHelper.js`);
 
-describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
+describe('Test Exchange Rate Service Helper', () => {
     describe('Test requests to External Currency Rate Services', () => {
         it('Should send request to CBR service and get response', (done) => {
             exchangeRateServiceHelper.requestCurrencyRates(exchangeRateServices.cbr.url)
@@ -21,7 +21,7 @@ describe('Test PRIVATE methods of Exchange Rate Service controller', () => {
                 });
         });
 
-        it('Should send request to OER (firefox) service and get response', (done) => {
+        it('Should send request to OER (forex) service and get response', (done) => {
             exchangeRateServiceHelper.requestCurrencyRates(exchangeRateServices.oer.url)
                 .then((rate) => {
                     expect(rate).toBeNonEmptyString();
