@@ -63,7 +63,7 @@ ProjectSchema = new Schema({
      */
     accounts: [{
         type: Schema.Types.ObjectId,
-        ref: Account
+        ref: 'Account'
     }],
 
     /**
