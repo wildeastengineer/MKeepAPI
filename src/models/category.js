@@ -36,7 +36,8 @@ let CategorySchema = new Schema({
      */
     categoryType: {
         type: String,
-        enum: ['income', 'expense']
+        enum: ['income', 'expense'],
+        required: true
     },
 
     /**
@@ -46,7 +47,8 @@ let CategorySchema = new Schema({
      * @memberof models/CategorySchema
      */
     parent: {
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        default: null
     },
 
     /**
