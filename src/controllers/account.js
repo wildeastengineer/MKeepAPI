@@ -26,6 +26,7 @@ module.exports = {
      * @param {String} data.account.name
      * @param {Number} data.account.value
      * @param {Number} data.account.initValue
+     * @param {?(ObjectId|String)[]} data.account.projects
      * @param {(ObjectId|String)} data.account.currency
      * @param {(ObjectId|String)} data.projectId - Project's id
      * @param {(ObjectId|String)} data.userId
@@ -43,6 +44,7 @@ module.exports = {
             value: data.account.value,
             initValue: data.account.initValue,
             currency: data.account.currency,
+            projects: data.account.projects,
             created: new Date(),
             createdBy: data.userId,
             modifiedBy: data.userId
@@ -217,6 +219,7 @@ module.exports = {
      * @param {?(ObjectId|String)} data.account.currency
      * @param {?Number} data.account.value
      * @param {?Number} data.account.initValue
+     * @param {?(ObjectId|String)[]} data.account.projects
      *
      * @returns {Promise<models/AccountSchema|Error>}
      */
@@ -224,7 +227,7 @@ module.exports = {
         let deferred = Q.defer();
 
         AccountModel.findOneAndUpdate({
-            _id: data.id,
+            _id: data.account.id,
             owners: data.userId
         }, {
                 $set: data.account
@@ -234,7 +237,7 @@ module.exports = {
         })
             .exec((error, doc) => {
                 if (error) {
-                    logger.error('Account was not updated: ' + data.id);
+                    logger.error('Account was not updated: ' + doc._id);
                     logger.error(error);
                     deferred.reject(error);
 
@@ -242,8 +245,88 @@ module.exports = {
                 }
 
                 //TODO: changing value, initialValue and currency should lead to recalculating all transactions
-                logger.info('Account was successfully updated: ' + data.id);
+                logger.info('Account was successfully updated: ' + doc._id);
                 deferred.resolve(doc);
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Delete given account
+     *
+     * @function
+     * @name delete
+     * @memberof controllers/Account
+     * @param {(ObjectId|String)} data.id - account id
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    delete(data) {
+        let deferred = Q.defer();
+        let that = this;
+
+        AccountModel.findOneAndRemove({
+            _id: data.id,
+            owners: data.userId
+        },{
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec((error, account) => {
+                if (error) {
+                    logger.error('Account with given id was not deleted: ' + account._id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                //Delete Account from all projects
+                that.deleteAccountFromProjects(data)
+                    .then(() => {
+                        logger.info('Account with given id was deleted: ' + account._id);
+                        deferred.resolve();
+                    })
+                    .fail((error) => {
+                        deferred.reject(error);
+                    });
+            });
+
+        return deferred.promise;
+    },
+
+    deleteAccountFromProjects(data) {
+        let deferred = Q.defer();
+
+        ProjectModel.update({
+            _id: {
+                "$in":data.projects
+            }
+        }, {
+            $pull: {
+                accounts: {
+                    _id: data._id
+                }
+            }
+        }, {
+            runValidators: true,
+            new: true, //return the modified document rather than the original
+            multi: true
+        })
+            .exec((error, docs) => {
+                if (error) {
+                    logger.error('Account with given id was not removed from existing projects: ' + data._id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+
+                logger.info('Account with given id was removed from existing projects: ' + data._id);
+                deferred.resolve();
             });
 
         return deferred.promise;
