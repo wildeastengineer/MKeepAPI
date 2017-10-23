@@ -69,17 +69,17 @@ module.exports = {
      * Add given account to the give project
      *
      * @function
-     * @name putAccountIntoProject
+     * @name addAccountToProjects
      * @memberof controllers/Account
      *
      * @param {Object} data
-     * @param {(ObjectId|String)} data.id
+     * @param {(ObjectId|String)} data._id
      * @param {(ObjectId|String)} data.projects - Project's id
      * @param {(ObjectId|String)} data.userId
      *
      * @returns {Promise<models/AccountSchema|Error>}
      */
-    putAccountIntoProjects(data) {
+    addAccountToProjects(data) {
         let deferred = Q.defer();
 
         // Find Project and add given account to project
@@ -92,7 +92,7 @@ module.exports = {
             }
         }, {
             $addToSet: {
-                accounts: data.id
+                accounts: data._id
             }
         }, {
             runValidators: true,
@@ -101,7 +101,7 @@ module.exports = {
         })
             .exec((error, projects) => {
                 if (error) {
-                    logger.error(`Account with given id "${data.id}" wasn\'t added to projects`);
+                    logger.error(`Account with given id "${data._id}" wasn\'t added to projects`);
                     logger.error(error);
                     deferred.reject(error);
 
@@ -110,7 +110,7 @@ module.exports = {
 
                 // Find User and add project id to projects field
                 AccountModel.findOneAndUpdate({
-                    _id: data.id
+                    _id: data._id
                 }, {
                     $pushAll: {
                         projects: data.projects
@@ -209,7 +209,6 @@ module.exports = {
         return deferred.promise;
     },
 
-
     /**
      * Update account
      *
@@ -303,7 +302,7 @@ module.exports = {
      * @name deleteAccountFromProjects
      * @memberof controllers/Account
      *
-     * @param {(ObjectId|String)} data.id - account id
+     * @param {(ObjectId|String)} data._id - account id
      * @param {(ObjectId|String)[]} data.projects
      *
      * @returns {Promise<void|Error>}
@@ -318,7 +317,7 @@ module.exports = {
             }
         }, {
             "$pull": {
-                accounts: data.id
+                accounts: data._id
             }
         }, {
             runValidators: true,
@@ -327,7 +326,7 @@ module.exports = {
         })
             .exec((error, projects) => {
                 if (error) {
-                    logger.error(`Account with given id "${data.id}" wasn\'t delete from projects`);
+                    logger.error(`Account with given id "${data._id}" wasn\'t delete from projects`);
                     logger.error(error);
                     deferred.reject(error);
 
@@ -336,13 +335,14 @@ module.exports = {
 
                 // Find User and add project id to projects field
                 AccountModel.findOneAndUpdate({
-                    _id: data.id
+                    _id: data._id
                 }, {
                     $pushAll: {
                         projects: data.projects
                     }
                 }, {
-                    runValidators: true
+                    runValidators: true,
+                    new: true //return the modified document rather than the original
                 })
                     .exec((error, account) => {
                         if (error) {
