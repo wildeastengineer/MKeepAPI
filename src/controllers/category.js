@@ -26,7 +26,7 @@ module.exports = {
      * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
      * @param {String} data.category.name
-     * @param {String} data.category.categoryType
+     * @param {String} data.category.type
      * @param {?(ObjectId|String)} data.category.parent
      *
      * @returns {Promise<models/CategorySchema|Error>}
@@ -55,7 +55,7 @@ module.exports = {
             $push: {
                 categories: {
                     name: data.category.name,
-                    categoryType: data.category.categoryType,
+                    type: data.category.type,
                     parent: data.category.parent,
                     created: new Date(),
                     createdBy: data.userId,
@@ -128,7 +128,7 @@ module.exports = {
      * @param {Object} data.category
      * @param {(ObjectId|String)} data.category.id
      * @param {String} data.category.name
-     * @param {String} data.category.categoryType
+     * @param {String} data.category.type
      * @param {?(ObjectId|String)} data.category.parent
      *
      * @returns {Promise<models/CategorySchema|Error>}
@@ -143,7 +143,7 @@ module.exports = {
         }, {
             $set: {
                 'categories.$.name': data.category.name,
-                'categories.$.categoryType': data.category.categoryType,
+                'categories.$.type': data.category.type,
                 'categories.$.parent': data.category.parent,
                 'categories.$.modifiedBy': data.userId,
                 'categories.$.modified': new Date()
