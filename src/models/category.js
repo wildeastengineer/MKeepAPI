@@ -34,7 +34,7 @@ let CategorySchema = new Schema({
      * @type String
      * @memberof models/CategorySchema
      */
-    categoryType: {
+    type: {
         type: String,
         enum: ['income', 'expense'],
         required: true
