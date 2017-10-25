@@ -1,11 +1,7 @@
-"use strict";
-
 /// Libs
 const mongoose = require('mongoose');
 /// Models
 const Currency = require('./currency');
-const Project = require('./project');
-const User = require('./auth/user');
 /// Local variables
 let Account;
 let Schema = mongoose.Schema;
@@ -17,28 +13,6 @@ const notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHand
  * @class models/AccountSchema
  */
 let AccountSchema = new Schema({
-    /**
-     * The account owners links.
-     *
-     * @type ObjectId[]
-     * @memberof models/AccountSchema
-     */
-    owners: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-
-    /**
-     * The account owners links.
-     *
-     * @type ObjectId[]
-     * @memberof models/AccountSchema
-     */
-    users: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-
     /**
      * The name of account.
      *
@@ -80,17 +54,6 @@ let AccountSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Currency'
     },
-
-    /**
-     * The list of projects links.
-     *
-     * @type ObjectId[]
-     * @memberof models/AccountSchema
-     */
-    projects: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Project'
-    }],
 
     /**
      * The creation date.
