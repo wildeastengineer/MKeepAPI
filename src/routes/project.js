@@ -170,9 +170,9 @@ let ProjectRegisterRoutes = function (router, authenticate) {
             userId: req.user._id,
             category: {
                 id: req.params.categoryId,
-                name: req.body.category.name,
-                categoryType: req.body.category.categoryType,
-                parent: req.body.category.parent
+                name: req.body.name,
+                type: req.body.type,
+                parent: req.body.parent
             }
         })
             .then((category) => {
