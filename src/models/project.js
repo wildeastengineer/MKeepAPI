@@ -61,10 +61,9 @@ ProjectSchema = new Schema({
      * @type ObjectId[]
      * @memberof models/ProjectSchema
      */
-    accounts: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Account'
-    }],
+    accounts: [
+        Account.schema
+    ],
 
     /**
      * The project main currency link.

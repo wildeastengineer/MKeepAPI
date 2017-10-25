@@ -2,7 +2,6 @@
 const passport = require('passport');
 /// Routes
 const config = require('../libs/config');
-const accountRoutes = require('./account');
 const currencyRoutes = require('./currency');
 const dashboardRoutes = require('./dashboard');
 const projectRoutes = require('./project');
@@ -25,7 +24,6 @@ module.exports = function (app, router) {
 
     userRoutes.register(router, authenticate);
 
-    accountRoutes.register(router, authenticate);
     currencyRoutes.register(router, authenticate);
     dashboardRoutes.register(router, authenticate);
     transactionRoutes.register(router, authenticate);

@@ -5,6 +5,7 @@ const Q = require('q');
 const UserModel = require('../models/auth/user');
 const ProjectModel = require('../models/project');
 /// Controllers
+const AccountController = require('./account');
 const CategoryController = require('./category');
 const CurrencyController = require('./currency');
 /// Local variables
@@ -334,5 +335,84 @@ module.exports = {
      */
     deleteCategory(data) {
         return CategoryController.deleteCategory(data);
+    },
+    /**
+     *
+     * Create new account and add it to the give project
+     *
+     * @function
+     * @name addAccount
+     * @memberof controllers/Account
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.account
+     * @param {String} data.account.name
+     * @param {Number} data.account.value
+     * @param {Number} data.account.initValue
+     * @param {?(ObjectId|String)} data.account.currency
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    addAccount(data) {
+        return AccountController.put(data);
+    },
+
+    /**
+     * Get accounts by project id
+     *
+     * @function
+     * @name getAccounts
+     * @memberof controllers/Account
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<models/AccountSchema[]|Error>}
+     */
+    getAccounts(data) {
+        return AccountController.getAll(data);
+    },
+
+    /**
+     * Update account
+     *
+     * @function
+     * @name updateAccount
+     * @memberof controllers/Account
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.account
+     * @param {(ObjectId|String)} data.account.id - account id
+     * @param {?String} data.account.name
+     * @param {?(ObjectId|String)} data.account.currency
+     * @param {?Number} data.account.value
+     * @param {?Number} data.account.initValue
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    updateAccount(data) {
+        return AccountController.updateAccount(data);
+    },
+
+    /**
+     * Delete given account from project
+     *
+     * @function
+     * @name deleteAccount
+     * @memberof controllers/Account
+     *
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.accountId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    deleteAccount(data) {
+        return AccountController.deleteAccount(data);
     }
 };
