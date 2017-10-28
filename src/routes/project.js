@@ -1,3 +1,5 @@
+/// Libs
+const _ = require('underscore');
 /// Controllers
 const projectController = require('../controllers/project.js');
 
@@ -112,13 +114,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     router.get('/projects/:id/categories', authenticate, (req, res, next) => {
         projectController.getCategories({
             id: req.params.id,
-            userId: req.user._id,
-            category: {
-                id: req.params.categoryId,
-                name: req.body.name,
-                type: req.body.type,
-                parent: req.body.parent
-            }
+            userId: req.user._id
         })
             .then((categories) => {
                 res.json(categories);
@@ -138,14 +134,12 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/CategorySchema} category - New add category to given project
      */
     router.put('/projects/:id/categories', authenticate, (req, res, next) => {
+        const categoryParams = _.pick(req.body, 'name', 'type', 'parent');
+
         projectController.addCategory({
             id: req.params.id,
             userId: req.user._id,
-            category: {
-                name: req.body.name,
-                type: req.body.type,
-                parent: req.body.parent
-            }
+            category: categoryParams
         })
             .then((category) => {
                 res.json(category);
@@ -165,14 +159,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/CategorySchema} category - new category
      */
     router.patch('/projects/:id/categories/:categoryId', authenticate, (req, res, next) => {
+        const categoryParams = _.pick(req.body, 'name', 'type', 'parent');
+
         projectController.updateCategory({
             id: req.params.id,
             userId: req.user._id,
             category: {
                 id: req.params.categoryId,
-                name: req.body.name,
-                type: req.body.type,
-                parent: req.body.parent
+                ...categoryParams
             }
         })
             .then((category) => {
@@ -288,15 +282,12 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/AccountSchema} account - New add account to given project
      */
     router.put('/projects/:id/accounts', authenticate, (req, res, next) => {
+        const accountParams = _.pick(req.body, 'name', 'initValue', 'value', 'currency');
+
         projectController.addAccount({
             id: req.params.id,
             userId: req.user._id,
-            account: {
-                name: req.body.name,
-                initValue: req.body.initValue,
-                value: req.body.value,
-                currency: req.body.currency
-            }
+            account: accountParams
         })
             .then((account) => {
                 res.json(account);
@@ -316,15 +307,14 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/AccountSchema} - updated account
      */
     router.patch('/projects/:id/accounts/:accountId', authenticate, (req, res, next) => {
+        const accountParams = _.pick(req.body, 'name', 'initValue', 'value', 'currency');
+
         projectController.updateAccount({
             id: req.params.id,
             userId: req.user._id,
             account: {
                 id: req.params.accountId,
-                name: req.body.name,
-                initValue: req.body.initValue,
-                value: req.body.value,
-                currency: req.body.currency
+                ...accountParams
             }
         })
             .then((account) => {
