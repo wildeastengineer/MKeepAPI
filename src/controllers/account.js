@@ -26,7 +26,6 @@ module.exports = {
      * @param {(ObjectId|String)} data.id - project id
      * @param {Object} data.account
      * @param {String} data.account.name
-     * @param {Number} data.account.value
      * @param {Number} data.account.initValue
      * @param {?(ObjectId|String)} data.account.currency
      *
@@ -55,7 +54,7 @@ module.exports = {
                 accounts: {
                     name: data.account.name,
                     initValue: data.account.initValue,
-                    value: data.account.value,
+                    value: data.account.initValue, //value should be equal to initValue when new acc is created
                     currency: data.account.currency,
                     created: new Date(),
                     createdBy: data.userId,
@@ -136,12 +135,13 @@ module.exports = {
      * @param {(ObjectId|String)} data.account.id - account id
      * @param {?String} data.account.name
      * @param {?(ObjectId|String)} data.account.currency
-     * @param {?Number} data.account.value
      * @param {?Number} data.account.initValue
      *
      * @returns {Promise<models/AccountSchema|Error>}
      */
     updateAccount(data) {
+        //TODO: calculated calculatedValue when transactions are implemented
+        let calculatedValue = data.account.initValue;
         let deferred = Q.defer();
 
         ProjectModel.findOneAndUpdate({
@@ -152,7 +152,7 @@ module.exports = {
             $set: {
                 'accounts.$.name': data.account.name,
                 'accounts.$.initValue': data.account.initValue,
-                'accounts.$.value': data.account.value,
+                'accounts.$.value': calculatedValue,
                 'accounts.$.currency': data.account.currency,
                 'accounts.$.modifiedBy': data.userId,
                 'accounts.$.modified': new Date()
