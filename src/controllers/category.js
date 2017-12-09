@@ -136,51 +136,84 @@ module.exports = {
     updateCategory(data) {
         let deferred = Q.defer();
 
-        ProjectModel.findOneAndUpdate({
+        // find the project and make sure that use have permissions to update
+        // make sure that project have required entity to update
+        ProjectModel.findOne({
             _id: data.id,
-            owners: data.userId,
-            'categories._id': data.category.id
-        }, {
-            $set: {
-                'categories.$.name': data.category.name,
-                'categories.$.type': data.category.type,
-                'categories.$.parent': data.category.parent,
-                'categories.$.modifiedBy': data.userId,
-                'categories.$.modified': new Date()
-            }
-        }, {
-            runValidators: true,
-            new: true //return the modified document rather than the original
+            owners: data.userId
         })
+            .populate('accounts accounts.currency')
             .exec((error, doc) => {
-                let updatedCategory;
+                let categoryToUpdate;
 
                 if (error) {
-                    logger.error('Category of the project with given id was not updated: ' + data.id);
+                    logger.error('Account of the project with given id was not updated: ' + data.id);
                     logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
-                updatedCategory = doc.categories.find(function (category) {
+                categoryToUpdate = doc.categories.find(function (category) {
                     return category._id.toString() === data.category.id.toString()
                 });
 
-                if (!updatedCategory) {
+                if (!categoryToUpdate) {
                     error = {
                         name: 'NotFoundError',
-                        message: 'Category of the project with given id was not found after updating: ' + data.id
+                        message: 'Category of the project with given id was not found for updating: ' + data.id
                     };
 
                     logger.error(error);
                     deferred.reject(error);
 
-                    return deferred.promise;
+                    return;
                 }
 
-                logger.info('Category of the project with given id was successfully changed: ' + data.id);
-                deferred.resolve(updatedCategory);
+                ProjectModel.findOneAndUpdate({
+                    'categories._id': categoryToUpdate._id
+                }, {
+                    $set: {
+                        'categories.$.name': data.category.name,
+                        'categories.$.type': data.category.type,
+                        'categories.$.parent': data.category.parent,
+                        'categories.$.modifiedBy': data.userId,
+                        'categories.$.modified': new Date()
+                    }
+                }, {
+                    runValidators: true,
+                    new: true //return the modified document rather than the original
+                })
+                    .exec((error, doc) => {
+                        let updatedCategory;
+
+                        if (error) {
+                            logger.error('Category of the project with given id was not updated: ' + data.id);
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return;
+                        }
+
+                        updatedCategory = doc.categories.find(function (category) {
+                            return category._id.toString() === data.category.id.toString()
+                        });
+
+                        if (!updatedCategory) {
+                            error = {
+                                name: 'NotFoundError',
+                                message: 'Category of the project with given id was not found after updating: ' + data.id
+                            };
+
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return deferred.promise;
+                        }
+
+                        logger.info('Category of the project with given id was successfully changed: ' + data.id);
+                        deferred.resolve(updatedCategory);
+                    });
             });
 
         return deferred.promise;

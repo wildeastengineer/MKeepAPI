@@ -38,7 +38,15 @@ const databasePort = config.get(`database:${env}:port`);
 const databaseName = config.get(`database:${env}:name`);
 const databaseUrl = `${databaseUri}:${databasePort}/${databaseName}`;
 
-mongoose.connect(databaseUrl); // connect to our database
+mongoose.Promise = global.Promise;
+mongoose.connect(databaseUrl,{autoReconnect: true}, (error) => {
+    if(error) {
+        logger.error(error);
+        logger.error(`Error happened connecting to mogoseDB '${databaseUrl}'`);
+    } else {
+        logger.info(`Successfully connected to mongoDB '${databaseUrl}'`);
+    }
+}); // connect to our database
 app.use(bodyParser()); // get information from html forms
 app.use(passport.initialize());
 

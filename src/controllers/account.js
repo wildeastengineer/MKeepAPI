@@ -144,26 +144,15 @@ module.exports = {
         let calculatedValue = data.account.initValue;
         let deferred = Q.defer();
 
-        ProjectModel.findOneAndUpdate({
+        // find the project and make sure that use have permissions to update
+        // make sure that project have required entity to update
+        ProjectModel.findOne({
             _id: data.id,
-            owners: data.userId,
-            'accounts._id': data.account.id
-        }, {
-            $set: {
-                'accounts.$.name': data.account.name,
-                'accounts.$.initValue': data.account.initValue,
-                'accounts.$.value': calculatedValue,
-                'accounts.$.currency': data.account.currency,
-                'accounts.$.modifiedBy': data.userId,
-                'accounts.$.modified': new Date()
-            }
-        }, {
-            runValidators: true,
-            new: true //return the modified document rather than the original
+            owners: data.userId
         })
             .populate('accounts accounts.currency')
             .exec((error, doc) => {
-                let updatedAccount;
+                let accountToUpdate;
 
                 if (error) {
                     logger.error('Account of the project with given id was not updated: ' + data.id);
@@ -173,24 +162,72 @@ module.exports = {
                     return;
                 }
 
-                updatedAccount = doc.accounts.find(function (account) {
+                accountToUpdate = doc.accounts.find(function (account) {
                     return account._id.toString() === data.account.id.toString()
                 });
 
-                if (!updatedAccount) {
+                console.log(doc);
+
+                if (!accountToUpdate) {
                     error = {
                         name: 'NotFoundError',
-                        message: 'Account of the project with given id was not found after updating: ' + data.id
+                        message: 'Account of the project with given id was not found for updating: ' + data.id
                     };
 
                     logger.error(error);
                     deferred.reject(error);
 
-                    return deferred.promise;
+                    return;
                 }
 
-                logger.info('Account of the project with given id was successfully changed: ' + data.id);
-                deferred.resolve(updatedAccount);
+                //use found entity to update it
+                ProjectModel.findOneAndUpdate({
+                    'accounts._id': accountToUpdate._id
+                }, {
+                    $set: {
+                        'accounts.$.name': data.account.name,
+                        'accounts.$.initValue': data.account.initValue,
+                        'accounts.$.value': calculatedValue,
+                        'accounts.$.currency': data.account.currency,
+                        'accounts.$.modifiedBy': data.userId,
+                        'accounts.$.modified': new Date()
+                    }
+                }, {
+                    runValidators: true,
+                    new: true //return the modified document rather than the original
+                })
+                    .populate('accounts accounts.currency')
+                    .exec((error, doc) => {
+                        let updatedAccount;
+
+                        if (error) {
+                            logger.error('Account of the project with given id was not updated: ' + data.id);
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return;
+                        }
+
+                        updatedAccount = doc.accounts.find(function (account) {
+                            return account._id.toString() === data.account.id.toString()
+                        });
+
+                        if (!updatedAccount) {
+                            error = {
+                                name: 'NotFoundError',
+                                message: 'Account of the project with given id was not found after updating: ' + data.id
+                            };
+
+                            logger.error(error);
+                            deferred.reject(error);
+
+                            return deferred.promise;
+                        }
+
+                        logger.info('Account of the project with given id was successfully changed: ' + data.id);
+                        deferred.resolve(updatedAccount);
+                    });
+
             });
 
         return deferred.promise;
