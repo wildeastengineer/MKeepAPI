@@ -1,11 +1,115 @@
-const Transaction = require('../models/transaction');
-const Account = require('../models/account');
-const Category = require('../models/category');
+/// Libs
+const Logger = require('../libs/log');
+const Q = require('q');
+/// Models
+const AccountModel = require('../models/account');
+const CategoryModel = require('../models/category');
+const UserModel = require('../models/auth/user');
+const ProjectModel = require('../models/project');
+const TransactionModel = require('../models/transaction');
 
-// ToDo: remove this when auth is implemented
-let user = {
-    _id: 777
+/// Controllers
+const AccountController = require('./account');
+const CategoryController = require('./category');
+const CurrencyController = require('./currency');
+/// Local variables
+const logger = Logger(module);
+/// Private functions
+
+/**
+ * Transaction controller.
+ * @class controllers/Transaction
+ */
+module.exports = {
+    /**
+     * Create new transaction
+     *
+     * @function
+     * @name post
+     * @memberof controllers/Transaction
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.transaction
+     * @param {String} data.transaction.type
+     * @param {Number} data.transaction.value
+     * @param {String} data.transaction.note
+     * @param {?(ObjectId|String)} data.transaction.category
+     * @param {?(ObjectId|String)} data.transaction.accountSource
+     * @param {?(ObjectId|String)} data.transaction.accountDestination
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    post(data) {
+        //find project to figure out whether use is able to create transactions
+
+        //created transaction specifying account sources
+        // IF transaction type income or expense
+        //update accounts values base on value =+ transaction.value * (-1 or +1 depends on type)
+        // IF ELSE transaction type is transfer
+        //update accountSource.value = value - transaction.value
+        //update accountDestination.value = value + transaction.value
+        //return
+    },
+
+    /**
+     * Update transaction
+     *
+     * @function
+     * @name update
+     * @memberof controllers/Transaction
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.transaction
+     * @param {String} data.transaction.type
+     * @param {Number} data.transaction.value
+     * @param {String} data.transaction.note
+     * @param {?(ObjectId|String)} data.transaction.category
+     * @param {?(ObjectId|String)} data.transaction.accountSource
+     * @param {?(ObjectId|String)} data.transaction.accountDestination
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    update(data) {
+
+    },
+
+    /**
+     * Get get all transaction by projectId
+     *
+     * @function
+     * @name getAllByProjectId
+     * @memberof controllers/Transaction
+     * @param {(ObjectId|String)} data.id - project id
+     *
+     * @returns {Promise<models/CategorySchema[]|Error>}
+     */
+    getAllByProjectId(data) {
+
+    },
+
+    /**
+     * Delete transaction
+     *
+     * @function
+     * @name delete
+     * @memberof controllers/Transaction
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.transactionId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    delete(data) {
+
+    }
 };
+
+
+
+
 
 let transactionController = {
     getAll: function (pagination, callback) {
@@ -348,5 +452,3 @@ let transactionController = {
         );
     }
 };
-
-module.exports = transactionController;

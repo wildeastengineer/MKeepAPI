@@ -19,7 +19,6 @@ const notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHand
  * @class models/TransactionSchema
  */
 let TransactionSchema = new Schema({
-    _owner: 'String',
 
     /**
      * The category link.
@@ -33,20 +32,12 @@ let TransactionSchema = new Schema({
     },
 
     /**
-     * The account value. - TODO: delete
-     *
-     * @type Number
-     * @memberof models/TransactionSchema
-     */
-    accountValue: Number,
-
-    /**
      * The transaction value.
      *
      * @type Number
      * @memberof models/TransactionSchema
      */
-    transactionValue: {
+    value: {
         type: Number
     },
 
@@ -56,13 +47,13 @@ let TransactionSchema = new Schema({
      * @type String
      * @memberof models/TransactionSchema
      */
-    transactionType: {
+    type: {
         type: String,
         enum: ['income', 'expense', 'transfer']
     },
 
     /**
-     * The source account link. - TODO: rename
+     * The source account link
      *
      * @type ObjectId
      * @memberof models/TransactionSchema
@@ -73,7 +64,7 @@ let TransactionSchema = new Schema({
     },
 
     /**
-     * The destination account link. - TODO: rename
+     * The destination account link
      *
      * @type ObjectId
      * @memberof models/TransactionSchema
