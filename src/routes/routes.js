@@ -5,7 +5,6 @@ const config = require('../libs/config');
 const currencyRoutes = require('./currency');
 const dashboardRoutes = require('./dashboard');
 const projectRoutes = require('./project');
-const transactionRoutes = require('./transaction');
 const userRoutes = require('./user');
 /// Local variables
 let authenticate;
@@ -26,7 +25,6 @@ module.exports = function (app, router) {
 
     currencyRoutes.register(router, authenticate);
     dashboardRoutes.register(router, authenticate);
-    transactionRoutes.register(router, authenticate);
     projectRoutes.register(router, authenticate);
 
     // All of our routes will be prefixed with '/api'

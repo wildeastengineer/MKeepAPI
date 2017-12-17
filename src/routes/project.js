@@ -35,6 +35,42 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
+     * Create transaction.
+     *
+     * @function
+     * @name POST: /projects/:id/transactions
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} userId
+     * @param {Object} body
+     * @param {String} body.type
+     * @param {Number} body.value
+     * @param {String} body.note
+     * @param {String} body.category
+     * @param {String} body.accountSource
+     * @param {String} body.accountDestination
+     *
+     * @returns {models/TransactionSchema} transaction - Created transaction.
+     */
+    router.post('/projects/:id/transactions', authenticate, (req, res, next) => {
+        const transactionParams = _.pick(req.body, 'type', 'value',
+            'note', 'category', 'accountSource', 'accountDestination');
+
+        projectController.addTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transaction: transactionParams
+        })
+            .then((project) => {
+                res.json(project);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
      * Get list of all projects.
      *
      * @function

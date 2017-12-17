@@ -8,6 +8,7 @@ const ProjectModel = require('../models/project');
 const AccountController = require('./account');
 const CategoryController = require('./category');
 const CurrencyController = require('./currency');
+const TransactionController = require('./transaction');
 /// Local variables
 const logger = Logger(module);
 /// Private functions
@@ -414,5 +415,30 @@ module.exports = {
      */
     deleteAccount(data) {
         return AccountController.deleteAccount(data);
+    },
+
+
+    /**
+     * Create new transaction
+     *
+     * @function
+     * @name post
+     * @memberof controllers/Transaction
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.transaction
+     * @param {String} data.transaction.type
+     * @param {Number} data.transaction.value
+     * @param {String} data.transaction.note
+     * @param {?(ObjectId|String)} data.transaction.category
+     * @param {?(ObjectId|String)} data.transaction.accountSource
+     * @param {?(ObjectId|String)} data.transaction.accountDestination
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    addTransaction(data) {
+        return TransactionController.post(data);
     }
 };
