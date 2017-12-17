@@ -1,6 +1,7 @@
 /// Libs
 const Logger = require('../libs/log');
 const Q = require('q');
+const _ = require('underscore');
 /// Models
 const AccountModel = require('../models/account');
 const CategoryModel = require('../models/category');
@@ -43,6 +44,149 @@ module.exports = {
      */
     post(data) {
         //find project to figure out whether use is able to create transactions
+        let deferred = Q.defer();
+        let that = this;
+
+        if (!data.transaction.accountDestination) {
+            data.transaction.accountDestination = data.transaction.accountSource;
+        }
+
+        // find the project and make sure that use have permissions to update
+        // make sure that project have required entity to update
+        ProjectModel.findOne({
+            _id: data.id,
+            owners: data.userId,
+            $and: [
+                {
+                    accounts: data.transaction.accountSource
+                },
+                {
+                    accounts: data.transaction.accountDestination
+                }
+            ]
+        })
+            .populate('accounts')
+            .exec((error, project) => {
+                let newTransaction;
+
+                if (error) {
+                    logger.error('Project for adding new transaction was not found ' +
+                        'or use doesn\'t have permissions to add new transaction: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                newTransaction = new TransactionModel({
+                    projectId: data.id,
+                    type: data.transaction.type,
+                    value: data.transaction.value,
+                    note: data.transaction.note,
+                    category: data.transaction.category,
+                    accountSource: data.transaction.accountSource,
+                    accountDestination: data.transaction.accountDestination,
+                    created: new Date(),
+                    createdBy: data.userId,
+                    modifiedBy: data.userId
+                });
+
+                newTransaction.save((error, transaction) => {
+                    let accountDestinationToUpdate;
+                    let accountSourceToUpdate;
+                    let accountSourceData = {
+                        userId: data.userId
+                    };
+
+                    if (error) {
+                        logger.error('New transaction hasn\'t been created');
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    // Get source and destination accounts from project
+                    accountSourceToUpdate = project.accounts.find(function (account) {
+                        return account._id.toString() === data.transaction.accountSource.toString()
+                    });
+
+                    accountDestinationToUpdate = project.accounts.find(function (account) {
+                        return account._id.toString() === data.transaction.accountDestination.toString()
+                    });
+
+                    if (!accountSourceToUpdate || !accountDestinationToUpdate) {
+                        error = {
+                            name: 'NotFoundError',
+                            message: 'Account Source or Account Destination of the project with given id ' +
+                            'was not found for updating: ' + data.id
+                        };
+
+                        logger.error(error);
+                        deferred.reject(error);
+
+                        return;
+                    }
+
+                    accountSourceData.account.id = accountSourceToUpdate._id;
+
+                    if (data.transaction.type !== 'transfer') {
+
+                        accountSourceData.account.value += accountSourceToUpdate.value +
+                            data.transaction.value * (data.transaction.type === 'income' ? 1 : -1);
+
+                        // Update source account value
+                        AccountController.updateAccountById(accountSourceData)
+                            .then(() => {
+                                return that.populateTransaction(transaction);
+                            })
+                            .then((populatedTransaction) => {
+                                logger.info('New Transaction was successfully created' +
+                                    ' and corresponding account was updated');
+
+                                deferred.resolve(populatedTransaction);
+                            })
+                            .catch((error) => {
+                                logger.error(error);
+                                deferred.reject(error);
+                            })
+                    } else {
+                        let accountDestinationData = {
+                            userId: data.userId
+                        };
+
+                        accountSourceData.account.value += accountSourceToUpdate.value -
+                            data.transaction.value;
+
+                        accountDestinationData.account.value += accountDestinationToUpdate.value +
+                            data.transaction.value;
+
+                        accountDestinationData.account.id = accountSourceToUpdate._id;
+
+                        // Update source and destination account values
+                        AccountController.updateAccountById(accountSourceData)
+                            .then(() => {
+                                return AccountController.updateAccountById(accountDestinationData);
+                            })
+                            .then(() => {
+                                return that.populateTransaction(transaction);
+                            })
+                            .then((populatedTransaction) => {
+                                logger.info('New Transaction was successfully created' +
+                                    ' and corresponding account was updated');
+
+                                deferred.resolve(populatedTransaction);
+                            })
+                            .catch((error) => {
+                                logger.error(error);
+                                deferred.reject(error);
+                            })
+                    }
+                });
+            });
+
+        return deferred.promise;
+
 
         //created transaction specifying account sources
         // IF transaction type income or expense
@@ -71,7 +215,7 @@ module.exports = {
      * @param {?(ObjectId|String)} data.transaction.accountSource
      * @param {?(ObjectId|String)} data.transaction.accountDestination
      *
-     * @returns {Promise<models/AccountSchema|Error>}
+     * @returns {Promise<models/TransactionSchema|Error>}
      */
     update(data) {
 
@@ -85,7 +229,7 @@ module.exports = {
      * @memberof controllers/Transaction
      * @param {(ObjectId|String)} data.id - project id
      *
-     * @returns {Promise<models/CategorySchema[]|Error>}
+     * @returns {Promise<models/TransactionSchema[]|Error>}
      */
     getAllByProjectId(data) {
 
@@ -104,6 +248,35 @@ module.exports = {
      */
     delete(data) {
 
+    },
+
+    /**
+     * Populate transaction
+     *
+     * @function
+     * @name populateTransaction
+     * @memberof controllers/Transaction
+     * @param {models/TransactionSchema} transaction
+     *
+     * @returns {Promise<models/TransactionSchema|Error>}
+     */
+    populateTransaction(transaction) {
+        let deferred = Q.defer();
+
+        TransactionModel.populate(transaction, 'accountSource accountDestination',
+            (error, populatedTransaction) => {
+                if (error) {
+                    logger.error('New transaction cannot be populated');
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                deferred.resolve(populatedTransaction);
+            });
+
+        return deferred.promise;
     }
 };
 
