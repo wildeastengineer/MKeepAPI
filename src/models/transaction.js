@@ -27,8 +27,7 @@ let TransactionSchema = new Schema({
      * @memberof models/TransactionSchema
      */
     category: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category'
+        type: Schema.Types.ObjectId
     },
 
     /**
@@ -59,8 +58,7 @@ let TransactionSchema = new Schema({
      * @memberof models/TransactionSchema
      */
     accountSource: {
-        type: Schema.Types.ObjectId,
-        ref: 'Account'
+        type: Schema.Types.ObjectId
     },
 
     /**
@@ -70,8 +68,7 @@ let TransactionSchema = new Schema({
      * @memberof models/TransactionSchema
      */
     accountDestination: {
-        type: Schema.Types.ObjectId,
-        ref: 'Account'
+        type: Schema.Types.ObjectId
     },
 
     /**

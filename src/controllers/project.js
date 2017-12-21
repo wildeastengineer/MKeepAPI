@@ -439,6 +439,6 @@ module.exports = {
      * @returns {Promise<models/AccountSchema|Error>}
      */
     addTransaction(data) {
-        return TransactionController.post(data);
+        return TransactionController.addNewTransaction(data);
     }
 };

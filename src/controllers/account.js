@@ -140,10 +140,7 @@ module.exports = {
      * @returns {Promise<models/AccountSchema|Error>}
      */
     updateAccount(data) {
-        const that = this;
-        //TODO: calculated calculatedValue when transactions are implemented
-        let calculatedValue = data.account.initValue;
-        let deferred = Q.defer();
+        const deferred = Q.defer();
 
         // find the project and make sure that use have permissions to update
         // make sure that project have required entity to update
@@ -179,9 +176,7 @@ module.exports = {
                     return;
                 }
 
-                data.value = calculatedValue;
-
-                that.updateAccountById(data)
+                this.updateAccountById(data)
                     .then((updatedAccount) => {
                         deferred.resolve(updatedAccount);
                     })
@@ -258,128 +253,44 @@ module.exports = {
      * @returns {Promise<models/AccountSchema|Error>}
      */
     updateAccountById(data) {
-        let deferred = Q.defer();
-        let that = this;
+        const deferred = Q.defer();
 
-        if (!_.isUndefined(data.account.initValue)) {
-            //get initial value
-            that.getAccountById(data.account.id)
-                .then((account) => {
-                    // calculate new account value as initial value has been changed
-                    data.account.value = account.value - (account.initValue - data.account.initValue);
-
-                    return updateAccById(data);
-                })
-                .then((updatedAcc) => {
-                    deferred.resolve(updatedAcc);
-                })
-                .catch((error) => {
-                    deferred.reject(error);
-                });
-
-            return deferred.promise;
-        } else {
-            updateAccById(data)
-                .then((updatedAcc) => {
-                    deferred.resolve(updatedAcc);
-                })
-                .catch((error) => {
-                    deferred.reject(error);
-                });
-
-            return deferred.promise;
-        }
-
-        function updateAccById () {
-            let deferred = Q.defer();
-            //use found entity to update it
-            ProjectModel.findOneAndUpdate({
-                'accounts._id': data.account.id
-            }, {
-                $set: {
-                    'accounts.$.name': data.account.name,
-                    'accounts.$.initValue': data.account.initValue,
-                    'accounts.$.value': data.account.value,
-                    'accounts.$.currency': data.account.currency,
-                    'accounts.$.modifiedBy': data.userId,
-                    'accounts.$.modified': new Date()
-                }
-            }, {
-                runValidators: true,
-                new: true //return the modified document rather than the original
-            })
-                .populate('accounts accounts.currency')
-                .exec((error, doc) => {
-                    let updatedAccount;
-
-                    if (error) {
-                        logger.error('Account of the project with given id was not updated: ' + data.id);
-                        logger.error(error);
-                        deferred.reject(error);
-
-                        return;
-                    }
-
-                    updatedAccount = doc.accounts.find(function (account) {
-                        return account._id.toString() === data.account.id.toString()
-                    });
-
-                    if (!updatedAccount) {
-                        error = {
-                            name: 'NotFoundError',
-                            message: 'Account of the project with given id was not found after updating: ' + data.id
-                        };
-
-                        logger.error(error);
-                        deferred.reject(error);
-
-                        return deferred.promise;
-                    }
-
-                    logger.info('Account of the project with given id was successfully changed: ' + data.id);
-                    deferred.resolve(updatedAccount);
-                });
-            return deferred.promise;
-        }
-    },
-
-    /**
-     * Get by given account id
-     *
-     * @function
-     * @name getAccountById
-     * @memberof controllers/Account
-     *
-     * @param {(ObjectId|String)} id
-     *
-     * @returns {Promise<models/AccountSchema|Error>}
-     */
-    getAccountById(id) {
-        let deferred = Q.defer();
-
-        ProjectModel.findOne({
+        //use found entity to update it
+        ProjectModel.findOneAndUpdate({
             'accounts._id': data.account.id
+        }, {
+            $set: {
+                'accounts.$.name': data.account.name,
+                'accounts.$.initValue': data.account.initValue,
+                'accounts.$.value': data.account.value,
+                'accounts.$.currency': data.account.currency,
+                'accounts.$.modified': new Date(),
+                'accounts.$.modifiedBy': data.userId
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
         })
             .populate('accounts accounts.currency')
             .exec((error, doc) => {
-                let account;
+                let updatedAccount;
 
                 if (error) {
-                    logger.error('Account of the project with given id was not updated: ' + id);
+                    logger.error('Account of the project with given id was not updated: ' + data.account.id);
                     logger.error(error);
                     deferred.reject(error);
 
                     return;
                 }
 
-                account = doc.accounts.find(function (account) {
-                    return account._id.toString() === data.id.toString()
+                updatedAccount = doc.accounts.find(function (account) {
+                    return account._id.toString() === data.account.id.toString()
                 });
 
-                if (!account) {
+                if (!updatedAccount) {
                     error = {
                         name: 'NotFoundError',
-                        message: 'Account by ud was not found ' + id
+                        message: 'Account of the project with given id was not found after updating: ' + data.account.id
                     };
 
                     logger.error(error);
@@ -388,10 +299,9 @@ module.exports = {
                     return deferred.promise;
                 }
 
-                logger.info('Account by id was successfully found: ' + id);
-                deferred.resolve(account);
+                logger.info('Account of the project with given id was successfully changed: ' + data.account.id);
+                deferred.resolve(updatedAccount);
             });
-
         return deferred.promise;
     }
 };
