@@ -242,7 +242,7 @@ module.exports = {
     populateTransaction(transaction) {
         let deferred = Q.defer();
 
-        TransactionModel.populate(transaction, 'accountSource accountDestination',
+        TransactionModel.populate(transaction, 'category accountSource accountDestination',
             (error, populatedTransaction) => {
                 if (error) {
                     logger.error('New transaction cannot be populated');
@@ -259,7 +259,7 @@ module.exports = {
     },
 
     /**
-     * Update transaction
+     * Find project and from that project find source and destination accounts
      *
      * @function
      * @name update

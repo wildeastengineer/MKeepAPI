@@ -348,7 +348,6 @@ let ProjectRegisterRoutes = function (router, authenticate) {
             });
     });
 
-
     /**
      * Create transaction.
      *
@@ -433,7 +432,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @memberof routes/Project
      *
      * @param {String} id - Project id
-     * @param {String} transactionId - Project id
+     * @param {String} transactionId
      * @param {String} userId
      *
      * @returns {void}
@@ -460,7 +459,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @memberof routes/Project
      *
      * @param {String} id - Project id
-     * @param {String} transactionId - Project id
+     * @param {String} transactionId
      * @param {String} userId
      *
      * @returns {models/TransactionSchema[]}
