@@ -136,7 +136,7 @@ module.exports = {
                         }
 
                         logger.info('Transaction has been successfully updated: ' + data.transaction.id);
-                        deferred.resolve(doc.name);
+                        deferred.resolve(doc);
                     });
             })
             .catch((error) => {
