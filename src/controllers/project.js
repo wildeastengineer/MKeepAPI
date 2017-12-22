@@ -417,12 +417,11 @@ module.exports = {
         return AccountController.deleteAccount(data);
     },
 
-
     /**
      * Create new transaction
      *
      * @function
-     * @name post
+     * @name addTransaction
      * @memberof controllers/Project
      *
      * @param {Object} data
@@ -471,7 +470,7 @@ module.exports = {
      * Get get all transaction by projectId
      *
      * @function
-     * @name getAllByProjectId
+     * @name getTransactions
      * @memberof controllers/Project
      * @param {(ObjectId|String)} id - project id
      *
@@ -485,7 +484,7 @@ module.exports = {
      * Delete transaction
      *
      * @function
-     * @name delete
+     * @name deleteTransaction
      * @memberof controllers/Project
      * @param {(ObjectId|String)} data.id - project id
      * @param {(ObjectId|String)} data.transactionId
