@@ -35,42 +35,6 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Create transaction.
-     *
-     * @function
-     * @name POST: /projects/:id/transactions
-     * @memberof routes/Project
-     *
-     * @param {String} id - Project id
-     * @param {String} userId
-     * @param {Object} body
-     * @param {String} body.type
-     * @param {Number} body.value
-     * @param {String} body.note
-     * @param {String} body.category
-     * @param {String} body.accountSource
-     * @param {String} body.accountDestination
-     *
-     * @returns {models/TransactionSchema} transaction - Created transaction.
-     */
-    router.post('/projects/:id/transactions', authenticate, (req, res, next) => {
-        const transactionParams = _.pick(req.body, 'type', 'value',
-            'note', 'category', 'accountSource', 'accountDestination');
-
-        projectController.addTransaction({
-            id: req.params.id,
-            userId: req.user._id,
-            transaction: transactionParams
-        })
-            .then((project) => {
-                res.json(project);
-            })
-            .fail((error) => {
-                next(error);
-            });
-    });
-
-    /**
      * Get list of all projects.
      *
      * @function
@@ -378,6 +342,130 @@ let ProjectRegisterRoutes = function (router, authenticate) {
         })
             .then(() => {
                 res.json();
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+
+    /**
+     * Create transaction.
+     *
+     * @function
+     * @name POST: /projects/:id/transactions
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} userId
+     * @param {Object} body
+     * @param {String} body.type
+     * @param {Number} body.value
+     * @param {String} body.note
+     * @param {String} body.category
+     * @param {String} body.accountSource
+     * @param {String} body.accountDestination
+     *
+     * @returns {models/TransactionSchema} transaction - Created transaction.
+     */
+    router.post('/projects/:id/transactions', authenticate, (req, res, next) => {
+        const transactionParams = _.pick(req.body, 'type', 'value',
+            'note', 'category', 'accountSource', 'accountDestination');
+
+        projectController.addTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transaction: transactionParams
+        })
+            .then((transaction) => {
+                res.json(transaction);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Update transaction.
+     *
+     * @function
+     * @name PATCH: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId - Project id
+     * @param {String} userId
+     * @param {Object} body
+     * @param {String} body.type
+     * @param {Number} body.value
+     * @param {String} body.note
+     * @param {String} body.category
+     * @param {String} body.accountSource
+     * @param {String} body.accountDestination
+     *
+     * @returns {models/TransactionSchema} transaction - Updated transaction.
+     */
+    router.patch('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
+        projectController.updateTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transaction: {
+                id: req.params.transactionId,
+                ...transactionParams
+            }
+        })
+            .then((transaction) => {
+                res.json(transaction);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Delete transaction.
+     *
+     * @function
+     * @name DELETE: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId - Project id
+     * @param {String} userId
+     *
+     * @returns {void}
+     */
+    router.delete('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
+        projectController.deleteTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transactionId: req.params.transactionId
+        })
+            .then(() => {
+                res.json();
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Get transactions.
+     *
+     * @function
+     * @name GET: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId - Project id
+     * @param {String} userId
+     *
+     * @returns {models/TransactionSchema[]}
+     */
+    router.get('/projects/:id/transactions', authenticate, (req, res, next) => {
+        projectController.getTransaction(req.params.id)
+            .then((transactions) => {
+                res.json(transactions);
             })
             .fail((error) => {
                 next(error);

@@ -307,7 +307,7 @@ module.exports = {
      *
      * @function
      * @name updateCategory
-     * @memberof controllers/Category
+     * @memberof controllers/Project
      * @param {(ObjectId|String)} data.id - project id
      * @param {(ObjectId|String)} data.userId
      * @param {Object} data.category
@@ -327,7 +327,7 @@ module.exports = {
      *
      * @function
      * @name deleteCategory
-     * @memberof controllers/Category
+     * @memberof controllers/Project
      * @param {(ObjectId|String)} data.id - project id
      * @param {(ObjectId|String)} data.categoryId
      * @param {(ObjectId|String)} data.userId
@@ -343,7 +343,7 @@ module.exports = {
      *
      * @function
      * @name addAccount
-     * @memberof controllers/Account
+     * @memberof controllers/Project
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.userId
@@ -365,7 +365,7 @@ module.exports = {
      *
      * @function
      * @name getAccounts
-     * @memberof controllers/Account
+     * @memberof controllers/Project
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.id - project id
@@ -382,7 +382,7 @@ module.exports = {
      *
      * @function
      * @name updateAccount
-     * @memberof controllers/Account
+     * @memberof controllers/Project
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.userId
@@ -405,7 +405,7 @@ module.exports = {
      *
      * @function
      * @name deleteAccount
-     * @memberof controllers/Account
+     * @memberof controllers/Project
      *
      * @param {(ObjectId|String)} data.id - project id
      * @param {(ObjectId|String)} data.userId
@@ -423,7 +423,7 @@ module.exports = {
      *
      * @function
      * @name post
-     * @memberof controllers/Transaction
+     * @memberof controllers/Project
      *
      * @param {Object} data
      * @param {(ObjectId|String)} data.userId
@@ -436,9 +436,63 @@ module.exports = {
      * @param {?(ObjectId|String)} data.transaction.accountSource
      * @param {?(ObjectId|String)} data.transaction.accountDestination
      *
-     * @returns {Promise<models/AccountSchema|Error>}
+     * @returns {Promise<models/TransactionSchema|Error>}
      */
     addTransaction(data) {
-        return TransactionController.addNewTransaction(data);
+        return TransactionController.post(data);
+    },
+
+    /**
+     * Update transaction
+     *
+     * @function
+     * @name update
+     * @memberof controllers/Project
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.transaction
+     * @param {(ObjectId|String)} data.transaction.id
+     * @param {String} data.transaction.type
+     * @param {Number} data.transaction.value
+     * @param {String} data.transaction.note
+     * @param {?(ObjectId|String)} data.transaction.category
+     * @param {?(ObjectId|String)} data.transaction.accountSource
+     * @param {?(ObjectId|String)} data.transaction.accountDestination
+     *
+     * @returns {Promise<models/TransactionSchema|Error>}
+     */
+    updateTransaction(data) {
+        return TransactionController.update(data);
+    },
+
+    /**
+     * Get get all transaction by projectId
+     *
+     * @function
+     * @name getAllByProjectId
+     * @memberof controllers/Project
+     * @param {(ObjectId|String)} id - project id
+     *
+     * @returns {Promise<models/TransactionSchema[]|Error>}
+     */
+    getTransactions(id) {
+        return TransactionController.getAllByProjectId(id)
+    },
+
+    /**
+     * Delete transaction
+     *
+     * @function
+     * @name delete
+     * @memberof controllers/Project
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.transactionId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    deleteTransaction(data) {
+        return TransactionController.delete(data);
     }
 };
