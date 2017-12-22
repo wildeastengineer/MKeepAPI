@@ -406,6 +406,9 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/TransactionSchema} transaction - Updated transaction.
      */
     router.patch('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
+        const transactionParams = _.pick(req.body, 'type', 'value',
+            'note', 'category', 'accountSource', 'accountDestination');
+
         projectController.updateTransaction({
             id: req.params.id,
             userId: req.user._id,
@@ -463,7 +466,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/TransactionSchema[]}
      */
     router.get('/projects/:id/transactions', authenticate, (req, res, next) => {
-        projectController.getTransaction(req.params.id)
+        projectController.getTransactions(req.params.id)
             .then((transactions) => {
                 res.json(transactions);
             })
