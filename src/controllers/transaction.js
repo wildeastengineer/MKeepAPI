@@ -45,6 +45,10 @@ module.exports = {
     post(data) {
         const deferred = Q.defer();
 
+        if (_.isUndefined(data.transaction.accountDestination)) {
+            data.transaction.accountDestination = data.transaction.accountSource
+        }
+
         // find the project and make sure that use have permissions to update
         // make sure that project have required entity to update
         this.findSourceAndDestinationAccounts(data)
@@ -106,6 +110,10 @@ module.exports = {
      */
     update(data) {
         const deferred = Q.defer();
+
+        if (_.isUndefined(data.transaction.accountDestination)) {
+            data.transaction.accountDestination = data.transaction.accountSource
+        }
 
         // find the project and make sure that use have permissions to update
         // make sure that project have required entity to update
