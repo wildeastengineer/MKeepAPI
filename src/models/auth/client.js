@@ -42,6 +42,7 @@ let ClientSchema = new Schema({
      */
     clientSecret: {
         type: String,
+        unique: true,
         required: true
     }
 });

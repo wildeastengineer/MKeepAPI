@@ -1,3 +1,5 @@
+/// Libs
+const _ = require('underscore');
 /// Controllers
 const projectController = require('../controllers/project.js');
 
@@ -54,7 +56,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Get project by id.
+     * Get project by id and setup active project for given user
      *
      * @function
      * @name GET: /projects/:id
@@ -69,6 +71,31 @@ let ProjectRegisterRoutes = function (router, authenticate) {
         })
             .then((project) => {
                 res.json(project);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Update project's name
+     *
+     * @function
+     * @name PATCH: /projects/:id/rename
+     * @memberof routes/Project
+     *
+     * @param {String} name - Project's new name
+     *
+     * @returns {String} name - New project's name.
+     */
+    router.patch('/projects/:id/rename', authenticate, (req, res, next) => {
+        projectController.rename({
+            id: req.params.id,
+            userId: req.user._id,
+            name: req.body.name
+        })
+            .then((name) => {
+                res.json(name);
             })
             .fail((error) => {
                 next(error);
@@ -98,24 +125,21 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Update given project categories
+     * Add new category to project's category
      *
      * @function
-     * @name PATCH: /projects/:id/categories/:categoryId
+     * @name PUT: /projects/:id/categories
      * @memberof routes/Project
      *
-     * @returns {models/CategorySchema} category - new category
+     * @returns {models/CategorySchema} category - New add category to given project
      */
-    router.patch('/projects/:id/categories/:categoryId', authenticate, (req, res, next) => {
-        projectController.updateCategory({
+    router.put('/projects/:id/categories', authenticate, (req, res, next) => {
+        const categoryParams = _.pick(req.body, 'name', 'type', 'parent');
+
+        projectController.addCategory({
             id: req.params.id,
             userId: req.user._id,
-            category: {
-                id: req.params.categoryId,
-                name: req.body.category.name,
-                categoryType: req.body.category.categoryType,
-                parent: req.body.category.parent
-            }
+            category: categoryParams
         })
             .then((category) => {
                 res.json(category);
@@ -126,27 +150,24 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Add new category to project's category
+     * Update given project categories
      *
      * @function
-     * @name PUT: /projects/:id/categories
+     * @name PATCH: /projects/:id/categories/:categoryId
      * @memberof routes/Project
      *
-     * @param {Object} data
-     * @param {(ObjectId|String)} data.id - Project's id
-     * @param {Object} data.category
-     * @param {String} data.category.name
-     * @param {String} data.category.categoryType
-     * @param {?(ObjectId|String)} data.category.parent
-     * @param {(ObjectId[]|String[])} data.currencies
-     *
-     * @returns {models/CategorySchema} category - New add category to given project
+     * @returns {models/CategorySchema} category - new category
      */
-    router.put('/projects/:id/categories', authenticate, (req, res, next) => {
-        projectController.addCategory({
+    router.patch('/projects/:id/categories/:categoryId', authenticate, (req, res, next) => {
+        const categoryParams = _.pick(req.body, 'name', 'type', 'parent');
+
+        projectController.updateCategory({
             id: req.params.id,
             userId: req.user._id,
-            category: req.body.category
+            category: {
+                id: req.params.categoryId,
+                ...categoryParams
+            }
         })
             .then((category) => {
                 res.json(category);
@@ -230,24 +251,225 @@ let ProjectRegisterRoutes = function (router, authenticate) {
     });
 
     /**
-     * Update project's name
+     * Get project accounts by project id.
      *
      * @function
-     * @name PATCH: /projects/:id/rename
+     * @name GET: /projects/:id/accounts
      * @memberof routes/Project
      *
-     * @param {String} name - Project's new name
-     *
-     * @returns {String} name - New project's name.
+     * @returns {models/AccountSchema[]} accounts
      */
-    router.patch('/projects/:id/rename', authenticate, (req, res, next) => {
-        projectController.rename({
+    router.get('/projects/:id/accounts', authenticate, (req, res, next) => {
+        projectController.getAccounts({
+            id: req.params.id,
+            userId: req.user._id
+        })
+            .then((accounts) => {
+                res.json(accounts);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Add new account to project's accounts
+     *
+     * @function
+     * @name PUT: /projects/:id/accounts
+     * @memberof routes/Project
+     *
+     * @returns {models/AccountSchema} account - New add account to given project
+     */
+    router.put('/projects/:id/accounts', authenticate, (req, res, next) => {
+        const accountParams = _.pick(req.body, 'name', 'initValue', 'value', 'currency');
+
+        projectController.addAccount({
             id: req.params.id,
             userId: req.user._id,
-            name: req.body.name
+            account: accountParams
         })
-            .then((name) => {
-                res.json(name);
+            .then((account) => {
+                res.json(account);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Update given project account
+     *
+     * @function
+     * @name PATCH: /projects/:id/categories/:accountId
+     * @memberof routes/Project
+     *
+     * @returns {models/AccountSchema} - updated account
+     */
+    router.patch('/projects/:id/accounts/:accountId', authenticate, (req, res, next) => {
+        const accountParams = _.pick(req.body, 'name', 'initValue', 'value', 'currency');
+
+        projectController.updateAccount({
+            id: req.params.id,
+            userId: req.user._id,
+            account: {
+                id: req.params.accountId,
+                ...accountParams
+            }
+        })
+            .then((account) => {
+                res.json(account);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Delete given project account
+     *
+     * @function
+     * @name DELETE: /projects/:id/accounts/:accountId
+     * @memberof routes/Project
+     *
+     * @returns {void}
+     */
+    router.delete('/projects/:id/accounts/:accountId', authenticate, (req, res, next) => {
+        projectController.deleteAccount({
+            id: req.params.id,
+            userId: req.user._id,
+            accountId: req.params.accountId
+        })
+            .then(() => {
+                res.json();
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Create transaction.
+     *
+     * @function
+     * @name POST: /projects/:id/transactions
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} userId
+     * @param {Object} body
+     * @param {String} body.type
+     * @param {Number} body.value
+     * @param {String} body.note
+     * @param {Date} body.date
+     * @param {String} body.category
+     * @param {String} body.accountSource
+     * @param {String} body.accountDestination
+     *
+     * @returns {models/TransactionSchema} transaction - Created transaction.
+     */
+    router.post('/projects/:id/transactions', authenticate, (req, res, next) => {
+        const transactionParams = _.pick(req.body, 'type', 'value', 'date',
+            'note', 'category', 'accountSource', 'accountDestination');
+
+        projectController.addTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transaction: transactionParams
+        })
+            .then((transaction) => {
+                res.json(transaction);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Update transaction.
+     *
+     * @function
+     * @name PATCH: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId - Project id
+     * @param {String} userId
+     * @param {Object} body
+     * @param {String} body.type
+     * @param {Number} body.value
+     * @param {String} body.note
+     * @param {Date} body.date
+     * @param {String} body.category
+     * @param {String} body.accountSource
+     * @param {String} body.accountDestination
+     *
+     * @returns {models/TransactionSchema} transaction - Updated transaction.
+     */
+    router.patch('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
+        const transactionParams = _.pick(req.body, 'type', 'value', 'date',
+            'note', 'category', 'accountSource', 'accountDestination');
+
+        projectController.updateTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transaction: {
+                id: req.params.transactionId,
+                ...transactionParams
+            }
+        })
+            .then((transaction) => {
+                res.json(transaction);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Delete transaction.
+     *
+     * @function
+     * @name DELETE: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId
+     * @param {String} userId
+     *
+     * @returns {void}
+     */
+    router.delete('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
+        projectController.deleteTransaction({
+            id: req.params.id,
+            userId: req.user._id,
+            transactionId: req.params.transactionId
+        })
+            .then(() => {
+                res.json();
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Get transactions.
+     *
+     * @function
+     * @name GET: /projects/:id/transactions/:transactionId
+     * @memberof routes/Project
+     *
+     * @param {String} id - Project id
+     * @param {String} transactionId
+     * @param {String} userId
+     *
+     * @returns {models/TransactionSchema[]}
+     */
+    router.get('/projects/:id/transactions', authenticate, (req, res, next) => {
+        projectController.getTransactions(req.params.id)
+            .then((transactions) => {
+                res.json(transactions);
             })
             .fail((error) => {
                 next(error);

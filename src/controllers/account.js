@@ -1,5 +1,13 @@
-const Account = require('../models/account');
-const Transaction = require('../models/transaction');
+/// Libs
+const _ = require('underscore');
+const Logger = require('../libs/log');
+const Q = require('q');
+/// Models
+const AccountModel = require('../models/account');
+const ProjectModel = require('../models/project');
+/// Controllers
+/// Local variables
+let logger = Logger(module);
 
 /**
  * Accounts controller.
@@ -7,159 +15,293 @@ const Transaction = require('../models/transaction');
  */
 module.exports = {
     /**
-     * Get list of all accounts
+     * Create new account and add it to the give project
+     *
+     * @function
+     * @name put
+     * @memberof controllers/Account
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.account
+     * @param {String} data.account.name
+     * @param {Number} data.account.initValue
+     * @param {?(ObjectId|String)} data.account.currency
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    put(data) {
+        let deferred = Q.defer();
+
+        if (!data.account) {
+            const error = {
+                name: 'ValidationError',
+                message: 'Project account were not specified'
+            };
+
+            logger.error(error);
+            deferred.reject(error);
+
+            return deferred.promise;
+        }
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId
+        }, {
+            $push: {
+                accounts: {
+                    name: data.account.name,
+                    initValue: data.account.initValue,
+                    value: data.account.initValue, //value should be equal to initValue when new acc is created
+                    currency: data.account.currency,
+                    created: new Date(),
+                    createdBy: data.userId,
+                    modifiedBy: data.userId,
+                    modified: new Date()
+                }
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .populate('accounts accounts.currency')
+            .exec((error, doc) => {
+                if (error) {
+                    logger.error('Account was not added to project: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Account was successfully added to project: ' + data.id);
+                //TODO: better way to return what was added since returning the last in the list
+                // might be added by another call in theory
+                deferred.resolve(doc.accounts.pop());
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Get accounts by project id
      *
      * @function
      * @name getAll
      * @memberof controllers/Account
      *
-     * @param {getAllAccountsCallback} callback
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     *
+     * @returns {Promise<models/AccountSchema[]|Error>}
      */
+    getAll(data) {
+        let deferred = Q.defer();
+
+        ProjectModel.findOne({
+            _id: data.id
+        })
+            .populate('accounts accounts.currency')
+            .exec((error, doc) => {
+                if (error) {
+                    logger.error('Accounts of the project with given id were\'t found: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                logger.info('Accounts of the project with given id were successfully found: ' + data.id);
+                deferred.resolve(doc.accounts);
+            });
+
+        return deferred.promise;
+    },
+
     /**
-     * This callback is displayed as a global member.
-     * @callback getAllAccountsCallback
+     * Update account
+     *
+     * @function
+     * @name updateAccount
      * @memberof controllers/Account
      *
-     * @param {models/AccountSchema[]} data
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {Object} data.account
+     * @param {(ObjectId|String)} data.account.id - account id
+     * @param {?String} data.account.name
+     * @param {?(ObjectId|String)} data.account.currency
+     * @param {?Number} data.account.initValue
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
      */
-    getAll: function (callback) {
-        Account.find(
-            {
-                _owner: user._id
-            })
-            .populate('currency')
-            .exec(callback);
-    },
-    getById: function (id, callback) {
-        Account.findOne({
-            _id: id,
-            _owner: user._id
+    updateAccount(data) {
+        const deferred = Q.defer();
+
+        // find the project and make sure that use have permissions to update
+        // make sure that project have required entity to update
+        ProjectModel.findOne({
+            _id: data.id,
+            owners: data.userId
         })
-            .populate('currency')
-            .exec(callback);
-    },
-    post: function (data, callback) {
-        let account = new Account();
+            .populate('accounts accounts.currency')
+            .exec((error, doc) => {
+                let accountToUpdate;
 
-        data.initValue = data.initValue || 0;
-        data.currency = data.currency || null;
-
-        account._owner = user._id;
-        account.name = data.name;
-        account.value = data.initValue;
-        account.initValue = data.initValue;
-        account.currency = data.currency;
-
-        account.save(callback);
-    },
-    update: function (id, data, callback) {
-        Account.findById(
-            id,
-            {
-                _owner: user._id
-            },
-            function (err, account) {
-                if (err) {
-                    callback(err);
+                if (error) {
+                    logger.error('Account of the project with given id was not updated: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
 
                     return;
                 }
 
-                account.name = data.name;
-                account.value = data.initValue;
-                account.initValue = data.initValue;
-                account.currency = data.currency;
-                account.save(callback);
-            }
-        );
-    },
-    recalculate: function (accountId, callback) {
-        console.log('recalculate');
+                accountToUpdate = doc.accounts.find(function (account) {
+                    return account._id.toString() === data.account.id.toString()
+                });
 
-        let accountValue;
+                if (!accountToUpdate) {
+                    error = {
+                        name: 'NotFoundError',
+                        message: 'Account of the project with given id was not found for updating: ' + data.id
+                    };
 
-        Account.findOne({
-            _id: accountId,
-            _owner: user._id
-        })
-            .exec(function (err, account) {
-                if (err) {
-                    callback(err);
+                    logger.error(error);
+                    deferred.reject(error);
 
                     return;
                 }
 
-                accountValue = account.initValue;
-                console.log('init value', account.initValue);
-
-                Transaction.find(
-                    {
-                        _owner: user._id,
-                        accountSource: accountId
+                this.updateAccountById(data)
+                    .then((updatedAccount) => {
+                        deferred.resolve(updatedAccount);
                     })
-                    .exec(function (err, transactions) {
-                        if (err) {
-                            callback(err);
-
-                            return;
-                        }
-
-                        for (let i = 0; i < transactions.length; i++) {
-                            let transaction = transactions[i];
-
-                            if (transaction.type === 'income') {
-                                accountValue += transaction.value;
-                            } else {
-                                accountValue -= transaction.value;
-                            }
-                        }
-
-                        Transaction.find(
-                            {
-                                _owner: user._id,
-                                accountDestination: accountId
-                            })
-                            .exec(function (err, transactions) {
-                                if (err) {
-                                    callback(err);
-
-                                    return;
-                                }
-
-                                for (let i = 0; i < transactions.length; i++) {
-                                    let transaction = transactions[i];
-
-                                    accountValue += transaction.value;
-                                }
-
-                                account.value = accountValue;
-                                account.save(callback);
-                            });
+                    .catch((error) => {
+                        deferred.reject(error);
                     });
             });
 
-
+        return deferred.promise;
     },
-    remove: function (id, callback) {
-        Account.remove(
-            {
-                _id: id,
-                _owner: user._id
-            },
-            function (err, result) {
-                if (err) {
-                    callback(err);
+
+    /**
+     * Delete given account from project
+     *
+     * @function
+     * @name deleteAccount
+     * @memberof controllers/Account
+     *
+     * @param {(ObjectId|String)} data.id - project id
+     * @param {(ObjectId|String)} data.userId
+     * @param {(ObjectId|String)} data.accountId
+     *
+     * @returns {Promise<void|Error>}
+     */
+    deleteAccount(data) {
+        let deferred = Q.defer();
+
+        ProjectModel.findOneAndUpdate({
+            _id: data.id,
+            owners: data.userId,
+            'accounts._id': data.accountId
+        }, {
+            $pull: {
+                accounts: {
+                    _id: data.accountId
+                }
+            }
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .exec((error, doc) => {
+                if (error) {
+                    logger.error('Account of the project with given id was not deleted: ' + data.id);
+                    logger.error(error);
+                    deferred.reject(error);
 
                     return;
                 }
 
-                Account.find(
-                    {
-                        _owner: user._id
-                    })
-                    .populate('currency')
-                    .exec(callback);
+                logger.info('Account of the project with given id was successfully deleted: ' + data.id);
+                deferred.resolve();
+            });
+
+        return deferred.promise;
+    },
+
+    /**
+     * Update account by given account id
+     *
+     * @function
+     * @name updateAccount
+     * @memberof controllers/Account
+     *
+     * @param {Object} data
+     * @param {(ObjectId|String)} data.userId
+     * @param {Object} data.account
+     * @param {(ObjectId|String)} data.account.id - account id
+     * @param {?String} data.account.name
+     * @param {?(ObjectId|String)} data.account.currency
+     * @param {?Number} data.account.initValue
+     * @param {?Number} data.account.value
+     *
+     * @returns {Promise<models/AccountSchema|Error>}
+     */
+    updateAccountById(data) {
+        const deferred = Q.defer();
+
+        //use found entity to update it
+        ProjectModel.findOneAndUpdate({
+            'accounts._id': data.account.id
+        }, {
+            $set: {
+                'accounts.$.name': data.account.name,
+                'accounts.$.initValue': data.account.initValue,
+                'accounts.$.value': data.account.value,
+                'accounts.$.currency': data.account.currency,
+                'accounts.$.modified': new Date(),
+                'accounts.$.modifiedBy': data.userId
             }
-        );
+        }, {
+            runValidators: true,
+            new: true //return the modified document rather than the original
+        })
+            .populate('accounts accounts.currency')
+            .exec((error, doc) => {
+                let updatedAccount;
+
+                if (error) {
+                    logger.error('Account of the project with given id was not updated: ' + data.account.id);
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return;
+                }
+
+                updatedAccount = doc.accounts.find(function (account) {
+                    return account._id.toString() === data.account.id.toString()
+                });
+
+                if (!updatedAccount) {
+                    error = {
+                        name: 'NotFoundError',
+                        message: 'Account of the project with given id was not found after updating: ' + data.account.id
+                    };
+
+                    logger.error(error);
+                    deferred.reject(error);
+
+                    return deferred.promise;
+                }
+
+                logger.info('Account of the project with given id was successfully changed: ' + data.account.id);
+                deferred.resolve(updatedAccount);
+            });
+        return deferred.promise;
     }
 };

@@ -1,10 +1,7 @@
-"use strict";
-
 /// Libs
 const mongoose = require('mongoose');
 /// Models
 const Currency = require('./currency');
-const User = require('./auth/user');
 /// Local variables
 let Account;
 let Schema = mongoose.Schema;
@@ -16,8 +13,6 @@ const notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHand
  * @class models/AccountSchema
  */
 let AccountSchema = new Schema({
-    _owner: 'String',
-
     /**
      * The name of account.
      *

@@ -21,13 +21,15 @@ let userRegisterRoutes = function (router, authenticate) {
      *
      * @param {String} username
      * @param {String} password
+     * @param {String} client_id
      *
      * @returns {models/UserSchema} user - Created user.
      */
     router.post('/registration', (req, res, next) => {
         userController.createUser({
             username: req.body.username,
-            password: req.body.password
+            password: req.body.password,
+            clientId: req.body.client_id
         })
             .then((user) => {
                 res.json(user);
@@ -60,6 +62,29 @@ let userRegisterRoutes = function (router, authenticate) {
     router.get('/profile', authenticate, (req, res, next) => {
         userController.getById({
             id: req.user._id
+        })
+            .then((user) => {
+                res.json(user);
+            })
+            .fail((error) => {
+                next(error);
+            });
+    });
+
+    /**
+     * Update given user
+     *
+     * @function
+     * @name PATCH: /profile
+     * @memberof routes/User
+     *
+     * @returns {models/UserSchema} user - updated user
+     */
+    router.patch('/profile', authenticate, (req, res, next) => {
+        userController.updateUser({
+            id: req.user._id,
+            username: req.body.username,
+            lang: req.body.lang
         })
             .then((user) => {
                 res.json(user);

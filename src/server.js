@@ -12,19 +12,20 @@ let app = express();
 let logger = Logger(module);
 
 /// Mongoose plugins
-const beautifyUnique = require('mongoose-beautiful-unique-validation');
-const idValidator = require('mongoose-id-validator');
-const hideDocumentFields = require('./utils/mongoosePlugins/hideDocumentFields.js');
-
+const beautifyUniqueMongoose = require('mongoose-beautiful-unique-validation');
+const idValidatorMongoose = require('mongoose-id-validator');
+const notFoundErrorHandlerMongoose = require('./utils/mongoosePlugins/notFoundErrorHandler.js');
+const hideDocumentFieldsMongoose = require('./utils/mongoosePlugins/hideDocumentFields.js');
 /// Express plugins
-const errorHandler = require('./utils/expressPlugins/errorHandler.js');
-const methodNotAllowedErrorHandler = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
-const notFoundErrorHandler = require('./utils/expressPlugins/notFoundErrorHandler.js');
+const errorHandlerExpress = require('./utils/expressPlugins/errorHandler.js');
+const methodNotAllowedErrorHandlerExpress = require('./utils/expressPlugins/methodNotAllowedErrorHandler.js');
+const notFoundErrorHandlerExpress = require('./utils/expressPlugins/notFoundErrorHandler.js');
 
 // register global mongoose plugins
-mongoose.plugin(idValidator); // validate ref docs existence
-mongoose.plugin(beautifyUnique); // convert mongodb unfriendly duplicate key error to mongoose validation error
-mongoose.plugin(hideDocumentFields);
+mongoose.plugin(idValidatorMongoose); // validate ref docs existence
+mongoose.plugin(beautifyUniqueMongoose); // convert mongodb unfriendly duplicate key error to mongoose validation error
+mongoose.plugin(hideDocumentFieldsMongoose);
+mongoose.plugin(notFoundErrorHandlerMongoose)
 
 // configuration ===============================================================
 const env = process.env.NODE_ENV || 'dev';
@@ -36,7 +37,16 @@ const databasePort = config.get(`database:${env}:port`);
 const databaseName = config.get(`database:${env}:name`);
 const databaseUrl = `${databaseUri}:${databasePort}/${databaseName}`;
 
-mongoose.connect(databaseUrl); // connect to our database
+mongoose.Promise = global.Promise;
+mongoose.connect(databaseUrl,{autoReconnect: true}, (error) => {
+    if(error) {
+        logger.error(error);
+        logger.error(`Error happened connecting to mogoseDB '${databaseUrl}'`);
+    } else {
+        logger.info(`Successfully connected to mongoDB '${databaseUrl}'`);
+    }
+}); // connect to our database
+
 app.use(bodyParser()); // get information from html forms
 app.use(passport.initialize());
 
@@ -59,11 +69,11 @@ app.use(function (req, res, next) {
 require('./routes/routes.js')(app, express.Router()); // load our routes and pass in our app and fully configured passport
 
 // error handlers that pass error to final handler
-app.use(methodNotAllowedErrorHandler);
-app.use(notFoundErrorHandler);
+app.use(methodNotAllowedErrorHandlerExpress);
+app.use(notFoundErrorHandlerExpress);
 
 // final error handler
-app.use(errorHandler);
+app.use(errorHandlerExpress);
 
 // launch ======================================================================
 migrator.run(databaseUrl)

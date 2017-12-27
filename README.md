@@ -70,13 +70,13 @@ App:
 To launch develop version of the server:
 
 ```
-$ gulp
+$ npm run dev
 ```
 
-To build production version of the application (it will be built in `./build` directory):
+To launch prod version of the server:
 
 ```
-$ gulp build
+$ npm start
 ```
 
 Try to send *GET* request to `localhost:8080/api`
@@ -89,25 +89,12 @@ REST Client for Chrome: [Postman](https://chrome.google.com/webstore/detail/post
 - restart mongo: `$ sudo service mongod restart`
 - stop mongo: `$ sudo service mongod stop`
 
-### Apply fixtures
-
-For creating clients and users run in console:
-
-```
-$ node src/fixtures/createUsers.js
-```
-
 # Tests
 
 ### Unit Tests
 
 All test specs are placed in `./test` directory
-
-All unit tests are run by default when `build` command is called. 
-Build will be successfully done if all tests are passed
-
-All unit tests are run on pre-commit hook on the files from `src` directory.
-It is possible to do a commit if all tests are passed.
+Unit tests automatically run on commit
 
 To run all tests during development process just call `gulp test`
 

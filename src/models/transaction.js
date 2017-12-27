@@ -19,7 +19,6 @@ const notFoundErrorHandler = require('../utils/mongoosePlugins/notFoundErrorHand
  * @class models/TransactionSchema
  */
 let TransactionSchema = new Schema({
-    _owner: 'String',
 
     /**
      * The category link.
@@ -28,17 +27,8 @@ let TransactionSchema = new Schema({
      * @memberof models/TransactionSchema
      */
     category: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category'
+        type: Schema.Types.ObjectId
     },
-
-    /**
-     * The account value. - TODO: delete
-     *
-     * @type Number
-     * @memberof models/TransactionSchema
-     */
-    accountValue: Number,
 
     /**
      * The transaction value.
@@ -46,7 +36,7 @@ let TransactionSchema = new Schema({
      * @type Number
      * @memberof models/TransactionSchema
      */
-    transactionValue: {
+    value: {
         type: Number
     },
 
@@ -56,31 +46,29 @@ let TransactionSchema = new Schema({
      * @type String
      * @memberof models/TransactionSchema
      */
-    transactionType: {
+    type: {
         type: String,
         enum: ['income', 'expense', 'transfer']
     },
 
     /**
-     * The source account link. - TODO: rename
+     * The source account link
      *
      * @type ObjectId
      * @memberof models/TransactionSchema
      */
     accountSource: {
-        type: Schema.Types.ObjectId,
-        ref: 'Account'
+        type: Schema.Types.ObjectId
     },
 
     /**
-     * The destination account link. - TODO: rename
+     * The destination account link
      *
      * @type ObjectId
      * @memberof models/TransactionSchema
      */
     accountDestination: {
-        type: Schema.Types.ObjectId,
-        ref: 'Account'
+        type: Schema.Types.ObjectId
     },
 
     /**
@@ -90,6 +78,14 @@ let TransactionSchema = new Schema({
      * @memberof models/TransactionSchema
      */
     note: String,
+
+    /**
+     * The transaction date.
+     *
+     * @type Date
+     * @memberof models/TransactionSchema
+     */
+    date: Date,
 
     /**
      * The project link.

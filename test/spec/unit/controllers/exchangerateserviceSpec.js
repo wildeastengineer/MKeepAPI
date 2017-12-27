@@ -1,10 +1,8 @@
-'use strict';
-
 const root = require('rootrequire');
-const exchangeRateServiceController = require(`${root}/${process.env.TEST_SRC}/controllers/exchangerateservice.js`);
-const exchangeRateServices = require('../../../../entity/exchangeRateServices');
+const exchangeRateServiceController = require(`${root}/src/controllers/exchangerateservice.js`);
+const exchangeRateServices = require('../../../entity/exchangeRateServices');
 
-describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
+describe('Test Exchange Rate Service Controller', () => {
     let exchangeRateServiceList;
 
     it('Should Get All Currency Exchange Services', (done) => {
@@ -95,7 +93,7 @@ describe('Test PUBLIC methods of Exchange Rate Service controller', () => {
                 expect(exchangeRate.url).toBe(exchangeRateServices.oer.url);
                 expect(exchangeRate.updatePeriod).toBe(exchangeRateServices.oer.updatePeriod);
                 expect(exchangeRate.rates).toBeNonEmptyObject();
-                expect(Object.keys(exchangeRate.rates).length).toBe(170);
+                expect(Object.keys(exchangeRate.rates).length).toBe(168);
 
                 done();
             })
