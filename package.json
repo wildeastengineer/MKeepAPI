@@ -1,6 +1,14 @@
 {
     "name": "mk-api",
     "main": "src/server.js",
+    "description": "Web API for MoneyKeeper",
+    "version": "0.3.0",
+    "author": "MK team",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/wildeastengineer/MKeepApi/issues"
+    },
+    "homepage": "https://github.com/wildeastengineer/MKeepApi#readme",
     "scripts": {
         "start": "NODE_ENV='prod' node src/server.js",
         "dev": "NODE_ENV='dev' nodemon src/server.js"
