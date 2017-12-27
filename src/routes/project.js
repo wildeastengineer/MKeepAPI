@@ -361,6 +361,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @param {String} body.type
      * @param {Number} body.value
      * @param {String} body.note
+     * @param {Date} body.date
      * @param {String} body.category
      * @param {String} body.accountSource
      * @param {String} body.accountDestination
@@ -368,7 +369,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/TransactionSchema} transaction - Created transaction.
      */
     router.post('/projects/:id/transactions', authenticate, (req, res, next) => {
-        const transactionParams = _.pick(req.body, 'type', 'value',
+        const transactionParams = _.pick(req.body, 'type', 'value', 'date',
             'note', 'category', 'accountSource', 'accountDestination');
 
         projectController.addTransaction({
@@ -398,6 +399,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @param {String} body.type
      * @param {Number} body.value
      * @param {String} body.note
+     * @param {Date} body.date
      * @param {String} body.category
      * @param {String} body.accountSource
      * @param {String} body.accountDestination
@@ -405,7 +407,7 @@ let ProjectRegisterRoutes = function (router, authenticate) {
      * @returns {models/TransactionSchema} transaction - Updated transaction.
      */
     router.patch('/projects/:id/transactions/:transactionId', authenticate, (req, res, next) => {
-        const transactionParams = _.pick(req.body, 'type', 'value',
+        const transactionParams = _.pick(req.body, 'type', 'value', 'date',
             'note', 'category', 'accountSource', 'accountDestination');
 
         projectController.updateTransaction({

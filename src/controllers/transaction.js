@@ -36,6 +36,7 @@ module.exports = {
      * @param {String} data.transaction.type
      * @param {Number} data.transaction.value
      * @param {String} data.transaction.note
+     * @param {Date} data.transaction.date
      * @param {?(ObjectId|String)} data.transaction.category
      * @param {?(ObjectId|String)} data.transaction.accountSource
      * @param {?(ObjectId|String)} data.transaction.accountDestination
@@ -58,6 +59,7 @@ module.exports = {
                     type: data.transaction.type,
                     value: data.transaction.value,
                     note: data.transaction.note,
+                    date: data.transaction.date,
                     category: data.transaction.category,
                     accountSource: data.transaction.accountSource,
                     accountDestination: data.transaction.accountDestination,
@@ -102,6 +104,7 @@ module.exports = {
      * @param {String} data.transaction.type
      * @param {Number} data.transaction.value
      * @param {String} data.transaction.note
+     * @param {Date} data.transaction.date
      * @param {?(ObjectId|String)} data.transaction.category
      * @param {?(ObjectId|String)} data.transaction.accountSource
      * @param {?(ObjectId|String)} data.transaction.accountDestination
@@ -125,6 +128,7 @@ module.exports = {
                     type: data.transaction.type,
                     value: data.transaction.value,
                     note: data.transaction.note,
+                    date: data.transaction.date,
                     category: data.transaction.category,
                     accountSource: data.transaction.accountSource,
                     accountDestination: data.transaction.accountDestination,
