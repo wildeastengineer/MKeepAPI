@@ -80,6 +80,14 @@ let TransactionSchema = new Schema({
     note: String,
 
     /**
+     * The transaction date.
+     *
+     * @type Date
+     * @memberof models/TransactionSchema
+     */
+    date: Date,
+
+    /**
      * The project link.
      *
      * @type ObjectId
